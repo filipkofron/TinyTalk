@@ -3,11 +3,24 @@
 
 class STObject;
 
+#include <map>
+#include <string>
+#include <memory>
+
 class STObject
 {
 private:
-    STObject *clazz;
-    STObject *data[];
+    std::shared_ptr<STObject> clazz;
+    std::map<std::string, std::shared_ptr<STObject> > data;
+
+public:
+    STObject();
+    ~STObject();
+    STObject(STObject &object);
+
+    std::shared_ptr<STObject> const &getClazz() const;
+
+    void setClazz(std::shared_ptr<STObject> const &clazz);
 };
 
 #endif
