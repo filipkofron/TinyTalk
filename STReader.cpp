@@ -1,25 +1,53 @@
 #include "STReader.h"
 
-void STReader::read(std::istream &is)
+STReader::STReader(std::shared_ptr<std::istream> is)
+    : is(is)
 {
 
 }
 
-void STReader::read(const std::string &str)
+int STReader::read()
 {
+    int ret;
 
-}
-
-
-bool STReader::isWhitespace(const int &c)
-{
-    switch(c)
+    if(!buffer.empty())
     {
-        case '\t':
-        case ' ':
-        case '\n':
-            return true;
+        ret = buffer.top();
+        buffer.pop();
+        return ret;
     }
 
-    return false;
+    ret = is->get();
+
+    if(is->fail())
+    {
+        ret = EOF;
+    }
+
+    return ret;
+}
+
+int STReader::peek()
+{
+    int ret;
+    if(!buffer.empty())
+    {
+        ret = buffer.top();
+        return ret;
+    }
+
+    ret = (int) is->get();
+
+    if(is->fail())
+    {
+        return EOF;
+    }
+
+    buffer.push(ret);
+    return ret;
+}
+
+void STReader::putBack(int c)
+{
+    buffer.push(c);
 }

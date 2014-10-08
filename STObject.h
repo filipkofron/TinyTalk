@@ -6,6 +6,7 @@ class STObject;
 #include <map>
 #include <string>
 #include <memory>
+#include "STMessage.h"
 
 class STObject
 {
@@ -21,6 +22,8 @@ public:
     std::shared_ptr<STObject> const &getClazz() const;
 
     void setClazz(std::shared_ptr<STObject> const &clazz);
+
+    virtual std::shared_ptr<STObject> sendMessage(STMessage &message);
 };
 
 #endif

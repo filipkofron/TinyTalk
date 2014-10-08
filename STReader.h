@@ -1,17 +1,23 @@
 #ifndef STREADER_H
-#define STREADER_h
+#define STREADER_H
 
 #include <istream>
-#include <string>
+#include <memory>
+#include <stack>
+
+class STReader;
 
 class STReader
 {
 private:
+    std::stack<int> buffer;
+    std::shared_ptr<std::istream> is;
 public:
-    void read(std::istream &is);
-    void read(const std::string &str);
+    STReader(std::shared_ptr<std::istream> is);
 
-    static bool isWhitespace(const int &c);
+    int read();
+    int peek();
+    void putBack(int c);
 };
 
 #endif
