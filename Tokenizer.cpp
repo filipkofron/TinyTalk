@@ -26,5 +26,22 @@ Tokenizer::Tokenizer(std::shared_ptr<STReader> reader)
 
 Token Tokenizer::readNextToken()
 {
-    throw TokenizerException(std::string("readNextToken NOT IMPLEMENTED:") + std::string(__FILE__) + std::string(":") + std::to_string(__LINE__));
+    //throw TokenizerException(std::string("readNextToken NOT IMPLEMENTED:") + std::string(__FILE__) + std::string(":") + std::to_string(__LINE__));
+
+    int c = 0;
+
+    Token token(Token::Type::INVALID, "");
+
+    do
+    {
+        c = reader->read();
+        switch(c)
+        {
+            case EOF:
+                return token;
+        }
+
+    } while(true);
+
+    return token;
 }

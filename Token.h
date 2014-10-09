@@ -24,12 +24,14 @@ public:
     };
 
 private:
-    std::string value;
     Type type;
+    std::string value;
 
 public:
-    const std::string &getValue();
+    Token(const Type &type, const std::string &value);
+
     const Type &getType();
+    const std::string &getValue();
 };
 
 #endif
