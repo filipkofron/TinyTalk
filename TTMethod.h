@@ -1,13 +1,12 @@
 #ifndef STMETHOD_H
 #defien STMETHOD_H
 
-class STMethod;
+struct TTMethod;
 
 #include "STObject.h"
 
-class STMethod : public STObject
+struct TTMethod
 {
-private:
 
 };
 

@@ -5,15 +5,15 @@
 #include <memory>
 #include <stack>
 
-class STReader;
+class Reader;
 
-class STReader
+class Reader
 {
 private:
     std::stack<int> buffer;
     std::shared_ptr<std::istream> is;
 public:
-    STReader(std::shared_ptr<std::istream> is);
+    Reader(std::shared_ptr<std::istream> is);
 
     int read();
     int peek();

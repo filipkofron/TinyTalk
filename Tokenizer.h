@@ -3,7 +3,7 @@
 
 class Tokenizer;
 
-#include "STReader.h"
+#include "Reader.h"
 #include "Token.h"
 #include <memory>
 
@@ -12,9 +12,9 @@ class Tokenizer
 private:
     bool isWhitespace(const int &c);
     bool isDigit(const int &c);
-    std::shared_ptr<STReader> reader;
+    std::shared_ptr<Reader> reader;
 public:
-    Tokenizer(std::shared_ptr<STReader> reader);
+    Tokenizer(std::shared_ptr<Reader> reader);
     Token readNextToken();
 };
 

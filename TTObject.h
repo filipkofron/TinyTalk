@@ -1,29 +1,22 @@
 #ifndef STOBJECT_HPP
 #define STOBJECT_HPP
 
-class STObject;
+struct TTObject;
 
 #include <map>
 #include <string>
-#include <memory>
-#include "STMessage.h"
+#include "TTMessage.h"
+#include "SlotManager.h"
 
-class STObject
+struct TTObject
 {
-private:
-    std::shared_ptr<STObject> clazz;
-    std::map<std::string, std::shared_ptr<STObject> > data;
+    uint8_t flags;
+    uint16_t slotCount;
 
-public:
-    STObject();
-    ~STObject();
-    STObject(STObject &object);
+    SlotManager slotManager;
 
-    std::shared_ptr<STObject> const &getClazz() const;
-
-    void setClazz(std::shared_ptr<STObject> const &clazz);
-
-    virtual std::shared_ptr<STObject> sendMessage(STMessage &message);
+    void init();
+    void deinit();
 };
 
 #endif

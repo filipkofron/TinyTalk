@@ -2,7 +2,7 @@
 #include <sstream>
 #include <memory>
 
-#include "STReader.h"
+#include "Reader.h"
 #include "Tokenizer.h"
 #include "TokenizerException.h"
 
@@ -19,7 +19,7 @@ int main()
     std::shared_ptr<std::stringstream> ss(new std::stringstream);
     *ss << "Class print";
 
-    STReader reader(ss);
+    Reader reader(ss);
 
     std::cout << "Reading test input: " << std::endl;
     std::cout << "'";
@@ -32,7 +32,7 @@ int main()
     std::cout << "'" << std::endl;
 
     *ss << "Class print";
-    Tokenizer tokenizer(std::shared_ptr<STReader>(new STReader(ss)));
+    Tokenizer tokenizer(std::shared_ptr<Reader>(new Reader(ss)));
 
     try
     {

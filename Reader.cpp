@@ -1,12 +1,12 @@
-#include "STReader.h"
+#include "Reader.h"
 
-STReader::STReader(std::shared_ptr<std::istream> is)
+Reader::Reader(std::shared_ptr<std::istream> is)
     : is(is)
 {
 
 }
 
-int STReader::read()
+int Reader::read()
 {
     int ret;
 
@@ -27,7 +27,7 @@ int STReader::read()
     return ret;
 }
 
-int STReader::peek()
+int Reader::peek()
 {
     int ret;
     if(!buffer.empty())
@@ -47,7 +47,7 @@ int STReader::peek()
     return ret;
 }
 
-void STReader::putBack(int c)
+void Reader::putBack(int c)
 {
     buffer.push(c);
 }

@@ -19,7 +19,7 @@ bool Tokenizer::isDigit(const int &c)
     return c >= '0' && c <= '9';
 }
 
-Tokenizer::Tokenizer(std::shared_ptr<STReader> reader)
+Tokenizer::Tokenizer(std::shared_ptr<Reader> reader)
     : reader(reader)
 {
 }
