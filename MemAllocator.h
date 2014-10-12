@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstdlib>
 
 class MemAllocator
 {
@@ -13,6 +14,7 @@ public:
     ~MemAllocator();
 
     uint8_t *allocate(size_t bytes);
+    uint8_t *allocateString(const uint8_t *str);
     static MemAllocator *getDefault();
     static void initializeDefaultAllocator(size_t poolCapacity);
     static void cleanupDefaultAllocator();

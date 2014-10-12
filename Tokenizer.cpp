@@ -1,5 +1,6 @@
 #include "Tokenizer.h"
 #include "TokenizerException.h"
+#include <cstdio>
 
 bool Tokenizer::isWhitespace(const int &c)
 {

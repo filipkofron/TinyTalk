@@ -1,4 +1,5 @@
 #include "Reader.h"
+#include <cstdio>
 
 Reader::Reader(std::shared_ptr<std::istream> is)
     : is(is)

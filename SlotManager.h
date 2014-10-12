@@ -4,6 +4,9 @@
 struct SlotManager;
 
 #include "TTObject.h"
+#include <cstring>
+
+#define cmpName(a, b) strcmp((const char *) a, (const char *) b)
 
 struct SlotManager
 {
@@ -13,15 +16,17 @@ struct SlotManager
         TTObject *object;
     };
 
-    TTObject *slots;
+    // TODO: GC must find these slots
+    NamePair *slots;
+
+    size_t slotCount;
+    size_t slotsUsed;
 
     void init(size_t slotCount);
     void deinit();
 
-    void setSlotIndex(uint16_t idx, TTObject *object);
-    TTObject *getSlotIndex(uint16_t idx);
-
-    void setSlotName(const uint8_t *name, TTObject *object);
+    bool addSlotName(const uint8_t *name, TTObject *object);
+    bool setSlotName(const uint8_t *name, TTObject *object);
     TTObject *getSlotName(const uint8_t *name);
 };
 
