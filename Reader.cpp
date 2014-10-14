@@ -1,7 +1,7 @@
 #include "Reader.h"
 #include <cstdio>
 
-Reader::Reader(std::shared_ptr<std::istream> is)
+Reader::Reader(std::istream *is)
     : is(is)
 {
 

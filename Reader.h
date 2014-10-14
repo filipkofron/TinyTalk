@@ -11,9 +11,9 @@ class Reader
 {
 private:
     std::stack<int> buffer;
-    std::shared_ptr<std::istream> is;
+    std::istream *is;
 public:
-    Reader(std::shared_ptr<std::istream> is);
+    Reader(std::istream *is);
 
     int read();
     int peek();

@@ -24,7 +24,11 @@ MemAllocator::~MemAllocator()
 
 uint8_t *MemAllocator::allocate(size_t bytes)
 {
-    uint8_t *nextAddr = (uint8_t *) top;
+    uint8_t *nextAddr = pool + top;
+
+#ifdef DEBUG
+    std::cout << "MemAllocator::allocate(): called to allocate " << bytes << " bytes." << std::endl;
+#endif
 
     if ((top + bytes) < capacity)
     {
@@ -37,14 +41,19 @@ uint8_t *MemAllocator::allocate(size_t bytes)
 uint8_t *MemAllocator::allocateString(const uint8_t *str)
 {
     size_t size = strlen((const char *) str);
-    uint8_t *newStr = MemAllocator::getDefault()->allocate(sizeof(char) * (size + 1));
+    uint8_t *newStr = allocate(sizeof(char) * (size + 1));
     newStr[size] = '\0';
     return newStr;
 }
 
+TTObject *MemAllocator::allocateObject()
+{
+    return (TTObject *) allocate(sizeof(TTObject));
+}
+
 MemAllocator *MemAllocator::defaultAllocator = NULL;
 
-MemAllocator *MemAllocator::getDefault()
+MemAllocator *MemAllocator::getCurrent()
 {
     return defaultAllocator;
 }
