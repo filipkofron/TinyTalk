@@ -93,23 +93,23 @@ struct TTObject
     /**
     * Add a new field. Will return false if it alread exists.
     */
-    bool addField(const char *name, TTObject *object);
+    bool addField(const uint8_t *name, TTObject *object);
 
     /**
     * Returns true if the field name exists.
     */
-    bool hasField(const char *name);
+    bool hasField(const uint8_t *name);
 
     /**
     * Returns an object from field by given name or NULL if not found.
     */
-    TTObject *getField(const char *name);
+    TTObject *getField(const uint8_t *name);
 
     /**
     * Sets an object overwriting the old one, returns false and does nothing if
     * an old one is not found.
     */
-    bool setField(const char *name, TTObject *object);
+    bool setField(const uint8_t *name, TTObject *object);
 };
 
 #endif

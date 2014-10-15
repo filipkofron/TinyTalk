@@ -43,26 +43,58 @@ TTObject *TTObject::clone()
     return newObject;
 }
 
-bool TTObject::addField(const char *name, TTObject *object)
+bool TTObject::addField(const uint8_t *name, TTObject *object)
 {
-    // TODO: implement
-    throw std::exception();
+    if(TTObject::hasField(name))
+    {
+        return false;
+    }
+    MemAllocator *alloc = MemAllocator::getCurrent();
+    if(fieldCount == fieldCapacity)
+    {
+        fieldCapacity *= 2;
+        Field *newFields = (Field *) alloc->allocate(sizeof(Field) * fieldCapacity);
+        memcpy(newFields, fields, sizeof(Field) * fieldCount);
+        fields = newFields;
+    }
+    fields[fieldCount].name = alloc->allocateString(name);
+    fields[fieldCount].object = object;
+    fieldCount++;
 }
 
-bool TTObject::hasField(const char *name)
+bool TTObject::hasField(const uint8_t *name)
 {
-    // TODO: implement
-    throw std::exception();
+    for(uint32_t i = 0; i < fieldCount; i++)
+    {
+        if(COMPARE_NAME(name, fields[i].name) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
-TTObject *TTObject::getField(const char *name)
+TTObject *TTObject::getField(const uint8_t *name)
 {
-    // TODO: implement
-    throw std::exception();
+    for(uint32_t i = 0; i < fieldCount; i++)
+    {
+        if(COMPARE_NAME(name, fields[i].name) == 0)
+        {
+            return fields[i].object;
+        }
+    }
+    return NULL;
 }
 
-bool TTObject::setField(const char *name, TTObject *object)
+bool TTObject::setField(const uint8_t *name, TTObject *object)
 {
-    // TODO: implement
-    throw std::exception();
+    for(uint32_t i = 0; i < fieldCount; i++)
+    {
+        if(COMPARE_NAME(name, fields[i].name) == 0)
+        {
+            fields[i].object = object;
+            return true;
+        }
+    }
+    return false;
 }
