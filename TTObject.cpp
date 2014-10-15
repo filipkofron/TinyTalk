@@ -34,10 +34,31 @@ TTObject *TTObject::clone()
     memcpy(newObject, this, sizeof(*this));
     newObject->fields = (Field *) alloc->allocate(sizeof(Field) * fieldCapacity);
 
-    for(uint32_t i = 0; i < fieldCount; i++)
+    if(IS_LITERAL(newObject))
     {
-        newObject->fields[i].object = fields[i].object->clone();
-        newObject->fields[i].name = fields[i].name;
+        for(uint32_t i = 0; i < fieldCount; i++)
+        {
+            if(!*fields[i].name)
+            {
+                TTLiteral *lit = ((TTLiteral *) fields[i].object)->clone();
+
+                newObject->fields[i].object = (TTObject *) lit;
+                newObject->fields[i].name = fields[i].name;
+            }
+            else
+            {
+                newObject->fields[i].object = fields[i].object->clone();
+                newObject->fields[i].name = fields[i].name;
+            }
+        }
+    }
+    else
+    {
+        for(uint32_t i = 0; i < fieldCount; i++)
+        {
+            newObject->fields[i].object = fields[i].object->clone();
+            newObject->fields[i].name = fields[i].name;
+        }
     }
 
     return newObject;
@@ -45,6 +66,10 @@ TTObject *TTObject::clone()
 
 bool TTObject::addField(const uint8_t *name, TTObject *object)
 {
+    if(!*name)
+    {
+        return false;
+    }
     if(TTObject::hasField(name))
     {
         return false;
@@ -64,6 +89,10 @@ bool TTObject::addField(const uint8_t *name, TTObject *object)
 
 bool TTObject::hasField(const uint8_t *name)
 {
+    if(!*name)
+    {
+        return false;
+    }
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(COMPARE_NAME(name, fields[i].name) == 0)
@@ -76,6 +105,10 @@ bool TTObject::hasField(const uint8_t *name)
 
 TTObject *TTObject::getField(const uint8_t *name)
 {
+    if(!*name)
+    {
+        return NULL;
+    }
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(COMPARE_NAME(name, fields[i].name) == 0)
@@ -88,6 +121,10 @@ TTObject *TTObject::getField(const uint8_t *name)
 
 bool TTObject::setField(const uint8_t *name, TTObject *object)
 {
+    if(!*name)
+    {
+        return false;
+    }
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(COMPARE_NAME(name, fields[i].name) == 0)
@@ -96,5 +133,30 @@ bool TTObject::setField(const uint8_t *name, TTObject *object)
             return true;
         }
     }
+    return false;
+}
+
+TTLiteral *TTObject::getLiteral()
+{
+    for(uint32_t i = 0; i < fieldCount; i++)
+    {
+        if(!*fields[i].name)
+        {
+            return (TTLiteral *) fields[i].object;
+        }
+    }
+    return NULL;
+}
+
+bool TTObject::setLiteral(TTLiteral *lit)
+{
+    for(uint32_t i = 0; i < fieldCount; i++)
+    {
+        if(!*fields[i].name)
+        {
+            fields[i].object = (TTObject *) lit;
+        }
+    }
+
     return false;
 }

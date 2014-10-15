@@ -51,6 +51,11 @@ TTObject *MemAllocator::allocateObject()
     return (TTObject *) allocate(sizeof(TTObject));
 }
 
+TTLiteral *MemAllocator::allocateLiteral()
+{
+    return (TTLiteral *) allocate(sizeof(TTLiteral));
+}
+
 MemAllocator *MemAllocator::defaultAllocator = NULL;
 
 MemAllocator *MemAllocator::getCurrent()

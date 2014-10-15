@@ -17,27 +17,31 @@ void testReader()
     //*ss << "Class print";
     //
 
-    std::cout << "Reading test input: " << std::endl;
     std::cout << "> ";
     std::flush(std::cout);
 
     Tokenizer tokenizer(std::shared_ptr<Reader>(new Reader(&std::cin)));
 
-    try
+    Token token;
+    do
     {
-        std::cout << "test token: " << tokenizer.readNextToken().getType() << std::endl;
-    }
-    catch(TokenizerException &e)
-    {
-        std::cerr << "Caught exception: " << e.what() << std::endl;
-    }
-
+        try
+        {
+            token = tokenizer.readNextToken();
+            std::cout << "Got token: " << token.getTypeInfo()
+                    << ": " << token.getValue() << std::endl;
+        }
+        catch (TokenizerException &e)
+        {
+            std::cerr << "Caught exception: " << e.what() << std::endl;
+            break;
+        }
+    } while(token.getType() != Token::TEOF);
 }
 
 void testObjects()
 {
     MemAllocator memAllocator(1024);
-
     std::cout << "testObjects(): creating object." << std::endl;
     TTObject *object = TTObject::createObject(OBJECT_MASK);
     std::cout << "testObjects(): creating object copy." << std::endl;
@@ -56,7 +60,7 @@ int main()
 
     testReader();
 
-    testObjects();
+    //testObjects();
 
     std::cout << ">> TESTS Done." << std::endl;
     MemAllocator::cleanupDefaultAllocator();

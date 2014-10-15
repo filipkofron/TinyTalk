@@ -1,11 +1,12 @@
-#ifndef STOBJECT_HPP
-#define STOBJECT_HPP
+#ifndef TTOBJECT_H
+#define TTOBJECT_H
 
 struct TTObject;
 
 #include <map>
 #include <string>
 #include "MemAllocator.h"
+#include "TTLiteral.h"
 
 #define DEFAULT_FIELD_COUNT 8
 
@@ -110,6 +111,17 @@ struct TTObject
     * an old one is not found.
     */
     bool setField(const uint8_t *name, TTObject *object);
+
+    /**
+    * Returns an object from field by given name or NULL if not found.
+    */
+    TTLiteral *getLiteral();
+
+    /**
+    * Sets an object overwriting the old one, returns false and does nothing if
+    * an old one is not found.
+    */
+    bool setLiteral(TTLiteral *object);
 };
 
 #endif

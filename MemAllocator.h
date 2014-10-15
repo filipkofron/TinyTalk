@@ -6,6 +6,7 @@ class MemAllocator;
 #include <cstdint>
 #include <cstdlib>
 #include "TTObject.h"
+#include "TTLiteral.h"
 
 // The mem allocator allocated memory from a pre-allocated pool it guarantees
 // that the allocated memory segment will be initialized with zeros.
@@ -24,6 +25,7 @@ public:
     uint8_t *allocate(size_t bytes);
     uint8_t *allocateString(const uint8_t *str);
     TTObject *allocateObject();
+    TTLiteral *allocateLiteral();
     static MemAllocator *getCurrent();
     static void initializeDefaultAllocator(size_t poolCapacity);
     static void cleanupDefaultAllocator();

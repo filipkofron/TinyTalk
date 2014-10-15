@@ -1,6 +1,8 @@
+#include "common.h"
 #include "Tokenizer.h"
 #include "TokenizerException.h"
 #include <cstdio>
+#include <iostream>
 
 bool Tokenizer::isWhitespace(const int &c)
 {
@@ -15,9 +17,135 @@ bool Tokenizer::isWhitespace(const int &c)
     return false;
 }
 
+bool Tokenizer::isLetter(const int &c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+bool Tokenizer::isSymbol(const int &c)
+{
+    return isSymbolStart(c) || isDigit(c);
+}
+
+bool Tokenizer::isSymbolStart(const int &c)
+{
+    return isLetter(c) || c == '_';
+}
+
 bool Tokenizer::isDigit(const int &c)
 {
     return c >= '0' && c <= '9';
+}
+
+bool Tokenizer::isString(const int &c)
+{
+    return c == '"';
+}
+
+bool Tokenizer::isCharacter(const int &c)
+{
+    return c == '\'';
+}
+
+bool Tokenizer::isEndOfFile(const int &c)
+{
+    return c == EOF;
+}
+
+std::string Tokenizer::readInteger()
+{
+    std::string val;
+    while(isDigit(reader->peek()))
+    {
+        val += (char) reader->read();
+    }
+
+    return val;
+}
+
+std::string Tokenizer::readSymbol()
+{
+    std::string val;
+    while(isSymbol(reader->peek()))
+    {
+        val += (char) reader->read();
+    }
+
+    return val;
+}
+
+std::string Tokenizer::readString()
+{
+    std::string val;
+    reader->read(); // eat "
+    for(;;)
+    {
+        int c = reader->peek();
+
+#ifdef DEBUG
+        std::cout << DEBUG_TOKENIZER_MSG << "readString: '" << c << "'" << std::endl;
+#endif
+
+        if(c == '\"')
+        {
+            reader->read();
+            break;
+        }
+
+        if(c == EOF)
+        {
+            break;
+        }
+
+        val += c;
+        reader->read();
+    }
+    return val;
+}
+
+std::string Tokenizer::readCharacter()
+{
+    std::string val;
+    reader->read(); // eat '
+    for(;;)
+    {
+        int c = reader->peek();
+
+        if(c == '\'')
+        {
+            reader->read();
+            break;
+        }
+
+        if(c == EOF)
+        {
+            break;
+        }
+
+        val += c;
+        reader->read();
+        break;
+    }
+    if(reader->peek() == '\'')
+    {
+        reader->read();
+    }
+    else
+    {
+        throw TokenizerException("Invalid character format. Missing the ' probably.");
+    }
+    return val;
+}
+
+void Tokenizer::eatWhitespace()
+{
+    while(isWhitespace(reader->peek()))
+    {
+#ifdef DEBUG
+        std::cout << DEBUG_TOKENIZER_MSG << "good whitespace." << std::endl;
+#endif
+        reader->read();
+    }
 }
 
 Tokenizer::Tokenizer(std::shared_ptr<Reader> reader)
@@ -35,13 +163,52 @@ Token Tokenizer::readNextToken()
 
     do
     {
-        c = reader->read();
-        switch(c)
+        c = reader->peek();
+
+        std::cout << DEBUG_TOKENIZER_MSG << "got '" << c << "'" << std::endl;
+
+        if(isWhitespace(c))
         {
-            case EOF:
-                return token;
+            eatWhitespace();
+            continue;
         }
 
+        if(isDigit(c))
+        {
+            token = Token(Token::Type::INTEGER, readInteger());
+            break;
+        }
+
+        if(isSymbolStart(c))
+        {
+            token = Token(Token::Type::SYMBOL, readSymbol());
+            break;
+        }
+
+        if(isString(c))
+        {
+            token = Token(Token::Type::STRING, readString());
+            break;
+        }
+
+        if(isCharacter(c))
+        {
+            token = Token(Token::Type::CHARACTER, readCharacter());
+            break;
+        }
+
+        if(isEndOfFile(c))
+        {
+            reader->read();
+            token = Token(Token::Type::TEOF, "");
+            break;
+        }
+
+#ifdef DEBUG
+        std::cout << DEBUG_TOKENIZER_MSG << "just got '" << c << "'" << std::endl;
+#endif
+        reader->read();
+        return token;
     } while(true);
 
     return token;
