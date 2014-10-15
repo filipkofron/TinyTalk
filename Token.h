@@ -5,7 +5,7 @@ class Token;
 
 #include <string>
 
-const static char *TypeStrings[11] =
+const static char *TypeStrings[14] =
 {
         "SYMBOL",
         "INTEGER",
@@ -18,6 +18,9 @@ const static char *TypeStrings[11] =
         "BLOCK_CLOSE",
         "INVALID",
         "EOF",
+        "EXPRESSION_END",
+        "RETURN",
+        "VERTICAL_BAR",
 };
 
 class Token
@@ -35,7 +38,10 @@ public:
         BLOCK_OPEN = 7,
         BLOCK_CLOSE = 8,
         INVALID = 9,
-        TEOF = 10
+        TEOF = 10,
+        EXPRESSION_END = 11,
+        RETURN = 12,
+        VERTICAL_BAR = 13
     };
 
 private:

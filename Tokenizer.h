@@ -25,6 +25,9 @@ private:
     bool isParenthesisClose(const int &c);
     bool isBlockOpen(const int &c);
     bool isBlockClose(const int &c);
+    bool isExpressionEnd(const int &c);
+    bool isReturn(const int &c);
+    bool isVerticalBar(const int &c);
     std::string readInteger();
     std::string readSymbol();
     std::string readString();
@@ -34,11 +37,17 @@ private:
     void readParenthesisClose();
     void readBlockOpen();
     void readBlockClose();
+    void readExpressionEnd();
+    void readReturn();
+    void readVerticalBar();
     void eatWhitespace();
+
     std::shared_ptr<Reader> reader;
+    bool reachedEOF;
 public:
     Tokenizer(std::shared_ptr<Reader> reader);
     Token readNextToken();
+    bool hasReachedEOF();
 };
 
 #endif

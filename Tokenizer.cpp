@@ -92,6 +92,16 @@ bool Tokenizer::isBlockClose(const int &c)
     return c == ']';
 }
 
+bool Tokenizer::isExpressionEnd(const int &c)
+{
+    return c == ';';
+}
+
+bool Tokenizer::isReturn(const int &c)
+{
+    return c == '^';
+}
+
 std::string Tokenizer::readInteger()
 {
     std::string val;
@@ -198,6 +208,11 @@ void Tokenizer::readBlockClose()
     reader->read();
 }
 
+void Tokenizer::readExpressionEnd()
+{
+    reader->read();
+}
+
 void Tokenizer::eatWhitespace()
 {
     while(isWhitespace(reader->peek()))
@@ -207,7 +222,7 @@ void Tokenizer::eatWhitespace()
 }
 
 Tokenizer::Tokenizer(std::shared_ptr<Reader> reader)
-    : reader(reader)
+    : reader(reader), reachedEOF(false)
 {
 }
 
@@ -288,10 +303,32 @@ Token Tokenizer::readNextToken()
             break;
         }
 
+        if(isExpressionEnd(c))
+        {
+            readExpressionEnd();
+            token = Token(Token::Type::EXPRESSION_END);
+            break;
+        }
+
+        if(isReturn(c))
+        {
+            readReturn();
+            token = Token(Token::Type::RETURN);
+            break;
+        }
+
+        if(isVerticalBar(c))
+        {
+            readVerticalBar();
+            token = Token(Token::Type::VERTICAL_BAR);
+            break;
+        }
+
         if(isEndOfFile(c))
         {
             reader->read();
-            token = Token(Token::Type::TEOF, "");
+            token = Token(Token::Type::TEOF);
+            reachedEOF = true;
             break;
         }
 
@@ -303,4 +340,9 @@ Token Tokenizer::readNextToken()
     } while(true);
 
     return token;
+}
+
+bool Tokenizer::hasReachedEOF()
+{
+    return reachedEOF;
 }

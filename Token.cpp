@@ -43,6 +43,9 @@ const char *Token::getTypeInfo()
         case Type::BLOCK_CLOSE:
         case Type::INVALID:
         case Type::TEOF:
+        case Type::EXPRESSION_END:
+        case Type::RETURN:
+        case Type::VERTICAL_BAR:
             return TypeStrings[getType()];
         default:
             return "Unknown";
