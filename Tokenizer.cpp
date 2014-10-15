@@ -29,7 +29,22 @@ bool Tokenizer::isSymbol(const int &c)
 
 bool Tokenizer::isSymbolStart(const int &c)
 {
-    return isLetter(c) || c == '_';
+    if(isLetter(c))
+    {
+        return true;
+    }
+
+    const char *allowedChars = "_+-/*^&~!";
+
+    while(*allowedChars)
+    {
+        if(*allowedChars++ == (char) c)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool Tokenizer::isDigit(const int &c)
@@ -50,6 +65,31 @@ bool Tokenizer::isCharacter(const int &c)
 bool Tokenizer::isEndOfFile(const int &c)
 {
     return c == EOF;
+}
+
+bool Tokenizer::isAssignment(const int &c)
+{
+    return c == '=';
+}
+
+bool Tokenizer::isParenthesisOpen(const int &c)
+{
+    return c == '(';
+}
+
+bool Tokenizer::isParenthesisClose(const int &c)
+{
+    return c == ')';
+}
+
+bool Tokenizer::isBlockOpen(const int &c)
+{
+    return c == '[';
+}
+
+bool Tokenizer::isBlockClose(const int &c)
+{
+    return c == ']';
 }
 
 std::string Tokenizer::readInteger()
@@ -81,10 +121,6 @@ std::string Tokenizer::readString()
     for(;;)
     {
         int c = reader->peek();
-
-#ifdef DEBUG
-        std::cout << DEBUG_TOKENIZER_MSG << "readString: '" << c << "'" << std::endl;
-#endif
 
         if(c == '\"')
         {
@@ -137,13 +173,35 @@ std::string Tokenizer::readCharacter()
     return val;
 }
 
+void Tokenizer::readAssignment()
+{
+    reader->read();
+}
+
+void Tokenizer::readParenthesisOpen()
+{
+    reader->read();
+}
+
+void Tokenizer::readParenthesisClose()
+{
+    reader->read();
+}
+
+void Tokenizer::readBlockOpen()
+{
+    reader->read();
+}
+
+void Tokenizer::readBlockClose()
+{
+    reader->read();
+}
+
 void Tokenizer::eatWhitespace()
 {
     while(isWhitespace(reader->peek()))
     {
-#ifdef DEBUG
-        std::cout << DEBUG_TOKENIZER_MSG << "good whitespace." << std::endl;
-#endif
         reader->read();
     }
 }
@@ -164,8 +222,6 @@ Token Tokenizer::readNextToken()
     do
     {
         c = reader->peek();
-
-        std::cout << DEBUG_TOKENIZER_MSG << "got '" << c << "'" << std::endl;
 
         if(isWhitespace(c))
         {
@@ -194,6 +250,41 @@ Token Tokenizer::readNextToken()
         if(isCharacter(c))
         {
             token = Token(Token::Type::CHARACTER, readCharacter());
+            break;
+        }
+
+        if(isAssignment(c))
+        {
+            readAssignment();
+            token = Token(Token::Type::ASSIGNMENT);
+            break;
+        }
+
+        if(isParenthesisOpen(c))
+        {
+            readParenthesisOpen();
+            token = Token(Token::Type::PARENTHESIS_OPEN);
+            break;
+        }
+
+        if(isParenthesisClose(c))
+        {
+            readParenthesisClose();
+            token = Token(Token::Type::PARENTHESIS_CLOSE);
+            break;
+        }
+
+        if(isBlockOpen(c))
+        {
+            readBlockOpen();
+            token = Token(Token::Type::BLOCK_OPEN);
+            break;
+        }
+
+        if(isBlockClose(c))
+        {
+            readBlockClose();
+            token = Token(Token::Type::BLOCK_CLOSE);
             break;
         }
 

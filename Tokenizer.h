@@ -20,10 +20,20 @@ private:
     bool isString(const int &c);
     bool isCharacter(const int &c);
     bool isEndOfFile(const int &c);
+    bool isAssignment(const int &c);
+    bool isParenthesisOpen(const int &c);
+    bool isParenthesisClose(const int &c);
+    bool isBlockOpen(const int &c);
+    bool isBlockClose(const int &c);
     std::string readInteger();
     std::string readSymbol();
     std::string readString();
     std::string readCharacter();
+    void readAssignment();
+    void readParenthesisOpen();
+    void readParenthesisClose();
+    void readBlockOpen();
+    void readBlockClose();
     void eatWhitespace();
     std::shared_ptr<Reader> reader;
 public:

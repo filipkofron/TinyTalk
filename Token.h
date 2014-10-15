@@ -7,16 +7,16 @@ class Token;
 
 const static char *TypeStrings[11] =
 {
-        "Symbol",
-        "Integer",
-        "String",
-        "Assignment",
-        "Character",
-        "ParenthesisOpen",
-        "ParenthesisClose",
-        "BlockOpen",
-        "BlockClose",
-        "Invalid",
+        "SYMBOL",
+        "INTEGER",
+        "STRING",
+        "ASSIGNMENT",
+        "CHARACTER",
+        "PARENTHESIS_OPEN",
+        "PARENTHESIS_CLOSE",
+        "BLOCK_OPEN",
+        "BLOCK_CLOSE",
+        "INVALID",
         "EOF",
 };
 

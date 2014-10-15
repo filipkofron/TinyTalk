@@ -17,9 +17,6 @@ void testReader()
     //*ss << "Class print";
     //
 
-    std::cout << "> ";
-    std::flush(std::cout);
-
     Tokenizer tokenizer(std::shared_ptr<Reader>(new Reader(&std::cin)));
 
     Token token;
@@ -27,16 +24,18 @@ void testReader()
     {
         try
         {
+            std::cout << "> ";
+            std::flush(std::cout);
             token = tokenizer.readNextToken();
             std::cout << "Got token: " << token.getTypeInfo()
-                    << ": " << token.getValue() << std::endl;
+                    << ": '" << token.getValue() << "'" << std::endl;
         }
         catch (TokenizerException &e)
         {
             std::cerr << "Caught exception: " << e.what() << std::endl;
             break;
         }
-    } while(token.getType() != Token::TEOF);
+    } while(token.getType() != Token::TEOF || token.getType() == Token::INVALID);
 }
 
 void testObjects()
