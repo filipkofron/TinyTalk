@@ -102,6 +102,11 @@ bool Tokenizer::isReturn(const int &c)
     return c == '^';
 }
 
+bool Tokenizer::isVerticalBar(const int &c)
+{
+    return c == '|';
+}
+
 std::string Tokenizer::readInteger()
 {
     std::string val;
@@ -209,6 +214,16 @@ void Tokenizer::readBlockClose()
 }
 
 void Tokenizer::readExpressionEnd()
+{
+    reader->read();
+}
+
+void Tokenizer::readVerticalBar()
+{
+    reader->read();
+}
+
+void Tokenizer::readReturn()
 {
     reader->read();
 }

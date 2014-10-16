@@ -25,7 +25,7 @@ TTLiteral *TTLiteral::clone()
 
 TTObject *TTLiteral::onMessage(TTObject *object)
 {
-
+    return TTObject::createObject(TT_NIL);
 }
 
 TTLiteral *TTLiteral::createStringLiteral(uint32_t length)

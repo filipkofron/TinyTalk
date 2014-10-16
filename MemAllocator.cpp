@@ -17,7 +17,7 @@ MemAllocator::MemAllocator(size_t poolCapacity)
 MemAllocator::~MemAllocator()
 {
 #ifdef DEBUG
-    std::cout << "~MemAllocator(): " << top << " bytes allocated" << std::endl;
+    std::cout << "~MemAllocator(): " << std::dec << top << " bytes allocated" << std::endl;
 #endif
     free(pool);
 }

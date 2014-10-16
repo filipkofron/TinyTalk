@@ -5,6 +5,7 @@ struct TTObject;
 
 #include <map>
 #include <string>
+#include <iostream>
 #include "MemAllocator.h"
 #include "TTLiteral.h"
 
@@ -12,23 +13,25 @@ struct TTObject;
 
 #define COMPARE_NAME(a, b) strcmp((const char *) a, (const char *) b)
 
-#define OBJECT_MASK 0x01
-#define METHOD_MASK 0x02
-#define EXPR_MASK 0x04
-#define LITERAL_MASK 0x08
-#define SYMBOL_MASK 0x10
-#define ENV_MASK 0x20
-#define MESSAGE_MASK 0x20
+#define TT_NIL 0x00
+#define TT_OBJECT 0x01
+#define TT_METHOD 0x02
+#define TT_EXPR 0x04
+#define TT_LITERAL 0x08
+#define TT_SYMBOL 0x10
+#define TT_ENV 0x20
+#define TT_MESSAGE 0x20
 
-#define IS_SOME_TYPE(a, b) (!(!((a)->flags & b)))
+#define IS_SOME_TYPE(a, b) (!(!((a)->flags == b)))
 
-#define IS_OBJECT(a) IS_SOME_TYPE(a, OBJECT_MASK)
-#define IS_METHOD(a) IS_SOME_TYPE(a, METHOD_MASK)
-#define IS_EXPR(a) IS_SOME_TYPE(a, EXPR_MASK)
-#define IS_LITERAL(a) IS_SOME_TYPE(a, LITERAL_MASK)
-#define IS_SYMBOL(a) IS_SOME_TYPE(a, SYMBOL_MASK)
-#define IS_ENV(a) IS_SOME_TYPE(a, ENV_MASK)
-#define IS_MESSAGE(a) IS_SOME_TYPE(a, MESSAGE_MASK)
+#define IS_NIL(a) IS_SOME_TYPE(a, TT_NIL)
+#define IS_OBJECT(a) IS_SOME_TYPE(a, TT_OBJECT)
+#define IS_METHOD(a) IS_SOME_TYPE(a, TT_METHOD)
+#define IS_EXPR(a) IS_SOME_TYPE(a, TT_EXPR)
+#define IS_LITERAL(a) IS_SOME_TYPE(a, TT_LITERAL)
+#define IS_SYMBOL(a) IS_SOME_TYPE(a, TT_SYMBOL)
+#define IS_ENV(a) IS_SOME_TYPE(a, TT_ENV)
+#define IS_MESSAGE(a) IS_SOME_TYPE(a, TT_MESSAGE)
 
 
 /**
@@ -123,5 +126,10 @@ struct TTObject
     */
     bool setLiteral(TTLiteral *object);
 };
+
+/**
+* Outputs rich object info.
+*/
+std::ostream &operator << (std::ostream &os, TTObject *object);
 
 #endif

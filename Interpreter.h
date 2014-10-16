@@ -10,7 +10,7 @@ class Interpreter
 {
 private:
     TTObject *globalEnvironment;
-    Tokenizer tokenizer;
+    std::shared_ptr<Tokenizer> tokenizer;
 
 public:
     Interpreter(std::shared_ptr<Reader> &reader);

@@ -85,6 +85,8 @@ bool TTObject::addField(const uint8_t *name, TTObject *object)
     fields[fieldCount].name = alloc->allocateString(name);
     fields[fieldCount].object = object;
     fieldCount++;
+
+    return true;
 }
 
 bool TTObject::hasField(const uint8_t *name)
@@ -159,4 +161,37 @@ bool TTObject::setLiteral(TTLiteral *lit)
     }
 
     return false;
+}
+
+std::ostream &operator << (std::ostream &os, TTObject *object)
+{
+    os << "Object" << std::endl << "{" << std::endl;
+    if(!object)
+    {
+        os << "  Address: NULL";
+    }
+    else
+    {
+        os << "  Address: " << std::hex << (unsigned long long) object << std::endl;
+        const char *type = "INVALID OBJECT (Invalid flags)";
+        switch(object->flags)
+        {
+            case TT_NIL:
+                type = "NIL OBJECT";
+                break;
+            default:
+                break;
+        }
+        os << "  Type: " << type << std::endl;
+        os << "  Field count/capacity: " << object->fieldCount << "/" << object->fieldCapacity
+                << std::endl;
+        os << "  Fields:";
+        for(uint32_t i = 0; i < object->fieldCount; i++)
+        {
+            os << " '" << object->fields[i].name << "'";
+        }
+        os << std::endl;
+    }
+    os << "}";
+    return os;
 }

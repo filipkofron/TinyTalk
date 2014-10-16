@@ -1,11 +1,12 @@
 #include "Interpreter.h"
 #include "TokenizerException.h"
+#include "Parser.h"
 #include <iostream>
 
 Interpreter::Interpreter(std::shared_ptr<Reader> &reader)
-    : tokenizer(reader)
+    : tokenizer(new Tokenizer(reader))
 {
-    globalEnvironment = TTObject::createObject(ENV_MASK);
+    globalEnvironment = TTObject::createObject(TT_ENV);
 }
 
 Interpreter::~Interpreter()
@@ -15,6 +16,8 @@ Interpreter::~Interpreter()
 
 void Interpreter::startInterpreting()
 {
+    Parser parser(tokenizer);
+
     do
     {
         try
@@ -22,12 +25,14 @@ void Interpreter::startInterpreting()
             std::cout << "> ";
             std::flush(std::cout);
 
+            TTObject *expression = parser.parse();
 
+            std::cout << "Expression result: " << std::endl << expression << std::endl;
         }
         catch (TokenizerException &e)
         {
             std::cerr << "Caught exception: " << e.what() << std::endl;
             break;
         }
-    } while (!tokenizer.hasReachedEOF());
+    } while (!tokenizer->hasReachedEOF());
 }
