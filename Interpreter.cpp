@@ -1,3 +1,4 @@
+#include "common.h"
 #include "Interpreter.h"
 #include "TokenizerException.h"
 #include "Parser.h"
@@ -7,6 +8,11 @@ Interpreter::Interpreter(std::shared_ptr<Reader> &reader)
     : tokenizer(new Tokenizer(reader))
 {
     globalEnvironment = TTObject::createObject(TT_ENV);
+    globalEnvironment->addField(TO_TT_STR("parent"), TTObject::createObject(TT_NIL));
+
+    std::cout << "### test global env: " << globalEnvironment << std::endl;
+
+    std::cout << "### test field parent: " << globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
 }
 
 Interpreter::~Interpreter()

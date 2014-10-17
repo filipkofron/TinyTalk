@@ -46,6 +46,14 @@ uint8_t *MemAllocator::allocateString(const uint8_t *str)
     return newStr;
 }
 
+uint8_t *MemAllocator::cloneString(const uint8_t *str)
+{
+    uint8_t *newStr = allocateString(str);
+    strcpy((char *) newStr, (const char *) str);
+
+    return newStr;
+}
+
 TTObject *MemAllocator::allocateObject()
 {
     return (TTObject *) allocate(sizeof(TTObject));

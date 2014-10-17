@@ -11,20 +11,20 @@ TTObject *TTObject::copy(MemAllocator *allocator)
     return newObject;
 }
 
-TTObject *TTObject::createObject(uint8_t flags, uint32_t fieldsPreallocated)
+TTObject *TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
     TTObject *newObject = alloc->allocateObject();
     newObject->fields = (Field *) alloc->allocate(sizeof(Field) * fieldsPreallocated);
     newObject->fieldCapacity = fieldsPreallocated;
     newObject->fieldCount = 0;
-    newObject->flags = flags;
+    newObject->type = type;
     return newObject;
 }
 
-TTObject *TTObject::createObject(uint8_t flags)
+TTObject *TTObject::createObject(uint8_t type)
 {
-    return createObject(flags, DEFAULT_FIELD_COUNT);
+    return createObject(type, DEFAULT_FIELD_COUNT);
 }
 
 TTObject *TTObject::clone()
@@ -82,7 +82,7 @@ bool TTObject::addField(const uint8_t *name, TTObject *object)
         memcpy(newFields, fields, sizeof(Field) * fieldCount);
         fields = newFields;
     }
-    fields[fieldCount].name = alloc->allocateString(name);
+    fields[fieldCount].name = alloc->cloneString(name);
     fields[fieldCount].object = object;
     fieldCount++;
 
@@ -168,16 +168,19 @@ std::ostream &operator << (std::ostream &os, TTObject *object)
     os << "Object" << std::endl << "{" << std::endl;
     if(!object)
     {
-        os << "  Address: NULL";
+        os << "  Address: NULL" << std::endl;
     }
     else
     {
         os << "  Address: " << std::hex << (unsigned long long) object << std::endl;
-        const char *type = "INVALID OBJECT (Invalid flags)";
-        switch(object->flags)
+        const char *type = "INVALID OBJECT";
+        switch(object->type)
         {
             case TT_NIL:
                 type = "NIL OBJECT";
+                break;
+            case TT_EXPR:
+                type = "EXPRESSION";
                 break;
             default:
                 break;

@@ -22,7 +22,7 @@ struct TTObject;
 #define TT_ENV 0x20
 #define TT_MESSAGE 0x20
 
-#define IS_SOME_TYPE(a, b) (!(!((a)->flags == b)))
+#define IS_SOME_TYPE(a, b) (!(!((a)->type == b)))
 
 #define IS_NIL(a) IS_SOME_TYPE(a, TT_NIL)
 #define IS_OBJECT(a) IS_SOME_TYPE(a, TT_OBJECT)
@@ -32,7 +32,6 @@ struct TTObject;
 #define IS_SYMBOL(a) IS_SOME_TYPE(a, TT_SYMBOL)
 #define IS_ENV(a) IS_SOME_TYPE(a, TT_ENV)
 #define IS_MESSAGE(a) IS_SOME_TYPE(a, TT_MESSAGE)
-
 
 /**
 * TTObject is any object within this VM, that can be directly interfaced from
@@ -53,7 +52,7 @@ struct TTObject
     };
 
     /**
-    * FLAGS
+    * Types
     *
     * Object  :  value     ~   hexa
     * ====== == ======
@@ -66,6 +65,13 @@ struct TTObject
     * env     :  0010 0000 ~   0x20
     * message :  0100 0000 ~   0x40
     *
+    */
+    uint8_t type;
+
+    /**
+    * Type specific flags
+    *
+    * for EXPRESSION - see Expression.h
     */
     uint8_t flags;
 
@@ -81,8 +87,8 @@ struct TTObject
     /**
     * Objects must only be created using these functions.
     */
-    static TTObject *createObject(uint8_t flags, uint32_t fieldsPreallocated);
-    static TTObject *createObject(uint8_t flags);
+    static TTObject *createObject(uint8_t type, uint32_t fieldsPreallocated);
+    static TTObject *createObject(uint8_t type);
 
     /**
     * Create deep copy of the object. Field names will not be cloned though, but the objects will!

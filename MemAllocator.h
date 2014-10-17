@@ -24,6 +24,7 @@ public:
 
     uint8_t *allocate(size_t bytes);
     uint8_t *allocateString(const uint8_t *str);
+    uint8_t *cloneString(const uint8_t *str);
     TTObject *allocateObject();
     TTLiteral *allocateLiteral();
     static MemAllocator *getCurrent();
