@@ -34,7 +34,7 @@ bool Tokenizer::isSymbolStart(const int &c)
         return true;
     }
 
-    const char *allowedChars = "_+-/*^&~!";
+    const char *allowedChars = "_+-/*^&~!:";
 
     while(*allowedChars)
     {
@@ -241,7 +241,7 @@ Tokenizer::Tokenizer(std::shared_ptr<Reader> reader)
 {
 }
 
-Token Tokenizer::readNextToken()
+Token Tokenizer::reallyReadToken()
 {
     //throw TokenizerException(std::string("readNextToken NOT IMPLEMENTED:") + std::string(__FILE__) + std::string(":") + std::to_string(__LINE__));
 
@@ -355,6 +355,31 @@ Token Tokenizer::readNextToken()
     } while(true);
 
     return token;
+}
+
+Token Tokenizer::readToken()
+{
+    if(tokenBuffer.empty())
+    {
+        return reallyReadToken();
+    }
+    Token token = tokenBuffer.top();
+    tokenBuffer.pop();
+    return token;
+}
+
+void Tokenizer::putBackToken(Token token)
+{
+    tokenBuffer.push(token);
+}
+
+Token Tokenizer::peekToken()
+{
+    if(tokenBuffer.empty())
+    {
+        tokenBuffer.push(reallyReadToken());
+    }
+    return tokenBuffer.top();
 }
 
 bool Tokenizer::hasReachedEOF()

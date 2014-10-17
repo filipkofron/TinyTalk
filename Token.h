@@ -53,9 +53,9 @@ public:
     Token(const Type &type);
     Token(const Type &type, const std::string &value);
 
-    const Type &getType();
-    const std::string &getValue();
-    const char *getTypeInfo();
+    const Type &getType() const ;
+    const std::string &getValue() const;
+    const char *getTypeInfo() const;
 };
 
 #endif

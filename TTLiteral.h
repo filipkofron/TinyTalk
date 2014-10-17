@@ -3,6 +3,7 @@
 
 struct TTLiteral;
 
+#include <vector>
 #include "TTObject.h"
 #include "MemAllocator.h"
 
@@ -25,9 +26,18 @@ struct TTLiteral
 
     TTObject *onMessage(TTObject *object);
 
-    TTLiteral *createStringLiteral(uint32_t length);
-    TTLiteral *createIntegerLiteral();
-    TTLiteral *createObjectArray(uint32_t size);
+    const char *getTypeInfo();
+
+    void printValue(std::ostream &os);
+
+    static TTLiteral *createStringLiteral(uint32_t length);
+    static TTLiteral *createStringLiteral(const uint8_t *str);
+
+    static TTLiteral *createIntegerLiteral();
+    static TTLiteral *createIntegerLiteral(const int32_t &value);
+
+    static TTLiteral *createObjectArray(uint32_t size);
+    static TTLiteral *createObjectArray(const std::vector<TTObject *> &objects);
 };
 
 #endif

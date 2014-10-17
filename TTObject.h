@@ -131,6 +131,16 @@ struct TTObject
     * an old one is not found.
     */
     bool setLiteral(TTLiteral *object);
+
+    /**
+    * Prints the object to a human readable format.
+    */
+    void print(std::ostream &os, uint32_t level, bool recursive);
+
+    /**
+    * Prints level spaces in front of a printed line.
+    */
+    void prlvl(std::ostream &os, uint32_t level);
 };
 
 /**

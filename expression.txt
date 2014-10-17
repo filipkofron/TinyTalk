@@ -1,0 +1,28 @@
+expression -> ( expression )
+expression -> #symbol
+expression -> ^ expression
+expressopm -> expression ; expression ; expression..
+expression -> #symbol #symbol
+
+
+///////////////////////////////
+
+test = test2;
+===================
+
+expr
+(
+	assign(test, expr(test2))
+)
+
+////////////////////////////////
+
+test msg;
+===================
+
+expr
+{
+	sendSimpleMessage(test, )
+}
+
+

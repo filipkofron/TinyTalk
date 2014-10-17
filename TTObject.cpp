@@ -1,4 +1,6 @@
 #include "TTObject.h"
+#include "Expression.h"
+#include "common.h"
 #include <cstring>
 
 TTObject *TTObject::copy(MemAllocator *allocator)
@@ -140,6 +142,11 @@ bool TTObject::setField(const uint8_t *name, TTObject *object)
 
 TTLiteral *TTObject::getLiteral()
 {
+    if(type != TT_LITERAL)
+    {
+        std::cerr << "Object is not literal: Cannot get literal value!" << std::endl;
+        throw  std::exception();
+    }
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(!*fields[i].name)
@@ -152,49 +159,150 @@ TTLiteral *TTObject::getLiteral()
 
 bool TTObject::setLiteral(TTLiteral *lit)
 {
+    if(type != TT_LITERAL)
+    {
+        std::cerr << "Object is not literal: Cannot set literal value!" << std::endl;
+        throw  std::exception();
+    }
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(!*fields[i].name)
         {
             fields[i].object = (TTObject *) lit;
+            return true;
         }
     }
 
-    return false;
+    MemAllocator *alloc = MemAllocator::getCurrent();
+    if(fieldCount == fieldCapacity)
+    {
+        fieldCapacity *= 2;
+        Field *newFields = (Field *) alloc->allocate(sizeof(Field) * fieldCapacity);
+        memcpy(newFields, fields, sizeof(Field) * fieldCount);
+        fields = newFields;
+    }
+    fields[fieldCount].name = alloc->cloneString(TO_TT_STR(""));
+    fields[fieldCount].object = (TTObject *) lit;
+    fieldCount++;
+
+    return true;
+}
+
+void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
+{
+    os << "Object" << std::endl;
+    prlvl(os, level - 1);
+    os << "{" << std::endl;
+
+    prlvl(os, level);
+    os << "Address: " << (unsigned long long) this << std::endl;
+    const char *type = "INVALID OBJECT";
+    switch(this->type)
+    {
+        case TT_NIL:
+            type = "NIL OBJECT";
+            break;
+        case TT_EXPR:
+            type = "EXPRESSION";
+            break;
+        case TT_LITERAL:
+            type = "LITERAL";
+            break;
+        default:
+            break;
+    }
+    prlvl(os, level);
+    os << "Type: " << type << std::endl;
+    switch(this->type)
+    {
+        case TT_EXPR:
+            prlvl(os, level);
+            os << "Expression type: " << Expression::getTypeInfo(this) << std::endl;
+            break;
+        case TT_LITERAL:
+            if(this->getLiteral())
+            {
+                prlvl(os, level);
+                os << "Literal type: " << this->getLiteral()->getTypeInfo() << std::endl;
+            }
+            else
+            {
+                prlvl(os, level);
+                os << "ERROR: literal is NULL!" << std::endl;
+                throw std::exception();
+            }
+            break;
+        default:
+            break;
+    }
+    prlvl(os, level);
+    os << "Field count/capacity: " << this->fieldCount << "/" << this->fieldCapacity
+            << std::endl;
+    prlvl(os, level);
+    os << "Fields:";
+    for(uint32_t i = 0; i < this->fieldCount; i++)
+    {
+        os << " '" << this->fields[i].name << "'";
+    }
+    os << std::endl;
+
+    for(uint32_t i = 0; i < this->fieldCount; i++)
+    {
+        if(*this->fields[i].name)
+        {
+            if(this->fields[i].object)
+            {
+                prlvl(os, level);
+                os << "[" << this->fields[i].name << "]" << " -> ";
+                this->fields[i].object->print(os, level + 1, recursive);
+                os << std::endl;
+            }
+            else
+            {
+                prlvl(os, level);
+                os << "[" << this->fields[i].name << "]" << " -> "
+                        << this->fields[i].object << std::endl;
+            }
+        }
+        else
+        {
+            prlvl(os, level);
+            os << "[" << this->fields[i].name << "]" << " -> " << "LITERAL <";
+            if(this->getLiteral())
+            {
+                this->getLiteral()->printValue(os);
+            }
+            else
+            {
+                os << "ERROR NULL !!!" << std::endl;
+            }
+            os << "> " << std::endl;
+        }
+    }
+    prlvl(os, level - 1);
+    os << "}";
+}
+
+void TTObject::prlvl(std::ostream &os, uint32_t level)
+{
+    for(uint32_t i = 0; i < level * 2; i++)
+    {
+        os << " ";
+    }
 }
 
 std::ostream &operator << (std::ostream &os, TTObject *object)
 {
-    os << "Object" << std::endl << "{" << std::endl;
     if(!object)
     {
+        os << "Object" << std::endl << "{" << std::endl;
         os << "  Address: NULL" << std::endl;
+        os << "}";
     }
     else
     {
-        os << "  Address: " << std::hex << (unsigned long long) object << std::endl;
-        const char *type = "INVALID OBJECT";
-        switch(object->type)
-        {
-            case TT_NIL:
-                type = "NIL OBJECT";
-                break;
-            case TT_EXPR:
-                type = "EXPRESSION";
-                break;
-            default:
-                break;
-        }
-        os << "  Type: " << type << std::endl;
-        os << "  Field count/capacity: " << object->fieldCount << "/" << object->fieldCapacity
-                << std::endl;
-        os << "  Fields:";
-        for(uint32_t i = 0; i < object->fieldCount; i++)
-        {
-            os << " '" << object->fields[i].name << "'";
-        }
-        os << std::endl;
+        object->print(os, 1, false);
     }
-    os << "}";
+
     return os;
 }

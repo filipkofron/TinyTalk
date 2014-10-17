@@ -18,17 +18,17 @@ Token::Token(const Type &type, const std::string &value)
 
 }
 
-const Token::Type &Token::getType()
+const Token::Type &Token::getType() const
 {
     return type;
 }
 
-const std::string &Token::getValue()
+const std::string &Token::getValue() const
 {
     return value;
 }
 
-const char *Token::getTypeInfo()
+const char *Token::getTypeInfo() const
 {
     switch(getType())
     {

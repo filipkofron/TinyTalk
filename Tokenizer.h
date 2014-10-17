@@ -42,11 +42,16 @@ private:
     void readVerticalBar();
     void eatWhitespace();
 
+    Token reallyReadToken();
+
     std::shared_ptr<Reader> reader;
     bool reachedEOF;
+    std::stack<Token> tokenBuffer;
 public:
     Tokenizer(std::shared_ptr<Reader> reader);
-    Token readNextToken();
+    Token readToken();
+    void putBackToken(Token token);
+    Token peekToken();
     bool hasReachedEOF();
 };
 
