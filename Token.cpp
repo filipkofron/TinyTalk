@@ -1,21 +1,26 @@
 #include "Token.h"
 
-Token::Token()
-        : type(Type::INVALID), value("")
+Token::Token(const uint32_t &line)
+        : line(line), type(Type::INVALID), value("")
 {
 
 }
 
-Token::Token(const Type &type)
-        : type(type), value("")
+Token::Token(const uint32_t &line, const Type &type)
+        : line(line), type(type), value("")
 {
 
 }
 
-Token::Token(const Type &type, const std::string &value)
-    : type(type), value(value)
+Token::Token(const uint32_t &line, const Type &type, const std::string &value)
+    : line(line), type(type), value(value)
 {
 
+}
+
+const uint32_t &Token::getLine() const
+{
+    return line;
 }
 
 const Token::Type &Token::getType() const

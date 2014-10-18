@@ -47,12 +47,14 @@ public:
 private:
     Type type;
     std::string value;
+    uint32_t line;
 
 public:
-    Token();
-    Token(const Type &type);
-    Token(const Type &type, const std::string &value);
+    Token(const uint32_t &line);
+    Token(const uint32_t &line, const Type &type);
+    Token(const uint32_t &line, const Type &type, const std::string &value);
 
+    const uint32_t &getLine() const;
     const Type &getType() const ;
     const std::string &getValue() const;
     const char *getTypeInfo() const;

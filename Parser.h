@@ -12,13 +12,16 @@ private:
     std::shared_ptr<Tokenizer> tokenizer;
 
     bool isSimpleMessage(const Token &token);
+    std::string getMultipleMessageName(const Token &token);
 
-    TTObject *parseSymbol();
+    TTObject *parseSymbol(const bool &parseOnlyOne);
+    TTObject *parseLiteral(const bool &parseOnlyOne);
     TTObject *parseSimpleMessageRest(TTObject *destExpr);
+    TTObject *parseMultipleMessageRest(TTObject *destExpr);
 
     TTObject *parseAssignmentRest(const Token &token);
 
-    TTObject *parseParenthesis();
+    TTObject *parseParenthesis(const bool &parseOnlyOne);
 
 public:
     Parser(std::shared_ptr<Tokenizer> tokenizer);

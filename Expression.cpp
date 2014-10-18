@@ -22,7 +22,7 @@ namespace Expression
     {
         TTObject *expr = TTObject::createObject(TT_EXPR);
 
-        expr->flags = EXPRESSION_FLAG_SIMPLE_MESSAGE;
+        expr->flags = EXPRESSION_FLAG_MULTIPLE_MESSAGE;
 
         TTObject *msgFullName = TTObject::createObject(TT_LITERAL);
         msgFullName->setLiteral(fullName);
@@ -50,6 +50,8 @@ namespace Expression
         TTObject *symbolName = TTObject::createObject(TT_LITERAL);
         symbolName->setLiteral(name);
 
+        expr->addField(TO_TT_STR("symbolName"), symbolName);
+
         return expr;
     }
 
@@ -64,6 +66,31 @@ namespace Expression
 
         expr->addField(TO_TT_STR("assignSymbolName"), symbolName);
         expr->addField(TO_TT_STR("assignExpression"), rightExpr);
+
+        return expr;
+    }
+
+    TTObject *createLiteralValue(TTLiteral *value)
+    {
+        TTObject *expr = TTObject::createObject(TT_EXPR);
+
+        expr->flags = EXPRESSION_FLAG_LITERAL_VALUE;
+
+        TTObject *literalValue = TTObject::createObject(TT_LITERAL);
+        literalValue->setLiteral(value);
+
+        expr->addField(TO_TT_STR("literalValue"), literalValue);
+
+        return expr;
+    }
+
+    TTObject *createParenthesis(TTObject *innerExpr)
+    {
+        TTObject *expr = TTObject::createObject(TT_EXPR);
+
+        expr->flags = EXPRESSION_FLAG_PARENTHESIS;
+
+        expr->addField(TO_TT_STR("innerExpr"), innerExpr);
 
         return expr;
     }
@@ -84,6 +111,8 @@ namespace Expression
                 return "MULTIPLE MESSAGE";
             case EXPRESSION_FLAG_PARENTHESIS:
                 return "PARENTHESIS";
+            case EXPRESSION_FLAG_LITERAL_VALUE:
+                return "LITERAL VALUE";
             default:
                 return "INVALID";
         }

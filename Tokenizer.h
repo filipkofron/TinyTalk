@@ -47,6 +47,7 @@ private:
     std::shared_ptr<Reader> reader;
     bool reachedEOF;
     std::stack<Token> tokenBuffer;
+    uint32_t lineCounter;
 public:
     Tokenizer(std::shared_ptr<Reader> reader);
     Token readToken();

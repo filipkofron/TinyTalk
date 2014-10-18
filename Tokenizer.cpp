@@ -233,11 +233,12 @@ void Tokenizer::eatWhitespace()
     while(isWhitespace(reader->peek()))
     {
         reader->read();
+        lineCounter++;
     }
 }
 
 Tokenizer::Tokenizer(std::shared_ptr<Reader> reader)
-    : reader(reader), reachedEOF(false)
+    : reader(reader), reachedEOF(false), lineCounter(1)
 {
 }
 
@@ -247,7 +248,7 @@ Token Tokenizer::reallyReadToken()
 
     int c = 0;
 
-    Token token(Token::Type::INVALID, "");
+    Token token(lineCounter, Token::Type::INVALID, "");
 
     do
     {
@@ -261,88 +262,88 @@ Token Tokenizer::reallyReadToken()
 
         if(isDigit(c))
         {
-            token = Token(Token::Type::INTEGER, readInteger());
+            token = Token(lineCounter, Token::Type::INTEGER, readInteger());
             break;
         }
 
         if(isSymbolStart(c))
         {
-            token = Token(Token::Type::SYMBOL, readSymbol());
+            token = Token(lineCounter, Token::Type::SYMBOL, readSymbol());
             break;
         }
 
         if(isString(c))
         {
-            token = Token(Token::Type::STRING, readString());
+            token = Token(lineCounter, Token::Type::STRING, readString());
             break;
         }
 
         if(isCharacter(c))
         {
-            token = Token(Token::Type::CHARACTER, readCharacter());
+            token = Token(lineCounter, Token::Type::CHARACTER, readCharacter());
             break;
         }
 
         if(isAssignment(c))
         {
             readAssignment();
-            token = Token(Token::Type::ASSIGNMENT);
+            token = Token(lineCounter, Token::Type::ASSIGNMENT);
             break;
         }
 
         if(isParenthesisOpen(c))
         {
             readParenthesisOpen();
-            token = Token(Token::Type::PARENTHESIS_OPEN);
+            token = Token(lineCounter, Token::Type::PARENTHESIS_OPEN);
             break;
         }
 
         if(isParenthesisClose(c))
         {
             readParenthesisClose();
-            token = Token(Token::Type::PARENTHESIS_CLOSE);
+            token = Token(lineCounter, Token::Type::PARENTHESIS_CLOSE);
             break;
         }
 
         if(isBlockOpen(c))
         {
             readBlockOpen();
-            token = Token(Token::Type::BLOCK_OPEN);
+            token = Token(lineCounter, Token::Type::BLOCK_OPEN);
             break;
         }
 
         if(isBlockClose(c))
         {
             readBlockClose();
-            token = Token(Token::Type::BLOCK_CLOSE);
+            token = Token(lineCounter, Token::Type::BLOCK_CLOSE);
             break;
         }
 
         if(isExpressionEnd(c))
         {
             readExpressionEnd();
-            token = Token(Token::Type::EXPRESSION_END);
+            token = Token(lineCounter, Token::Type::EXPRESSION_END);
             break;
         }
 
         if(isReturn(c))
         {
             readReturn();
-            token = Token(Token::Type::RETURN);
+            token = Token(lineCounter, Token::Type::RETURN);
             break;
         }
 
         if(isVerticalBar(c))
         {
             readVerticalBar();
-            token = Token(Token::Type::VERTICAL_BAR);
+            token = Token(lineCounter, Token::Type::VERTICAL_BAR);
             break;
         }
 
         if(isEndOfFile(c))
         {
             reader->read();
-            token = Token(Token::Type::TEOF);
+            token = Token(lineCounter, Token::Type::TEOF);
             reachedEOF = true;
             break;
         }
