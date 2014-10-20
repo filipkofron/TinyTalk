@@ -31,7 +31,7 @@ namespace Expression
         msgNameArray->setLiteral(nameArray);
 
         TTObject *msgValueArray = TTObject::createObject(TT_LITERAL);
-        msgNameArray->setLiteral(valueArray);
+        msgValueArray->setLiteral(valueArray);
 
         expr->addField(TO_TT_STR("msgDestExpr"), destExpr);
         expr->addField(TO_TT_STR("msgFullName"), msgFullName);

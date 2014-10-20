@@ -3,6 +3,8 @@
 #include <cstring>
 #include <iostream>
 
+#undef DEBUG
+
 MemAllocator::MemAllocator(size_t poolCapacity)
         : capacity(poolCapacity), top(0)
 {

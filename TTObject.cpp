@@ -270,7 +270,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             os << "[" << this->fields[i].name << "]" << " -> " << "LITERAL <";
             if(this->getLiteral())
             {
-                this->getLiteral()->printValue(os);
+                this->getLiteral()->printValue(os, level + 1, recursive);
             }
             else
             {
@@ -281,14 +281,6 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
     }
     prlvl(os, level - 1);
     os << "}";
-}
-
-void TTObject::prlvl(std::ostream &os, uint32_t level)
-{
-    for(uint32_t i = 0; i < level * 2; i++)
-    {
-        os << " ";
-    }
 }
 
 std::ostream &operator << (std::ostream &os, TTObject *object)

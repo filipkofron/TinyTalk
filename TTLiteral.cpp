@@ -1,4 +1,5 @@
 #include "TTLiteral.h"
+#include "common.h"
 #include <cstring>
 
 TTLiteral *TTLiteral::copy(MemAllocator *allocator)
@@ -66,7 +67,7 @@ const char *TTLiteral::getTypeInfo()
     return res;
 }
 
-void TTLiteral::printValue(std::ostream &os)
+void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &recursive)
 {
     switch(type)
     {
@@ -77,7 +78,22 @@ void TTLiteral::printValue(std::ostream &os)
             os << (const char *) data;
             break;
         case LITERAL_TYPE_OBJECT_ARRAY:
-            os << "not implemented";
+            os << "byte size: " << length << std::endl;
+            for(uint32_t i = 0; i < length / sizeof(TTObject *); i++)
+            {
+                prlvl(os, level);
+                os << "[" << i << "] -> ";
+                if(((TTObject **) data)[i])
+                {
+                    ((TTObject **) data)[i]->print(os, level + 1, recursive);
+                }
+                else
+                {
+                    os << "NULL";
+                }
+                os << std::endl;
+            }
+            prlvl(os, level - 1);
             break;
     }
 }

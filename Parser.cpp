@@ -62,14 +62,15 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne)
                 }
                 else
                 {
-                    std::cout << "at symbol, found multiple message TODO IMPLEMENT" << std::endl;
-                    // TODO: implement
-                    throw std::exception();
-                    return result;
+                    std::cout << "at symbol, found multiple message" << std::endl;
+                    return parseMultipleMessageRest(result);
                 }
             case Token::Type::ASSIGNMENT:
                 return parseAssignmentRest(symbolToken);
             case Token::Type::INTEGER:
+            case Token::Type::PARENTHESIS_OPEN:
+                std::cerr << "[Parser]: cannot send the resutl of parenthesis to object (not yet)" << std::endl;
+                return result;
             case Token::Type::STRING:
                 std::cerr << "[Parser]: cannot send a literal to object (not yet)" << std::endl;
                 return result;
@@ -83,6 +84,7 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne)
 
 TTObject *Parser::parseLiteral(const bool &parseOnlyOne)
 {
+    std::cout << "(ParseLiteral onlyone:" << parseOnlyOne << ")" << std::endl;
     TTObject *result = NULL;
 
     Token literalToken = tokenizer->readToken();
@@ -164,10 +166,14 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
     std::string fullName;
 
     uint32_t maxArgs = 1024 + 1;
+    bool atEnd = false;
 
     do
     {
         Token token = tokenizer->peekToken();
+
+        std::cout << "token: " << token.getTypeInfo() << " - " << token.getValue() << std::endl;
+
         switch(token.getType())
         {
             case Token::Type::SYMBOL:
@@ -181,12 +187,26 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
                     tokenizer->readToken(); // eat it
                     std::string name = getMultipleMessageName(token);
                     argNames.push_back(name);
-                    fullName += name;
+                    fullName += token.getValue();
                 }
                 break;
+            case Token::Type::PARENTHESIS_CLOSE: // TODO: Is this neccessary ?
+            case Token::Type::BLOCK_CLOSE: // TODO: Is this neccessary ?
+            case Token::Type::TEOF:
+                atEnd = true;
+                break;
+            case Token::Type::EXPRESSION_END:
+                tokenizer->readToken(); // eat it
+                atEnd = true;
+                break;
             default:
-                std::cerr << "[Parser]: Error: Multiple message unexpected token.";
+                std::cerr << "[Parser]: Error: Multiple message unexpected token." << std::endl;
                 return NULL;
+        }
+
+        if(atEnd)
+        {
+            break;
         }
 
         token = tokenizer->peekToken();
@@ -199,15 +219,16 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
                 break;
             case Token::Type::STRING:
             case Token::Type::INTEGER:
-                expr = parseSymbol(true);
+                expr = parseLiteral(true);
                 break;
             case Token::Type::PARENTHESIS_OPEN:
                 expr = parseParenthesis(true);
                 break;
             default:
-                std::cerr << "[Parser]: Error: Multiple message unexpected token.";
+                std::cerr << "[Parser]: Error: Multiple message unexpected token." << std::endl;
                 return NULL;
         }
+        std::cout << "(mul msg val): got expr: " << expr << std::endl;
         argValues.push_back(expr);
     } while (--maxArgs);
 
@@ -231,8 +252,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
 
     TTLiteral *valueArrayLit = TTLiteral::createObjectArray(argValues);
 
-
-    TTObject *result = Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
+    return Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
 }
 
 TTObject *Parser::parseAssignmentRest(const Token &token)
@@ -278,10 +298,8 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)
                 }
                 else
                 {
-                    std::cout << "after parenthesis end, found multiple message TODO IMPLEMENT" << std::endl;
-                    // TODO: implement
-                    throw std::exception();
-                    return result;
+                    std::cout << "after parenthesis end, found multiple message" << std::endl;
+                    return parseMultipleMessageRest(result);
                 }
             case Token::Type::ASSIGNMENT:
                 std::cerr << "Parser: Error: cannot assign to result of parenthesis." << std::endl;
@@ -321,7 +339,7 @@ TTObject *Parser::parse()
             break;
     }
 
-    if(!res)
+    if(!res && token.getType() != Token::Type::TEOF)
     {
         // an error occures, gonna eat the next token
         std::cerr << "parse error, eating next token" << std::endl;

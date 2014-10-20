@@ -28,7 +28,7 @@ struct TTLiteral
 
     const char *getTypeInfo();
 
-    void printValue(std::ostream &os);
+    void printValue(std::ostream &os, const uint32_t &level, const bool &recursive);
 
     static TTLiteral *createStringLiteral(uint32_t length);
     static TTLiteral *createStringLiteral(const uint8_t *str);
