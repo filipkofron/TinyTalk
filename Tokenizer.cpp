@@ -244,8 +244,6 @@ Tokenizer::Tokenizer(std::shared_ptr<Reader> reader)
 
 Token Tokenizer::reallyReadToken()
 {
-    //throw TokenizerException(std::string("readNextToken NOT IMPLEMENTED:") + std::string(__FILE__) + std::string(":") + std::to_string(__LINE__));
-
     int c = 0;
 
     Token token(lineCounter, Token::Type::INVALID, "");
@@ -349,7 +347,7 @@ Token Tokenizer::reallyReadToken()
         }
 
 #ifdef DEBUG
-        std::cout << DEBUG_TOKENIZER_MSG << "just got '" << c << "'" << std::endl;
+        std::cout << "<" << token.getValue() << ">" << std::endl;
 #endif
         reader->read();
         return token;

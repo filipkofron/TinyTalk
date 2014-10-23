@@ -2,5 +2,5 @@ test = "testValue";
 test method;
 test arg0: val0;
 test arg0: val0 arg1: val1;
-test arg0: (1 + 2)
-
+test arg0: (1 + 2);
+| local some lol |;

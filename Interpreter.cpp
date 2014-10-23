@@ -31,8 +31,9 @@ void Interpreter::startInterpreting()
             std::cout << "> ";
             std::flush(std::cout);
 
-            TTObject *expression = parser.parse();
+            TTObject *expression = parser.parse(false);
 
+            std::cout << std::endl << "======================================" << std::endl;
             std::cout << "Expression result: " << std::endl << expression << std::endl;
         }
         catch (TokenizerException &e)

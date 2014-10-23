@@ -45,9 +45,9 @@ public:
     };
 
 private:
+    uint32_t line;
     Type type;
     std::string value;
-    uint32_t line;
 
 public:
     Token(const uint32_t &line);

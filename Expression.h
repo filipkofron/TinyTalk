@@ -11,8 +11,17 @@
 * 1. symbol name - "assignSymbolName"
 * 2. assigned expression for value - "assignExpression"
 */
-#define EXPRESSION_FLAG_ASSIGN 0x01
-#define EXPRESSION_FLAG_CHAINED 0x02
+#define EXPRESSION_ASSIGN 0x01
+
+/**
+* Chained expression.
+*
+* Consists only of next expression.
+*
+* 1, current expression - "currExpr"
+* 2. next expression - "nextExpr"
+*/
+#define EXPRESSION_CHAINED 0x02
 
 /**
 * Parenthesis expression flag.
@@ -21,7 +30,7 @@
 *
 * 1. inner expression - "innerExpr"
 */
-#define EXPRESSION_FLAG_PARENTHESIS 0x04
+#define EXPRESSION_PARENTHESIS 0x03
 
 /**
 * Simple message expression flag.
@@ -32,7 +41,7 @@
 * 1. destination expression - "msgExprDest"
 * 2. message name - "msgName"
 */
-#define EXPRESSION_FLAG_SIMPLE_MESSAGE 0x08
+#define EXPRESSION_SIMPLE_MESSAGE 0x04
 
 /**
 * Multiple message expression flag.
@@ -45,7 +54,7 @@
 * 3. message nameArray - "msgNameArray"
 * 4. message valueArray - "msgValueArray"
 */
-#define EXPRESSION_FLAG_MULTIPLE_MESSAGE 0x10
+#define EXPRESSION_MULTIPLE_MESSAGE 0x05
 
 /**
 * Symbol value expression flag.
@@ -54,7 +63,7 @@
 *
 * 1. symbol name - "symbolName"
 */
-#define EXPRESSION_FLAG_SYMBOL_VALUE 0x20
+#define EXPRESSION_SYMBOL_VALUE 0x06
 
 /**
 * Literal value expression flag.
@@ -63,21 +72,38 @@
 *
 * 1. literal value - "literalValue"
 */
-#define EXPRESSION_FLAG_LITERAL_VALUE 0x40
+#define EXPRESSION_LITERAL_VALUE 0x07
+
+/**
+* Block expression flag.
+*
+* It consists of block arguments and its expression.
+*
+* 1. arguments  - "blockArgNames"
+* 2. expression - "blockExpr"
+*/
+#define EXPRESSION_BLOCK 0x08
+
+/**
+* Create variable expression.
+*
+* Consists of variable name array.
+*
+* 1. variable names - "varNames"
+*/
+#define EXPRESSION_CREATE_VARIABLES 0x09
 
 namespace Expression
 {
     TTObject *createSimpleMessage(TTObject *destExpr, TTLiteral *name);
-
     TTObject *createMultipleMessage(TTObject *destExpr, TTLiteral *fullName, TTLiteral *nameArray, TTLiteral *valueArray);
-
     TTObject *createSymbolValue(TTLiteral *name);
-
     TTObject *createAssignment(TTLiteral *name, TTObject *rightExpr);
-
     TTObject *createLiteralValue(TTLiteral *value);
-
     TTObject *createParenthesis(TTObject *innerExpr);
+    TTObject *createBlock(TTLiteral *nameArray, TTObject *expr);
+    TTObject *createChained(TTObject *currExpr, TTObject *nextExpr);
+    TTObject *createCreateVariables(TTLiteral *varNames);
 
     const char *getTypeInfo(TTObject *expr);
 }
