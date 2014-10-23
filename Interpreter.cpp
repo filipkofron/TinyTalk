@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "TokenizerException.h"
 #include "Parser.h"
-#include <iostream>
+#include "Evaluator.h"
 
 Interpreter::Interpreter(std::shared_ptr<Reader> &reader)
     : tokenizer(new Tokenizer(reader))
@@ -23,6 +23,7 @@ Interpreter::~Interpreter()
 void Interpreter::startInterpreting()
 {
     Parser parser(tokenizer);
+    Evaluator evaluator;
 
     do
     {
@@ -33,8 +34,20 @@ void Interpreter::startInterpreting()
 
             TTObject *expression = parser.parse(false);
 
-            std::cout << std::endl << "======================================" << std::endl;
-            std::cout << "Expression result: " << std::endl << expression << std::endl;
+            std::cout << std::endl << "<<< ======================================" << std::endl;
+            std::cout << "Expression result: " << std::endl;
+            expression->print(std::cout, 1, true);
+            std::cout << std::endl;
+
+            if(expression != NULL)
+            {
+                TTObject *result = evaluator.evaluate(expression, globalEnvironment);
+
+                std::cout << std::endl << ">>> ======================================" << std::endl;
+                std::cout << "Evaluator result: " << std::endl;
+                result->print(std::cout, 1, false);
+                std::cout << std::endl;
+            }
         }
         catch (TokenizerException &e)
         {

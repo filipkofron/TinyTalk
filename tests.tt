@@ -4,3 +4,10 @@ test arg0: val0;
 test arg0: val0 arg1: val1;
 test arg0: (1 + 2);
 | local some lol |;
+
+test ~ expression
+testOb ~ anObject
+
+test call ~ if test is block with this name, EVAL.
+test call ~ if test is not block with this name, find such field if has then EVAL
+test call ~ if test is not block with this name, find such field if does not have then ERROR

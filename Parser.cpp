@@ -287,6 +287,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
     uint32_t maxArgs = PARSER_MAX_METHOD_ARGS + 1;
 
     std::vector<std::string> argNames;
+    std::string fullName;
 
     bool atEnd = false;
     do
@@ -296,7 +297,14 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
             case Token::Type::SYMBOL:
                 if(isBlockArgument(tokenizer->peekToken()))
                 {
-                    argNames.push_back(getBlockArgumentName(tokenizer->readToken())); // eat out the token
+                    std::string name = getBlockArgumentName(tokenizer->readToken());
+                    if(name.size() == 0)
+                    {
+                        std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Too short block argument name." << std::endl;
+                        return NULL;
+                    }
+                    argNames.push_back(name); // eat out the token
+                    fullName += name;
                 }
                 else
                 {
@@ -334,6 +342,12 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
         }
     } while(--maxArgs);
 
+    if(maxArgs == PARSER_MAX_METHOD_ARGS + 1)
+    {
+        std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Empty block argument." << std::endl;
+        return NULL;
+    }
+
     std::cout << "Block loaded these arguments:";
     for(auto str : argNames)
     {
@@ -348,8 +362,6 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
     }
 
     TTObject *rightSideExpression = parse(false);
-    std::cout << "[Parser]: BLOCK HAAAX expr res: " << rightSideExpression;
-    std::cout << std::endl;
 
     if(rightSideExpression == NULL)
     {
@@ -365,7 +377,9 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
     }
 
     TTLiteral *nameArray = createLiteralArrayOfStrings(argNames);
-    TTObject *res = Expression::createBlock(nameArray, rightSideExpression);
+    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()));
+
+    TTObject *res = Expression::createBlock(nameArray, fullNameLit, rightSideExpression);
     if(parseOnlyOne)
     {
         return res;

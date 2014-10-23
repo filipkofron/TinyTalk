@@ -77,10 +77,11 @@
 /**
 * Block expression flag.
 *
-* It consists of block arguments and its expression.
+* It consists of block arguments, fullname and its expression.
 *
 * 1. arguments  - "blockArgNames"
-* 2. expression - "blockExpr"
+* 2. full name - "blockFullName"
+* 3. expression - "blockExpr"
 */
 #define EXPRESSION_BLOCK 0x08
 
@@ -101,7 +102,7 @@ namespace Expression
     TTObject *createAssignment(TTLiteral *name, TTObject *rightExpr);
     TTObject *createLiteralValue(TTLiteral *value);
     TTObject *createParenthesis(TTObject *innerExpr);
-    TTObject *createBlock(TTLiteral *nameArray, TTObject *expr);
+    TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr);
     TTObject *createChained(TTObject *currExpr, TTObject *nextExpr);
     TTObject *createCreateVariables(TTLiteral *varNames);
 

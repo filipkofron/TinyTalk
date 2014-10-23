@@ -95,7 +95,7 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createBlock(TTLiteral *nameArray, TTObject *expr)
+    TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr)
     {
         TTObject *res = TTObject::createObject(TT_EXPR);
 
@@ -104,7 +104,11 @@ namespace Expression
         TTObject *blockArgNames = TTObject::createObject(TT_LITERAL);
         blockArgNames->setLiteral(nameArray);
 
+        TTObject *blockFullName = TTObject::createObject(TT_LITERAL);
+        blockFullName->setLiteral(fullName);
+
         res->addField(TO_TT_STR("blockArgNames"), blockArgNames);
+        res->addField(TO_TT_STR("blockFullName"), blockFullName);
         res->addField(TO_TT_STR("blockExpr"), expr);
 
         return res;

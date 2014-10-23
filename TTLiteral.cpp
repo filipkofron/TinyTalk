@@ -85,7 +85,14 @@ void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &
                 os << "[" << i << "] -> ";
                 if(((TTObject **) data)[i])
                 {
-                    ((TTObject **) data)[i]->print(os, level + 1, recursive);
+                    if(recursive)
+                    {
+                        ((TTObject **) data)[i]->print(os, level + 1, recursive);
+                    }
+                    else
+                    {
+                        os << "<non-recursive-print>";
+                    }
                 }
                 else
                 {

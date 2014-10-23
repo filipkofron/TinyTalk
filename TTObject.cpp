@@ -190,9 +190,24 @@ bool TTObject::setLiteral(TTLiteral *lit)
 
 void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
 {
+    if(level < 1)
+    {
+        level = 1;
+    }
+
+
     os << "Object" << std::endl;
     prlvl(os, level - 1);
     os << "{" << std::endl;
+
+    if(!this)
+    {
+        prlvl(os, level);
+        os << "NULL" << std::endl;
+        prlvl(os, level - 1);
+        os << "}";
+        return;
+    }
 
     prlvl(os, level);
     os << "Address: " << (unsigned long long) this << std::endl;
@@ -254,14 +269,29 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             {
                 prlvl(os, level);
                 os << "[" << this->fields[i].name << "]" << " -> ";
-                this->fields[i].object->print(os, level + 1, recursive);
+                if(recursive)
+                {
+                    this->fields[i].object->print(os, level + 1, recursive);
+                }
+                else
+                {
+                    os << "<non-recursive-print>";
+                }
                 os << std::endl;
             }
             else
             {
                 prlvl(os, level);
-                os << "[" << this->fields[i].name << "]" << " -> "
-                        << this->fields[i].object << std::endl;
+                if(recursive)
+                {
+                    os << "[" << this->fields[i].name << "]" << " -> "
+                            << this->fields[i].object << std::endl;
+                }
+                else
+                {
+                    os << "[" << this->fields[i].name << "]" << " -> "
+                            << "<non-recursive-print>" << std::endl;
+                }
             }
         }
         else
@@ -270,7 +300,14 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             os << "[" << this->fields[i].name << "]" << " -> " << "LITERAL <";
             if(this->getLiteral())
             {
-                this->getLiteral()->printValue(os, level + 1, recursive);
+                if(recursive)
+                {
+                    this->getLiteral()->printValue(os, level + 1, recursive);
+                }
+                else
+                {
+                    os << "<non-recursive-print>";
+                }
             }
             else
             {
