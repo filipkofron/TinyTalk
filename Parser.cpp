@@ -372,7 +372,9 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
     Token blockEnd = tokenizer->readToken();
     if(blockEnd.getType() != Token::Type::BLOCK_CLOSE)
     {
-        std::cerr << "[Parser]: Line:" << blockEnd.getLine() << " the block hasn't ended correctly." << std::endl;
+        std::cerr << "[Parser]: Line:" << blockEnd.getLine()
+                << " the block hasn't ended correctly, a token: "
+                << blockEnd.getTypeInfo() << " of value " << blockEnd.getValue() << std::endl;
         return NULL;
     }
 
@@ -395,11 +397,20 @@ TTObject *Parser::parseAssignmentRest(const Token &token)
     std::cout << "(parseAssignmentRest)" << std::endl;
     // ----------------------------------------------------------------------- //
 
-    tokenizer->readToken(); // eat the assign token
+    Token assignToken = tokenizer->readToken(); // eat the assign token
 
     TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(token.getValue().c_str()));
 
-    return Expression::createAssignment(lit, parse(false)); // recursively parse the right side
+    TTObject* result = Expression::createAssignment(lit, parse(true)); // recursively parse the right side
+
+    /*Token nextToken = tokenizer->peekToken();
+    if(nextToken.getType() == Token::Type::EXPRESSION_END)
+    {
+
+    }*/
+    // TODO: Is this correct after assign?
+
+    return parseRightOfValue(result, assignToken);
 }
 
 TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)

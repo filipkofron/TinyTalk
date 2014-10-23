@@ -9,6 +9,9 @@ Interpreter::Interpreter(std::shared_ptr<Reader> &reader)
 {
     globalEnvironment = TTObject::createObject(TT_ENV);
     globalEnvironment->addField(TO_TT_STR("parent"), TTObject::createObject(TT_NIL));
+    TTObject *lit = TTObject::createObject(TT_LITERAL);
+    lit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR("Hello, World!")));
+    globalEnvironment->addField(TO_TT_STR("testStr"), lit);
 
     std::cout << "### test global env: " << globalEnvironment << std::endl;
 

@@ -38,7 +38,7 @@
 * Simple message expression object consists of
 * 2 string literals.
 *
-* 1. destination expression - "msgExprDest"
+* 1. destination expression - "msgDestExpr"
 * 2. message name - "msgName"
 */
 #define EXPRESSION_SIMPLE_MESSAGE 0x04
@@ -49,7 +49,7 @@
 * Multiple message expression object consists of
 * 2 string literals and array literal.
 *
-* 1. destination expression - "msgExprDest"
+* 1. destination expression - "msgDestExpr"
 * 2. message name - "msgFullName"
 * 3. message nameArray - "msgNameArray"
 * 4. message valueArray - "msgValueArray"
