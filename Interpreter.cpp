@@ -3,19 +3,35 @@
 #include "TokenizerException.h"
 #include "Parser.h"
 #include "Evaluator.h"
+#include "Expression.h"
 
 Interpreter::Interpreter(std::shared_ptr<Reader> &reader)
     : tokenizer(new Tokenizer(reader))
 {
+    initialize();
+}
+
+void Interpreter::initialize()
+{
     globalEnvironment = TTObject::createObject(TT_ENV);
     globalEnvironment->addField(TO_TT_STR("parent"), TTObject::createObject(TT_NIL));
+
     TTObject *lit = TTObject::createObject(TT_LITERAL);
     lit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR("Hello, World!")));
     globalEnvironment->addField(TO_TT_STR("testStr"), lit);
 
-    std::cout << "### test global env: " << globalEnvironment << std::endl;
+    setupObject();
 
+    std::cout << "### test global env: " << globalEnvironment << std::endl;
     std::cout << "### test field parent: " << globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
+}
+
+void Interpreter::setupObject()
+{
+    TTObject *object = TTObject::createObject(TT_OBJECT);
+    //TTObject *allocBlock = Expression::createBlock(std::strin, <#(TTLiteral*)fullName#>, <#(TTObject*)expr#>, <#(TTLiteral*)nativeName#>)
+
+    throw std::exception();
 }
 
 Interpreter::~Interpreter()

@@ -16,6 +16,8 @@ private:
 
 public:
     Interpreter(std::shared_ptr<Reader> &reader);
+    void initialize();
+    void setupObject();
     ~Interpreter();
 
     void startInterpreting();
