@@ -16,7 +16,7 @@ TTObject *Evaluator::sendSimpleMessageToNonExpression(std::string &simpleMessage
             std::cerr << "Eval: Sorry, value is not a method: " << simpleMessageName << " !!!" << std::endl;
         }
 
-        return executeSimpleMessage(field, simpleMessageName, env);
+        return executeSimpleMessage(field, simpleMessageName, env, dest);
     }
     else
     {
@@ -25,7 +25,7 @@ TTObject *Evaluator::sendSimpleMessageToNonExpression(std::string &simpleMessage
     }
 }
 
-TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msgName, TTObject *env)
+TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msgName, TTObject *env, TTObject *thiz)
 {
     std::cout << "(executeSimpleMessage)" << std::endl;
 
@@ -37,11 +37,16 @@ TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msg
         TTObject *newEnv = TTObject::createObject(TT_ENV);
         newEnv->addField(TO_TT_STR("parent"), blockEnv);
 
+        if(thiz)
+        {
+            newEnv->addField(TO_TT_STR("this"), thiz);
+        }
+
         /**
         * Todo: execute bytecode or native code .. or builtin function. LOL
         */
 
-        return evaluate(blockExpr, blockEnv);
+        return evaluate(blockExpr, newEnv);
     }
     else
     {
@@ -75,7 +80,7 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
     {
         if(destValue->flags == EXPRESSION_BLOCK)
         {
-            return executeSimpleMessage(destValue, msgName, env);
+            return executeSimpleMessage(destValue, msgName, env, NULL);
         }
         else
         {
@@ -275,7 +280,7 @@ TTObject *Evaluator::sendMultipleMessageToNonExpression(std::string &msgFullName
             std::cerr << "(sendMultipleMessageToNonExpression): Sorry, value is not a method: " << field << " !!!" << std::endl;
         }
 
-        return executeMultipleMessage(dest, msgFullName, argNames, values, env);
+        return executeMultipleMessage(dest, msgFullName, argNames, values, env, dest);
     }
     else
     {
@@ -284,7 +289,7 @@ TTObject *Evaluator::sendMultipleMessageToNonExpression(std::string &msgFullName
     }
 }
 
-TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::string &msgFullName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *env)
+TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::string &msgFullName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *env, TTObject *thiz)
 {
     std::cout << "(executeMultipleMessage)" << std::endl;
 
@@ -295,6 +300,12 @@ TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::stri
         TTObject *blockExpr = blockExpression->getField(TO_TT_STR("blockExpr"));
         TTObject *newEnv = TTObject::createObject(TT_ENV);
         newEnv->addField(TO_TT_STR("parent"), blockEnv);
+
+        if(thiz)
+        {
+            newEnv->addField(TO_TT_STR("this"), thiz);
+        }
+
         for(size_t i = 0; i < argNames.size(); i++)
         {
             newEnv->addField(TO_TT_STR(argNames[i].c_str()), values[i]);
@@ -304,7 +315,7 @@ TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::stri
         * Todo: execute bytecode or native code .. or builtin function. LOL
         */
 
-        return evaluate(blockExpr, blockEnv);
+        return evaluate(blockExpr, newEnv);
     }
     else
     {
@@ -334,6 +345,7 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *expr, TTObject *env)
     for(uint32_t i = 0; i < len; i++)
     {
         names.push_back((char *) nameObjects[i]->getLiteral()->data);
+        std::cout << "(evaluateMultipleMessage): arg name " << i << " = " << names[i] << std::endl;
         valuesExpressions.push_back(expressionObjects[i]);
     }
 
@@ -353,7 +365,7 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *expr, TTObject *env)
     {
         if(msgDest->flags == EXPRESSION_BLOCK)
         {
-            return executeMultipleMessage(msgDest, fullName, names, values, env);
+            return executeMultipleMessage(msgDest, fullName, names, values, env, NULL);
         }
         else
         {

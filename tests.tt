@@ -1,13 +1,32 @@
-test = "testValue";
-test method;
-test arg0: val0;
-test arg0: val0 arg1: val1;
-test arg0: (1 + 2);
-| local some lol |;
+[ :test |
 
-test ~ expression
-testOb ~ anObject
+    | msg msg2 msg3 |;
 
-test call ~ if test is block with this name, EVAL.
-test call ~ if test is not block with this name, find such field if has then EVAL
-test call ~ if test is not block with this name, find such field if does not have then ERROR
+    msg = [:getMeHello | "Hello World" ];
+    msg2 = [:getMeMsg | msg ];
+    msg3 = [:getMeHelloFromMsg: | getMeHelloFromMsg getMeMsg getMeHello];
+    msg3 getMeHelloFromMsg: msg2
+] test;
+
+
+[ :test |
+
+    | msg msg2 msg3 |;
+
+    msg = [:getMeHello | "Hello World" ];
+    msg2 = [:getMeMsg | msg ];
+    msg2 getMeMsg getMeHello
+] test;
+
+
+[:test: |
+    test
+] test: "hello";
+
+
+| msg |;
+msg = [:callme | "hullo" ];
+
+[:test |
+    msg callme
+] test

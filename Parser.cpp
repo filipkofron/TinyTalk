@@ -297,14 +297,23 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
             case Token::Type::SYMBOL:
                 if(isBlockArgument(tokenizer->peekToken()))
                 {
-                    std::string name = getBlockArgumentName(tokenizer->readToken());
+                    Token nameToken = tokenizer->readToken();
+                    std::string name = getBlockArgumentName(nameToken);
+                    fullName += name; // save the argument without removing : if present
+
+
+                    Token tempToken(0, Token::Type::STRING, name); // create temp token with name
+                    // if it has : at the end, strip it
+                    if(!isSimpleMessage(tempToken))
+                    {
+                        name = getMultipleMessageName(tempToken);
+                    }
                     if(name.size() == 0)
                     {
                         std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Too short block argument name." << std::endl;
                         return NULL;
                     }
                     argNames.push_back(name); // eat out the token
-                    fullName += name;
                 }
                 else
                 {
