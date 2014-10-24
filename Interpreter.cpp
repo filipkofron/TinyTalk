@@ -29,9 +29,40 @@ void Interpreter::initialize()
 void Interpreter::setupObject()
 {
     TTObject *object = TTObject::createObject(TT_OBJECT);
-    //TTObject *allocBlock = Expression::createBlock(std::strin, <#(TTLiteral*)fullName#>, <#(TTObject*)expr#>, <#(TTLiteral*)nativeName#>)
 
-    throw std::exception();
+    addSimpleMethod(object, "alloc", "object_alloc");
+    addMultipleMethod(object, "addField:", {"addField"},"object_add");
+    addMultipleMethod(object, "get:", {"get"},"object_get");
+    addMultipleMethod(object, "set:value:", {"set", "value"},"object_set");
+
+    globalEnvironment->addField(TO_TT_STR("Object"), object);
+}
+
+void Interpreter::addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName)
+{
+    std::vector<TTObject *> names;
+    TTObject *objectLit = TTObject::createObject(TT_LITERAL);
+    objectLit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str())));
+    names.push_back(objectLit);
+    TTLiteral *objArray = TTLiteral::createObjectArray(names);
+    TTObject *allocBlock = Expression::createBlock(objArray, TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str())), NULL, TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str())));
+
+    dest->addField(TO_TT_STR(msgName.c_str()), allocBlock);
+}
+
+void Interpreter::addMultipleMethod(TTObject *dest, const std::string &msgName, const std::vector<std::string> &msgArgs, const std::string &buitlinName)
+{
+    std::vector<TTObject *> names;
+    for(auto arg : msgArgs)
+    {
+        TTObject *objectLit = TTObject::createObject(TT_LITERAL);
+        objectLit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR(arg.c_str())));
+        names.push_back(objectLit);
+    }
+    TTLiteral *objArray = TTLiteral::createObjectArray(names);
+    TTObject *allocBlock = Expression::createBlock(objArray, TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str())), NULL, TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str())));
+
+    dest->addField(TO_TT_STR(msgName.c_str()), allocBlock);
 }
 
 Interpreter::~Interpreter()

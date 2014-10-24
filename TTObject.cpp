@@ -223,6 +223,12 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
         case TT_LITERAL:
             type = "LITERAL";
             break;
+        case TT_ENV:
+            type = "ENV";
+            break;
+        case TT_OBJECT:
+            type = "OBJECT";
+            break;
         default:
             break;
     }

@@ -30,3 +30,7 @@ msg = [:callme | "hullo" ];
 [:test |
     msg callme
 ] test
+
+Object addField: "testificat";
+Object set: "testificat" value: (Object alloc);
+Object get: "testificat"

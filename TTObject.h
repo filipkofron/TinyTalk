@@ -15,23 +15,17 @@ struct TTObject;
 
 #define TT_NIL 0x00
 #define TT_OBJECT 0x01
-#define TT_METHOD 0x02
-#define TT_EXPR 0x04
-#define TT_LITERAL 0x08
-#define TT_SYMBOL 0x10
-#define TT_ENV 0x20
-#define TT_MESSAGE 0x20
+#define TT_EXPR 0x02
+#define TT_LITERAL 0x04
+#define TT_ENV 0x08
 
 #define IS_SOME_TYPE(a, b) (!(!((a)->type == b)))
 
 #define IS_NIL(a) IS_SOME_TYPE(a, TT_NIL)
 #define IS_OBJECT(a) IS_SOME_TYPE(a, TT_OBJECT)
-#define IS_METHOD(a) IS_SOME_TYPE(a, TT_METHOD)
 #define IS_EXPR(a) IS_SOME_TYPE(a, TT_EXPR)
 #define IS_LITERAL(a) IS_SOME_TYPE(a, TT_LITERAL)
-#define IS_SYMBOL(a) IS_SOME_TYPE(a, TT_SYMBOL)
 #define IS_ENV(a) IS_SOME_TYPE(a, TT_ENV)
-#define IS_MESSAGE(a) IS_SOME_TYPE(a, TT_MESSAGE)
 
 /**
 * TTObject is any object within this VM, that can be directly interfaced from

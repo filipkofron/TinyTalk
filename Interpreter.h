@@ -18,6 +18,8 @@ public:
     Interpreter(std::shared_ptr<Reader> &reader);
     void initialize();
     void setupObject();
+    void addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName);
+    void addMultipleMethod(TTObject *dest, const std::string &msgName, const std::vector<std::string> &msgArgs, const std::string &buitlinName);
     ~Interpreter();
 
     void startInterpreting();

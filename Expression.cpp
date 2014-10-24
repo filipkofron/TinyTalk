@@ -116,7 +116,7 @@ namespace Expression
             TTObject *blockNativeName = TTObject::createObject(TT_LITERAL);
             blockNativeName->setLiteral(nativeName);
 
-            res->addField(TO_TT_STR("nativeName"), blockNativeName);
+            res->addField(TO_TT_STR("blockNativeName"), blockNativeName);
         }
 
         return res;

@@ -6,8 +6,10 @@ BuiltinPool::BuiltinPool()
 {
     std::cout << "[BuiltinPool]: initializing" << std::endl;
 
-    registerBultin("obj_alloc", std::shared_ptr<BuiltinObjectAlloc> (new BuiltinObjectAlloc()));
-
+    registerBultin("object_alloc", std::shared_ptr<Builtin> (new BuiltinObjectAlloc()));
+    registerBultin("object_add", std::shared_ptr<Builtin> (new BuiltinObjectAddField));
+    registerBultin("object_get", std::shared_ptr<Builtin> (new BuiltinObjectGetter()));
+    registerBultin("object_set", std::shared_ptr<Builtin> (new BuiltinObjectSetter()));
 }
 
 void BuiltinPool::registerBultin(const std::string &name, std::shared_ptr<Builtin> builtin)

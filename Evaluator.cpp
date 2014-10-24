@@ -31,6 +31,11 @@ TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msg
 {
     std::cout << "(executeSimpleMessage) of name=" << msgName << std::endl;
 
+    std::cout << "blockExpression: " << expression << std::endl;
+
+    std::cout << "blockExpression->getField(TO_TT_STR(\"blockFullName\")): " << expression->getField(TO_TT_STR("blockFullName")) << std::endl;
+
+
     std::string name = (char *) expression->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
 
     std::cout << "(executeSimpleMessage) with block name=" << name << " empty: " << name.empty() << std::endl;
@@ -53,6 +58,8 @@ TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msg
         /**
         * Todo: execute bytecode or native code .. LOL
         */
+
+        std::cout << "nativeName: " << nativeName << std::endl;
 
         if(nativeName)
         {
@@ -315,9 +322,10 @@ TTObject *Evaluator::sendMultipleMessageToNonExpression(std::string &msgFullName
         if(field->type != TT_EXPR)
         {
             std::cerr << "(sendMultipleMessageToNonExpression): Sorry, value is not a method: " << field << " !!!" << std::endl;
+            throw std::exception();
         }
 
-        return executeMultipleMessage(dest, msgFullName, argNames, values, env, dest);
+        return executeMultipleMessage(field, msgFullName, argNames, values, env, dest);
     }
     else
     {
@@ -330,7 +338,15 @@ TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::stri
 {
     std::cout << "(executeMultipleMessage)" << std::endl;
 
+    std::cout << "blockExpression: " << blockExpression << std::endl;
+
+    std::cout << "blockExpression->getField(TO_TT_STR(\"blockFullName\")): " << blockExpression->getField(TO_TT_STR("blockFullName")) << std::endl;
+
     std::string name = (char *) blockExpression->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
+
+    std::cout << "(executeMultipleMessage): blockName:'" << name << "'" << std::endl;
+    std::cout << "(executeMultipleMessage): msgFullName:'" << msgFullName << "'" << std::endl;
+
     if(COMPARE_NAME(msgFullName.c_str(), name.c_str()) == 0)
     {
         TTObject *blockEnv = blockExpression->getField(TO_TT_STR("blockEnv"));
@@ -357,6 +373,7 @@ TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::stri
         {
             TTLiteral *lit = nativeName->getLiteral();
             std::string strName = (char *) lit->data;
+
 
             std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(strName);
             if(builtin)
