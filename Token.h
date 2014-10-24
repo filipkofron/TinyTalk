@@ -5,24 +5,6 @@ class Token;
 
 #include <string>
 
-const static char *TypeStrings[14] =
-{
-        "SYMBOL",
-        "INTEGER",
-        "STRING",
-        "ASSIGNMENT",
-        "CHARACTER",
-        "PARENTHESIS_OPEN",
-        "PARENTHESIS_CLOSE",
-        "BLOCK_OPEN",
-        "BLOCK_CLOSE",
-        "INVALID",
-        "EOF",
-        "EXPRESSION_END",
-        "RETURN",
-        "VERTICAL_BAR",
-};
-
 class Token
 {
 public:

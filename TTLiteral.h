@@ -24,7 +24,7 @@ struct TTLiteral
 
     TTLiteral *clone();
 
-    TTObject *onMessage(TTObject *object);
+    TTObject *onMessage(TTObject *msg);
 
     const char *getTypeInfo();
 

@@ -24,7 +24,7 @@ TTLiteral *TTLiteral::clone()
     return copy(MemAllocator::getCurrent());
 }
 
-TTObject *TTLiteral::onMessage(TTObject *object)
+TTObject *TTLiteral::onMessage(TTObject *msg)
 {
     std::cout << "TTLiteral<";
 

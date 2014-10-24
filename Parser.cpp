@@ -353,8 +353,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
 
     if(maxArgs == PARSER_MAX_METHOD_ARGS + 1)
     {
-        std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Empty block argument." << std::endl;
-        return NULL;
+        std::cout << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Empty block argument." << std::endl;
     }
 
     std::cout << "Block loaded these arguments:";
@@ -390,7 +389,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
     TTLiteral *nameArray = createLiteralArrayOfStrings(argNames);
     TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()));
 
-    TTObject *res = Expression::createBlock(nameArray, fullNameLit, rightSideExpression);
+    TTObject *res = Expression::createBlock(nameArray, fullNameLit, rightSideExpression, NULL);
     if(parseOnlyOne)
     {
         return res;

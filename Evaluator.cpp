@@ -1,7 +1,9 @@
 #include "Evaluator.h"
 #include "Expression.h"
 #include "common.h"
+#include "Runtime.h"
 #include <cstring>
+#include "Runtime.h"
 
 TTObject *Evaluator::sendSimpleMessageToNonExpression(std::string &simpleMessageName, TTObject *dest, TTObject *env)
 {
@@ -27,14 +29,20 @@ TTObject *Evaluator::sendSimpleMessageToNonExpression(std::string &simpleMessage
 
 TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msgName, TTObject *env, TTObject *thiz)
 {
-    std::cout << "(executeSimpleMessage)" << std::endl;
+    std::cout << "(executeSimpleMessage) of name=" << msgName << std::endl;
 
     std::string name = (char *) expression->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
-    if(COMPARE_NAME(msgName.c_str(), name.c_str()) == 0)
+
+    std::cout << "(executeSimpleMessage) with block name=" << name << " empty: " << name.empty() << std::endl;
+
+    bool anon = COMPARE_NAME(msgName.c_str(), "value") == 0 && name.empty();
+
+    if(COMPARE_NAME(msgName.c_str(), name.c_str()) == 0 || anon)
     {
         TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
         TTObject *blockExpr = expression->getField(TO_TT_STR("blockExpr"));
         TTObject *newEnv = TTObject::createObject(TT_ENV);
+        TTObject *nativeName = expression->getField(TO_TT_STR("blockNativeName"));
         newEnv->addField(TO_TT_STR("parent"), blockEnv);
 
         if(thiz)
@@ -43,13 +51,42 @@ TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msg
         }
 
         /**
-        * Todo: execute bytecode or native code .. or builtin function. LOL
+        * Todo: execute bytecode or native code .. LOL
         */
+
+        if(nativeName)
+        {
+            TTLiteral *lit = nativeName->getLiteral();
+            std::string strName = (char *) lit->data;
+
+            std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(strName);
+            std::vector<std::string> singleList;
+            singleList.push_back(msgName);
+            if(builtin)
+            {
+                std::cout << "(executeSimpleMessage): Builtin function '" << strName << "' found." << std::endl;
+                if(thiz)
+                {
+                    return builtin->invoke(thiz, singleList, std::vector<TTObject *>());
+                }
+                return builtin->invoke(env, singleList, std::vector<TTObject *>());
+            }
+            else
+            {
+                std::cerr << "(executeSimpleMessage): Builtin function '" << strName << "' not found!" << std::endl;
+                throw std::exception();
+            }
+        }
 
         return evaluate(blockExpr, newEnv);
     }
     else
     {
+        if(anon)
+        {
+            std::cerr << "(executeSimpleMessage): Cannot evaluate anonymous block." << std::endl;
+            return NULL;
+        }
         return sendSimpleMessageToNonExpression(msgName, expression, env);
     }
 }
@@ -298,6 +335,7 @@ TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::stri
     {
         TTObject *blockEnv = blockExpression->getField(TO_TT_STR("blockEnv"));
         TTObject *blockExpr = blockExpression->getField(TO_TT_STR("blockExpr"));
+        TTObject *nativeName = blockExpression->getField(TO_TT_STR("blockNativeName"));
         TTObject *newEnv = TTObject::createObject(TT_ENV);
         newEnv->addField(TO_TT_STR("parent"), blockEnv);
 
@@ -312,8 +350,30 @@ TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::stri
         }
 
         /**
-        * Todo: execute bytecode or native code .. or builtin function. LOL
+        * Todo: execute bytecode or native code ... LOL
         */
+
+        if(nativeName)
+        {
+            TTLiteral *lit = nativeName->getLiteral();
+            std::string strName = (char *) lit->data;
+
+            std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(strName);
+            if(builtin)
+            {
+                std::cout << "(executeMultipleMessage): Builtin function '" << strName << "' found." << std::endl;
+                if(thiz)
+                {
+                    return builtin->invoke(thiz, argNames, values);
+                }
+                return builtin->invoke(env, argNames, values);
+            }
+            else
+            {
+                std::cerr << "(executeMultipleMessage): Builtin function '" << strName << "' not found!" << std::endl;
+                throw std::exception();
+            }
+        }
 
         return evaluate(blockExpr, newEnv);
     }

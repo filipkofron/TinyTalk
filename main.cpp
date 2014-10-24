@@ -12,6 +12,11 @@
 
 using namespace std;
 
+void initializeBuiltins()
+{
+
+}
+
 int main()
 {
     std::cout << ">> Tinytalk Interpreter" << std::endl;

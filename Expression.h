@@ -82,6 +82,7 @@
 * 1. arguments  - "blockArgNames"
 * 2. full name - "blockFullName"
 * 3. expression - "blockExpr"
+* 4. native name - "blockNativeName"
 */
 #define EXPRESSION_BLOCK 0x08
 
@@ -102,7 +103,7 @@ namespace Expression
     TTObject *createAssignment(TTLiteral *name, TTObject *rightExpr);
     TTObject *createLiteralValue(TTLiteral *value);
     TTObject *createParenthesis(TTObject *innerExpr);
-    TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr);
+    TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr, TTLiteral *nativeName);
     TTObject *createChained(TTObject *currExpr, TTObject *nextExpr);
     TTObject *createCreateVariables(TTLiteral *varNames);
 

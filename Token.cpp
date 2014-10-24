@@ -13,7 +13,7 @@ Token::Token(const uint32_t &line, const Type &type)
 }
 
 Token::Token(const uint32_t &line, const Type &type, const std::string &value)
-    : line(line), type(type), value(value)
+        : line(line), type(type), value(value)
 {
 
 }
@@ -33,9 +33,27 @@ const std::string &Token::getValue() const
     return value;
 }
 
+const static char *TypeStrings[14] =
+        {
+                "SYMBOL",
+                "INTEGER",
+                "STRING",
+                "ASSIGNMENT",
+                "CHARACTER",
+                "PARENTHESIS_OPEN",
+                "PARENTHESIS_CLOSE",
+                "BLOCK_OPEN",
+                "BLOCK_CLOSE",
+                "INVALID",
+                "EOF",
+                "EXPRESSION_END",
+                "RETURN",
+                "VERTICAL_BAR",
+        };
+
 const char *Token::getTypeInfo() const
 {
-    switch(getType())
+    switch (getType())
     {
         case Type::SYMBOL:
         case Type::INTEGER:
