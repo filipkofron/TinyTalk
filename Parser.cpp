@@ -208,6 +208,8 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
     std::vector<TTObject *> argValues;
     std::string fullName;
 
+    bool finishedWithExpressionEnd = false;
+
     uint32_t maxArgs = PARSER_MAX_METHOD_ARGS + 1;
     bool atEnd = false;
 
@@ -239,7 +241,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
                 atEnd = true;
                 break;
             case Token::Type::EXPRESSION_END:
-                tokenizer->readToken(); // eat it
+                finishedWithExpressionEnd = true;
                 atEnd = true;
                 break;
             default:
@@ -273,7 +275,13 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
 
     TTLiteral *valueArrayLit = TTLiteral::createObjectArray(argValues);
 
-    return Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
+    TTObject *res = Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
+
+    if(finishedWithExpressionEnd)
+    {
+        return parseChain(res, false);
+    }
+    return res;
 }
 
 TTObject *Parser::parseBlock(const bool &parseOnlyOne)

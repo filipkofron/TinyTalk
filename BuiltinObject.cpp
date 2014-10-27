@@ -10,7 +10,7 @@ TTObject *BuiltinObjectAlloc::invoke(TTObject *dest, std::vector<std::string> &a
 
 TTObject *BuiltinObjectAddField::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if(argNames.size() != 1 && values.size() != 1)
+    if (argNames.size() != 1 && values.size() != 1)
     {
         std::cerr << "[Builtin]: Adding field accepts one argument only." << std::endl;
         throw std::exception();
@@ -29,14 +29,14 @@ TTObject *BuiltinObjectAddField::invoke(TTObject *dest, std::vector<std::string>
 
 TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if(argNames.size() != 1 && values.size() != 1)
+    if (argNames.size() != 1 && values.size() != 1)
     {
         std::cerr << "[Builtin]: Getting field accepts one argument only." << std::endl;
         throw std::exception();
     }
     else
     {
-        if(values[0]->type != TT_LITERAL)
+        if (values[0]->type != TT_LITERAL)
         {
             std::cerr << "[Builtin]: Getting field accepts literal value only!" << std::endl;
             throw std::exception();
@@ -47,7 +47,7 @@ TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &
 
     std::cout << "[Builtin]: Checking field in dest = " << dest << std::endl;
 
-    if(!dest->hasField(TO_TT_STR(name.c_str())))
+    if (!dest->hasField(TO_TT_STR(name.c_str())))
     {
         std::cerr << "[Builtin]: Field not found!" << std::endl;
         throw std::exception();
@@ -60,20 +60,20 @@ TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &
 
 TTObject *BuiltinObjectSetter::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if(argNames.size() != 2 || values.size() != 2)
+    if (argNames.size() != 2 || values.size() != 2)
     {
         std::cerr << "[Builtin]: Setting field accepts 2 arguments only." << std::endl;
         throw std::exception();
     }
     else
     {
-        if(values[0]->type != TT_LITERAL)
+        if (values[0]->type != TT_LITERAL)
         {
             std::cerr << "[Builtin]: Setting field accepts literal value only!" << std::endl;
             throw std::exception();
         }
     }
-    if(argNames[1] != "value")
+    if (argNames[1] != "value")
     {
         std::cerr << "[Builtin]: Setting field's second argument must be 'value', '"
                 << argNames[1] << "' given!" << std::endl;
@@ -84,7 +84,7 @@ TTObject *BuiltinObjectSetter::invoke(TTObject *dest, std::vector<std::string> &
 
     std::cout << "[Builtin]: Checking field in dest = " << dest << std::endl;
 
-    if(!dest->hasField(TO_TT_STR(name.c_str())))
+    if (!dest->hasField(TO_TT_STR(name.c_str())))
     {
         std::cerr << "[Builtin]: Field not found!" << std::endl;
         throw std::exception();
@@ -93,6 +93,36 @@ TTObject *BuiltinObjectSetter::invoke(TTObject *dest, std::vector<std::string> &
     std::cout << "[Builtin]: Setting field in dest = " << dest << std::endl;
 
     dest->setField(TO_TT_STR(name.c_str()), values[1]);
+
+    return dest;
+}
+
+TTObject *BuiltinObjectDebugPrint::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    if (argNames.size() != 1 && values.size() != 1)
+    {
+        std::cerr << "[Builtin]: Print object accepts one argument only." << std::endl;
+        throw std::exception();
+    }
+
+    std::cout << "DBG PRINT ***************************** BEGIN ********************************" << std::endl;
+    values[0]->print(std::cout, 1, false);
+    std::cout << "DBG PRINT ****************************** END *********************************" << std::endl;
+
+    return dest;
+}
+
+TTObject *BuiltinObjectDebugPrintRec::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    if (argNames.size() != 1 && values.size() != 1)
+    {
+        std::cerr << "[Builtin]: Print object accepts one argument only." << std::endl;
+        throw std::exception();
+    }
+
+    std::cout << "DBG PRINT REC ***************************** BEGIN ********************************" << std::endl;
+    values[0]->print(std::cout, 1, true);
+    std::cout << "DBG PRINT REC ****************************** END *********************************" << std::endl;
 
     return dest;
 }

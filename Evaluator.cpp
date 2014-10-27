@@ -194,7 +194,8 @@ TTObject *Evaluator::evaluateSymbolValue(TTObject *symbolValue, TTObject *env)
         return evaluateSymbolValue(symbolValue, parent);
     }
     std::cout << "(evaluateSymbolValue): field not found in anywhere, sorry" << std::endl;
-    return TTObject::createObject(TT_NIL);
+    throw std::exception();
+    //return TTObject::createObject(TT_NIL);
 }
 
 TTObject *Evaluator::evaluateBlock(TTObject *block, TTObject *env)

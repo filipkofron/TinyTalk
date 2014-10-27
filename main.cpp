@@ -26,9 +26,8 @@ int main()
     std::cout << std::endl;
     std::cout << std::endl;
 
-    std::shared_ptr<Reader> reader(new Reader(&std::cin));
-    Interpreter interpreter(reader);
-    interpreter.startInterpreting();
+    Interpreter interpreter;
+    interpreter.interpret(std::cin);
 
     MemAllocator::cleanupDefaultAllocator();
     return 0;

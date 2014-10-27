@@ -107,6 +107,18 @@ bool Tokenizer::isVerticalBar(const int &c)
     return c == '|';
 }
 
+bool Tokenizer::isComment(const int &c)
+{
+    if(c == '/')
+    {
+        int toBeReturned = reader->read();
+        int next = reader->peek();
+        reader->putBack(toBeReturned);
+        return next == '/';
+    }
+    return false;
+}
+
 std::string Tokenizer::readInteger()
 {
     std::string val;
@@ -228,6 +240,16 @@ void Tokenizer::readReturn()
     reader->read();
 }
 
+void Tokenizer::readComment()
+{
+    reader->read();
+    reader->read();
+    while(reader->peek() != '\n' && reader->peek() != '\r' )
+    {
+        reader->read();
+    }
+}
+
 void Tokenizer::eatWhitespace()
 {
     while(isWhitespace(reader->peek()))
@@ -255,6 +277,12 @@ Token Tokenizer::reallyReadToken()
         if(isWhitespace(c))
         {
             eatWhitespace();
+            continue;
+        }
+
+        if(isComment(c))
+        {
+            readComment();
             continue;
         }
 

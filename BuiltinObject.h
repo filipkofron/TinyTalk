@@ -29,5 +29,16 @@ public:
     virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 };
 
+class BuiltinObjectDebugPrint : public Builtin
+{
+public:
+    virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+};
+
+class BuiltinObjectDebugPrintRec : public Builtin
+{
+public:
+    virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+};
 
 #endif

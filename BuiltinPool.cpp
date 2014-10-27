@@ -10,6 +10,8 @@ BuiltinPool::BuiltinPool()
     registerBultin("object_add", std::shared_ptr<Builtin> (new BuiltinObjectAddField));
     registerBultin("object_get", std::shared_ptr<Builtin> (new BuiltinObjectGetter()));
     registerBultin("object_set", std::shared_ptr<Builtin> (new BuiltinObjectSetter()));
+    registerBultin("object_debugprint", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrint));
+    registerBultin("object_debugprintrec", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrintRec));
 }
 
 void BuiltinPool::registerBultin(const std::string &name, std::shared_ptr<Builtin> builtin)

@@ -4,9 +4,9 @@
 #include "Parser.h"
 #include "Evaluator.h"
 #include "Expression.h"
+#include <fstream>
 
-Interpreter::Interpreter(std::shared_ptr<Reader> &reader)
-    : tokenizer(new Tokenizer(reader))
+Interpreter::Interpreter()
 {
     initialize();
 }
@@ -15,6 +15,8 @@ void Interpreter::initialize()
 {
     globalEnvironment = TTObject::createObject(TT_ENV);
     globalEnvironment->addField(TO_TT_STR("parent"), TTObject::createObject(TT_NIL));
+
+    globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
 
     TTObject *lit = TTObject::createObject(TT_LITERAL);
     lit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR("Hello, World!")));
@@ -34,8 +36,31 @@ void Interpreter::setupObject()
     addMultipleMethod(object, "addField:", {"addField"},"object_add");
     addMultipleMethod(object, "get:", {"get"},"object_get");
     addMultipleMethod(object, "set:value:", {"set", "value"},"object_set");
+    addMultipleMethod(object, "debugprint:", {"debugprint"}, "object_debugprint");
+    addMultipleMethod(object, "debugprintrec:", {"debugprintrec"}, "object_debugprintrec");
 
     globalEnvironment->addField(TO_TT_STR("Object"), object);
+
+    std::cout << "%% Loading TTLib." << std::endl;
+    loadTTLib();
+    std::cout << "%% Loading TTLib done." << std::endl;
+}
+
+void Interpreter::loadTTLib()
+{
+    std::ifstream init("../TinyTalk/ttlib/init.tt", std::ifstream::in);
+    std::ifstream control("../TinyTalk/ttlib/control.tt", std::ifstream::in);
+    std::ifstream clazz("../TinyTalk/ttlib/class.tt", std::ifstream::in);
+
+    if(init.fail() || control.fail() || clazz.fail())
+    {
+        std::cerr << "TTLib: Cannot open ttlib files!!" << std::endl;
+        throw std::exception();
+    }
+
+    interpret(init);
+    interpret(control);
+    interpret(clazz);
 }
 
 void Interpreter::addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName)
@@ -70,8 +95,10 @@ Interpreter::~Interpreter()
 
 }
 
-void Interpreter::startInterpreting()
+void Interpreter::interpret(std::istream &is)
 {
+    std::shared_ptr<Reader> reader(new Reader(&is));
+    std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
     Parser parser(tokenizer);
     Evaluator evaluator;
 

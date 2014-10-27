@@ -11,18 +11,18 @@ class Interpreter
 {
 private:
     TTObject *globalEnvironment;
-    std::shared_ptr<Tokenizer> tokenizer;
     BuiltinPool pool;
 
 public:
-    Interpreter(std::shared_ptr<Reader> &reader);
+    Interpreter();
     void initialize();
     void setupObject();
+    void loadTTLib();
     void addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName);
     void addMultipleMethod(TTObject *dest, const std::string &msgName, const std::vector<std::string> &msgArgs, const std::string &buitlinName);
     ~Interpreter();
 
-    void startInterpreting();
+    void interpret(std::istream &is);
 };
 
 #endif

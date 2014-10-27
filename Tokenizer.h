@@ -28,6 +28,7 @@ private:
     bool isExpressionEnd(const int &c);
     bool isReturn(const int &c);
     bool isVerticalBar(const int &c);
+    bool isComment(const int &c);
     std::string readInteger();
     std::string readSymbol();
     std::string readString();
@@ -40,6 +41,7 @@ private:
     void readExpressionEnd();
     void readReturn();
     void readVerticalBar();
+    void readComment();
     void eatWhitespace();
 
     Token reallyReadToken();
