@@ -31,15 +31,17 @@ void Interpreter::initialize()
 void Interpreter::setupObject()
 {
     TTObject *object = TTObject::createObject(TT_OBJECT);
+    TTObject *debug = TTObject::createObject(TT_OBJECT);
 
     addSimpleMethod(object, "alloc", "object_alloc");
-    addMultipleMethod(object, "addField:", {"addField"},"object_add");
-    addMultipleMethod(object, "get:", {"get"},"object_get");
-    addMultipleMethod(object, "set:value:", {"set", "value"},"object_set");
-    addMultipleMethod(object, "debugprint:", {"debugprint"}, "object_debugprint");
-    addMultipleMethod(object, "debugprintrec:", {"debugprintrec"}, "object_debugprintrec");
+    addMultipleMethod(object, "object:addField:", {"object", "addField"},"object_add");
+    addMultipleMethod(object, "object:get:", {"object", "get"},"object_get");
+    addMultipleMethod(object, "object:set:value:", {"object", "set", "value"},"object_set");
+    addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
+    addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
 
     globalEnvironment->addField(TO_TT_STR("Object"), object);
+    globalEnvironment->addField(TO_TT_STR("Debug"), debug);
 
     std::cout << "%% Loading TTLib." << std::endl;
     loadTTLib();

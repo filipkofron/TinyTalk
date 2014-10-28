@@ -1,9 +1,10 @@
 
-| True False |;
-True = Object alloc;
-False = Object alloc;
-Object inObject: True createField: "ifTrue:" withValue: [:ifTrue: | ifTrue value];
+// Initialize control structures
 
+| True False |;
+True = (Object alloc);
+False = (Object alloc);
+Object inObject: True createField: "ifTrue:" withValue: [:ifTrue: | ifTrue value];
 
 Object inObject: True createField: "ifFalse:" withValue: [:ifFalse: | nil];
 Object inObject: True createField: "ifTrue:ifFalse:" withValue: [:ifTrue: :ifFalse:| ifTrue value];
@@ -13,5 +14,3 @@ Object inObject: False createField: "ifFalse:" withValue: [:ifFalse: | ifFalse v
 Object inObject: False createField: "ifTrue:" withValue: [:ifTrue: | nil];
 Object inObject: False createField: "ifTrue:ifFalse:" withValue: [:ifTrue: :ifFalse:| ifFalse value];
 Object inObject: False createField: "ifFalse:ifTrue:" withValue: [:ifFalse: :ifTrue:| ifFalse value];
-
-True ifTrue: ["It is true!"];

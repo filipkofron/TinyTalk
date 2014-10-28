@@ -244,7 +244,7 @@ void Tokenizer::readComment()
 {
     reader->read();
     reader->read();
-    while(reader->peek() != '\n' && reader->peek() != '\r' )
+    while(reader->peek() != '\n' && reader->peek() != '\r' && reader->peek() != EOF)
     {
         reader->read();
     }

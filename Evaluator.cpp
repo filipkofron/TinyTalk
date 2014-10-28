@@ -314,7 +314,7 @@ TTObject *Evaluator::evaluateLiteralValue(TTObject *expr, TTObject *env)
 
 TTObject *Evaluator::sendMultipleMessageToNonExpression(std::string &msgFullName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *dest, TTObject *env)
 {
-    std::cout << "(sendMultipleMessageToNonExpression)" << std::endl;
+    std::cout << "(sendMultipleMessageToNonExpression) msgFullName: '" << msgFullName << "'" << std::endl;
 
     TTObject *field = dest->getField(TO_TT_STR(msgFullName.c_str()));
 
@@ -323,6 +323,7 @@ TTObject *Evaluator::sendMultipleMessageToNonExpression(std::string &msgFullName
         if(field->type != TT_EXPR)
         {
             std::cerr << "(sendMultipleMessageToNonExpression): Sorry, value is not a method: " << field << " !!!" << std::endl;
+            std::cerr << "(sendMultipleMessageToNonExpression): Sorry, value is not a method str hax: '" << (char *) field->getLiteral()->data << "' !!!" << std::endl;
             throw std::exception();
         }
 
@@ -417,7 +418,7 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *expr, TTObject *env)
     std::vector<TTObject *> valuesExpressions;
     std::vector<TTObject *> values;
 
-    uint32_t len = msgNameArray->getLiteral()->length / sizeof(TTObject *);
+    uint32_t len = (uint32_t) (msgNameArray->getLiteral()->length / sizeof(TTObject *));
     TTObject **nameObjects = (TTObject **) msgNameArray->getLiteral()->data; // TODO: fix this, we should not allocate any memory, but if a GC is forced here, the inevitable will happen ... GC will fail
     TTObject **expressionObjects = (TTObject **) msgValueArray->getLiteral()->data; // TODO: fix this, we should not allocate any memory, but if a GC is forced here, the inevitable will happen ... GC will fail
     for(uint32_t i = 0; i < len; i++)
@@ -436,7 +437,8 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *expr, TTObject *env)
     if(!msgDest)
     {
         std::cerr << "(evaluateMultipleMessage): destValue is NULL!" << std::endl;
-        return TTObject::createObject(TT_NIL);
+        throw std::exception();
+        //return TTObject::createObject(TT_NIL);
     }
 
     if(msgDest->type == TT_EXPR)

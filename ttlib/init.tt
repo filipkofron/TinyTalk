@@ -1,10 +1,9 @@
 // Initial TinyTalk library for basic object operations
 
-Object addField: "inObject:createField:withValue:";
-Object set: "inObject:createField:withValue:"
+Object object: Object addField: "inObject:createField:withValue:";
+Object object: Object set: "inObject:createField:withValue:"
 value:
     [ :inObject: :createField: :withValue: |
-        inObject addField: createField;
-        inObject set: createField value: withValue;
-        Object debugprint: inObject
+        Object object: inObject addField: createField;
+        Object object: inObject set: createField value: withValue
     ];
