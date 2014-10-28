@@ -246,6 +246,7 @@ void Tokenizer::readComment()
     reader->read();
     while(reader->peek() != '\n' && reader->peek() != '\r' && reader->peek() != EOF)
     {
+        if(reader->peek() == '\n') lineCounter++;
         reader->read();
     }
 }
@@ -254,8 +255,8 @@ void Tokenizer::eatWhitespace()
 {
     while(isWhitespace(reader->peek()))
     {
-        reader->read();
-        lineCounter++;
+        int c = reader->read();
+        if(c == '\n') lineCounter++;
     }
 }
 
