@@ -13,16 +13,18 @@ private:
     TTObject *globalEnvironment;
     BuiltinPool pool;
 
-public:
-    Interpreter();
+
     void initialize();
     void setupObject();
     void loadTTLib();
     void addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName);
     void addMultipleMethod(TTObject *dest, const std::string &msgName, const std::vector<std::string> &msgArgs, const std::string &buitlinName);
+public:
+    Interpreter();
     ~Interpreter();
 
-    void interpret(std::istream &is);
+    void interpretFile(std::istream &is);
+    void interpretCommandLine(std::istream &is);
 };
 
 #endif

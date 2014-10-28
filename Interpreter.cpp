@@ -5,6 +5,7 @@
 #include "Evaluator.h"
 #include "Expression.h"
 #include <fstream>
+#include <sstream>
 
 Interpreter::Interpreter()
 {
@@ -60,9 +61,9 @@ void Interpreter::loadTTLib()
         throw std::exception();
     }
 
-    interpret(init);
-    interpret(control);
-    interpret(clazz);
+    interpretFile(init);
+    interpretFile(control);
+    interpretFile(clazz);
 }
 
 void Interpreter::addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName)
@@ -97,7 +98,7 @@ Interpreter::~Interpreter()
 
 }
 
-void Interpreter::interpret(std::istream &is)
+void Interpreter::interpretFile(std::istream &is)
 {
     std::shared_ptr<Reader> reader(new Reader(&is));
     std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
@@ -108,9 +109,6 @@ void Interpreter::interpret(std::istream &is)
     {
         try
         {
-            std::cout << "> ";
-            std::flush(std::cout);
-
             TTObject *expression = parser.parse(false);
 
             std::cout << std::endl << "<<< ======================================" << std::endl;
@@ -133,5 +131,39 @@ void Interpreter::interpret(std::istream &is)
             std::cerr << "Caught exception: " << e.what() << std::endl;
             break;
         }
+        catch (std::exception &ex)
+        {
+            std::cerr << "Caught exception: " << ex.what() << std::endl;
+            break;
+        }
     } while (!tokenizer->hasReachedEOF());
+}
+
+void Interpreter::interpretCommandLine(std::istream &is)
+{
+    bool notEOF = true;
+    do
+    {
+        std::stringstream ss;
+
+        std::cout << "> ";
+        std::flush(std::cout);
+
+        while(true)
+        {
+            int c = is.get();
+            if(c == '\n' || c == '\r' || c == EOF || ss.fail())
+            {
+                if(c == EOF || ss.fail())
+                {
+                    notEOF = false;
+                }
+                break;
+            }
+            ss << (char) c;
+        }
+
+        interpretFile(ss);
+    }
+    while (notEOF && !is.fail());
 }

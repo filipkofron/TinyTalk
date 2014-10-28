@@ -27,7 +27,7 @@ int main()
     std::cout << std::endl;
 
     Interpreter interpreter;
-    interpreter.interpret(std::cin);
+    interpreter.interpretCommandLine(std::cin);
 
     MemAllocator::cleanupDefaultAllocator();
     return 0;
