@@ -130,3 +130,17 @@ TTObject *BuiltinObjectDebugPrintRec::invoke(TTObject *dest, std::vector<std::st
 
     return dest;
 }
+
+TTObject *BuiltinObjectClone::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    if (argNames.size() != 1 && values.size() != 1)
+    {
+        std::cerr << "[Builtin]: Clone object accepts one argument only." << std::endl;
+        throw std::exception();
+    }
+
+    TTObject *cloned = values[0];
+    TTObject *res = TTObject::clone(cloned);
+
+    return  res;
+}

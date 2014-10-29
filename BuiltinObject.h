@@ -41,4 +41,10 @@ public:
     virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 };
 
+class BuiltinObjectClone : public Builtin
+{
+public:
+    virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+};
+
 #endif

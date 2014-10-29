@@ -3,7 +3,7 @@
 #include "common.h"
 #include <cstring>
 
-TTObject *TTObject::copy(MemAllocator *allocator)
+TTObject *TTObject::gccopy(MemAllocator *allocator)
 {
     TTObject *newObject = allocator->allocateObject();
     memcpy(newObject, this, sizeof(*this));
@@ -29,39 +29,14 @@ TTObject *TTObject::createObject(uint8_t type)
     return createObject(type, DEFAULT_FIELD_COUNT);
 }
 
-TTObject *TTObject::clone()
+TTObject *TTObject::clone(TTObject *cloned)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
     TTObject *newObject = alloc->allocateObject();
-    memcpy(newObject, this, sizeof(*this));
-    newObject->fields = (Field *) alloc->allocate(sizeof(Field) * fieldCapacity);
+    memcpy(newObject, cloned, sizeof(*cloned));
+    newObject->fields = (Field *) alloc->allocate(sizeof(newObject->fields) * cloned->fieldCapacity);
 
-    if(IS_LITERAL(newObject))
-    {
-        for(uint32_t i = 0; i < fieldCount; i++)
-        {
-            if(!*fields[i].name)
-            {
-                TTLiteral *lit = ((TTLiteral *) fields[i].object)->clone();
-
-                newObject->fields[i].object = (TTObject *) lit;
-                newObject->fields[i].name = fields[i].name;
-            }
-            else
-            {
-                newObject->fields[i].object = fields[i].object->clone();
-                newObject->fields[i].name = fields[i].name;
-            }
-        }
-    }
-    else
-    {
-        for(uint32_t i = 0; i < fieldCount; i++)
-        {
-            newObject->fields[i].object = fields[i].object->clone();
-            newObject->fields[i].name = fields[i].name;
-        }
-    }
+    memcpy(newObject->fields, cloned->fields, sizeof(*cloned->fields) * cloned->fieldCapacity);
 
     return newObject;
 }

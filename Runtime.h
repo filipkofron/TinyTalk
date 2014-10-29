@@ -4,10 +4,12 @@
 struct Runtime;
 
 #include "BuiltinPool.h"
+#include "RefPtrMap.h"
 
 struct Runtime
 {
     static BuiltinPool builtinPool;
+    static RefPtrMap refPtrMap;
 };
 
 #endif

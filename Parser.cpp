@@ -343,12 +343,14 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
                 break;
             case Token::Type::BLOCK_CLOSE:
                 std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Block without body." << std::endl;
-                return NULL;
+                throw std::exception();
+                //return NULL;
             default:
                 if(maxArgs != PARSER_MAX_METHOD_ARGS + 1)
                 {
                     std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Invalid block argument." << std::endl;
-                    return NULL;
+                    throw std::exception();
+                    //return NULL;
                 }
                 atEnd = true;
                 break;

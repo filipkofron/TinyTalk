@@ -20,9 +20,9 @@ struct TTLiteral
     uint32_t length;
     uint8_t *data;
 
-    TTLiteral *copy(MemAllocator *allocator);
+    static TTLiteral *copy(MemAllocator *allocator, TTLiteral *lit);
 
-    TTLiteral *clone();
+    static TTLiteral *clone(TTLiteral *lit);
 
     TTObject *onMessage(TTObject *msg);
 

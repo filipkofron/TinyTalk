@@ -2,26 +2,26 @@
 #include "common.h"
 #include <cstring>
 
-TTLiteral *TTLiteral::copy(MemAllocator *allocator)
+TTLiteral *TTLiteral::copy(MemAllocator *allocator, TTLiteral *lit)
 {
     // TODO: simple copy, since we don't need to recurse and this value is held as a single instance
     // TODO: only, so the GC will be ok with this.
     // TODO: Also, no object references can be yet referenced from these data.
 
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTLiteral *lit = alloc->allocateLiteral();
+    TTLiteral *newLit = alloc->allocateLiteral();
 
-    lit->type = type;
-    lit->length = length;
-    lit->data = alloc->allocate(length);
-    memcpy(lit->data, data, length);
+    newLit->type = lit->type;
+    newLit->length = lit->length;
+    newLit->data = alloc->allocate(lit->length);
+    memcpy(newLit->data, lit->data, lit->length);
 
-    return lit;
+    return newLit;
 }
 
-TTLiteral *TTLiteral::clone()
+TTLiteral *TTLiteral::clone(TTLiteral *lit)
 {
-    return copy(MemAllocator::getCurrent());
+    return copy(MemAllocator::getCurrent(), lit);
 }
 
 TTObject *TTLiteral::onMessage(TTObject *msg)

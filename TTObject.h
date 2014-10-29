@@ -76,7 +76,7 @@ struct TTObject
     /**
     * For future stuff (GC) only!
     */
-    TTObject *copy(MemAllocator *allocator);
+    TTObject *gccopy(MemAllocator *allocator);
 
     /**
     * Objects must only be created using these functions.
@@ -85,9 +85,9 @@ struct TTObject
     static TTObject *createObject(uint8_t type);
 
     /**
-    * Create deep copy of the object. Field names will not be cloned though, but the objects will!
+    * Not deep copy. Cannot do that due to cycle references.
     */
-    TTObject *clone();
+    static TTObject *clone(TTObject *cloned);
 
 
     /**

@@ -40,6 +40,7 @@ void Interpreter::setupObject()
     addMultipleMethod(object, "object:set:value:", {"object", "set", "value"},"object_set");
     addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
     addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
+    addMultipleMethod(object, "clone:", {"clone"},"object_clone");
 
     globalEnvironment->addField(TO_TT_STR("Object"), object);
     globalEnvironment->addField(TO_TT_STR("Debug"), debug);
