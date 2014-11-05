@@ -135,7 +135,7 @@ TTObject *BuiltinObjectClone::invoke(TTObject *dest, std::vector<std::string> &a
 {
     if (argNames.size() != 1 && values.size() != 1)
     {
-        std::cerr << "[Builtin]: Clone object accepts one argument only." << std::endl;
+        std::cerr << "[Builtin]: Clone builting function accepts one argument only." << std::endl;
         throw std::exception();
     }
 
@@ -143,4 +143,18 @@ TTObject *BuiltinObjectClone::invoke(TTObject *dest, std::vector<std::string> &a
     TTObject *res = TTObject::clone(cloned);
 
     return  res;
+}
+
+TTObject *BuiltinObjectNew::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    if (argNames.size() != 0 && values.size() != 0)
+    {
+        std::cerr << "[Builtin]: New builtin function accepts no arguments." << std::endl;
+        throw std::exception();
+    }
+
+    TTObject *res = TTObject::createObject(TT_OBJECT);
+    res->addField(TO_TT_STR("parent"), dest);
+
+    return res;
 }

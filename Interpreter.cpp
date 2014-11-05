@@ -4,6 +4,7 @@
 #include "Parser.h"
 #include "Evaluator.h"
 #include "Expression.h"
+#include "Runtime.h"
 #include <fstream>
 #include <sstream>
 
@@ -14,19 +15,19 @@ Interpreter::Interpreter()
 
 void Interpreter::initialize()
 {
-    globalEnvironment = TTObject::createObject(TT_ENV);
-    globalEnvironment->addField(TO_TT_STR("parent"), TTObject::createObject(TT_NIL));
+    Runtime::globalEnvironment = TTObject::createObject(TT_ENV);
+    Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), TTObject::createObject(TT_NIL));
 
-    globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
+    Runtime::globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
 
     TTObject *lit = TTObject::createObject(TT_LITERAL);
     lit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR("Hello, World!")));
-    globalEnvironment->addField(TO_TT_STR("testStr"), lit);
+    Runtime::globalEnvironment->addField(TO_TT_STR("testStr"), lit);
 
     setupObject();
 
-    std::cout << "### test global env: " << globalEnvironment << std::endl;
-    std::cout << "### test field parent: " << globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
+   // std::cout << "### test global env: " << Runtime::globalEnvironment << std::endl;
+   // std::cout << "### test field parent: " << Runtime::globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
 }
 
 void Interpreter::setupObject()
@@ -41,9 +42,10 @@ void Interpreter::setupObject()
     addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
     addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
     addMultipleMethod(object, "clone:", {"clone"},"object_clone");
+    addSimpleMethod(object, "new", "object_new");
 
-    globalEnvironment->addField(TO_TT_STR("Object"), object);
-    globalEnvironment->addField(TO_TT_STR("Debug"), debug);
+    Runtime::globalEnvironment->addField(TO_TT_STR("Object"), object);
+    Runtime::globalEnvironment->addField(TO_TT_STR("Debug"), debug);
 
     std::cout << "%% Loading TTLib." << std::endl;
     loadTTLib();
@@ -119,7 +121,7 @@ void Interpreter::interpretFile(std::istream &is)
 
             if(expression != NULL)
             {
-                TTObject *result = evaluator.evaluate(expression, globalEnvironment);
+                TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
                 std::cout << std::endl << ">>> ======================================" << std::endl;
                 std::cout << "Evaluator result: " << std::endl;

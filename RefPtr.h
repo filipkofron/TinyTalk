@@ -14,7 +14,9 @@ class RefPtrBase
 {
 protected:
     uintptr_t ptr;
+    bool object;
     RefPtrBase(uintptr_t ptr, bool object);
+    RefPtrBase(const RefPtrBase &orig);
     ~RefPtrBase();
 
     void setBasePtr(uintptr_t ptr);
@@ -34,6 +36,12 @@ public:
     RefPtr(T *ptr)
         : RefPtrBase((uintptr_t) ptr, isObject(ptr))
     {
+    }
+
+    RefPtr(const RefPtr<T> &orig)
+        : RefPtrBase(orig)
+    {
+
     }
 
     ~RefPtr()
@@ -57,6 +65,21 @@ public:
     }
 
     T *getPtr()
+    {
+        return (T *) ptr;
+    }
+
+    T &operator *()
+    {
+        return * (T *) ptr;
+    }
+
+    T *operator &()
+    {
+        return (T *) ptr;
+    }
+
+    T* operator ->()
     {
         return (T *) ptr;
     }

@@ -2,3 +2,4 @@
 
 BuiltinPool Runtime::builtinPool;
 RefPtrMap Runtime::refPtrMap;
+TTObject *Runtime::globalEnvironment = NULL;

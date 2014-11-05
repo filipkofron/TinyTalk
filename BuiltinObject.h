@@ -47,4 +47,10 @@ public:
     virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 };
 
+class BuiltinObjectNew : public Builtin
+{
+public:
+    virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+};
+
 #endif

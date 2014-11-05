@@ -1,21 +1,15 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
-#include <cstdio>
 
 #include "common.h"
 #include "Reader.h"
-#include "Tokenizer.h"
 #include "TokenizerException.h"
 #include "MemAllocator.h"
 #include "Interpreter.h"
+#include "RefPtr.h"
 
 using namespace std;
-
-void initializeBuiltins()
-{
-
-}
 
 int main()
 {
@@ -28,6 +22,9 @@ int main()
 
     Interpreter interpreter;
     interpreter.interpretCommandLine(std::cin);
+
+    RefPtr<TTObject> ptr(TTObject::createObject(TT_OBJECT));
+    ptr->print(std::cout, 1, false);
 
     MemAllocator::cleanupDefaultAllocator();
     return 0;

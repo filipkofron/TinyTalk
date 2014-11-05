@@ -2,10 +2,20 @@
 #include "Runtime.h"
 
 RefPtrBase::RefPtrBase(uintptr_t ptr, bool object)
+    : ptr(ptr), object(object)
 {
     if(ptr)
     {
-        Runtime::refPtrMap.reg(this, ptr);
+        Runtime::refPtrMap.reg(this, object);
+    }
+}
+
+RefPtrBase::RefPtrBase(const RefPtrBase &orig)
+    : ptr(orig.ptr), object(orig.object)
+{
+    if(ptr)
+    {
+        Runtime::refPtrMap.reg(this, object);
     }
 }
 

@@ -10,6 +10,7 @@ struct Runtime
 {
     static BuiltinPool builtinPool;
     static RefPtrMap refPtrMap;
+    static TTObject *globalEnvironment;
 };
 
 #endif

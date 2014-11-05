@@ -13,6 +13,7 @@ BuiltinPool::BuiltinPool()
     registerBultin("object_debugprint", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrint));
     registerBultin("object_debugprintrec", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrintRec));
     registerBultin("object_clone", std::shared_ptr<Builtin> (new BuiltinObjectClone));
+    registerBultin("object_new", std::shared_ptr<Builtin> (new BuiltinObjectNew));
 }
 
 void BuiltinPool::registerBultin(const std::string &name, std::shared_ptr<Builtin> builtin)

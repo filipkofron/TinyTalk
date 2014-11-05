@@ -83,6 +83,8 @@
 * 2. full name - "blockFullName"
 * 3. expression - "blockExpr"
 * 4. native name - "blockNativeName"
+*
+* it will later also have "blockEnv" when evaluating
 */
 #define EXPRESSION_BLOCK 0x08
 

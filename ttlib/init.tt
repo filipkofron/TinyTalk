@@ -7,3 +7,10 @@ value:
         Object object: inObject addField: createField;
         Object object: inObject set: createField value: withValue
     ];
+
+Object inObject: Object createField: "createField:withValue:" withValue:
+    [ :createField: :withValue: |
+        Object inObject: this createField: createField withValue: withValue
+    ];
+
+Object createField: "getParent" withValue: [ parent ];

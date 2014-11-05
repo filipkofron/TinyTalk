@@ -10,7 +10,6 @@ class Interpreter;
 class Interpreter
 {
 private:
-    TTObject *globalEnvironment;
     BuiltinPool pool;
 
 

@@ -336,8 +336,11 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
             case Token::Type::VERTICAL_BAR:
                 if(maxArgs == PARSER_MAX_METHOD_ARGS + 1)
                 {
-                    std::cout << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Warning: Empty block argument list. (No reason to have the vertical bar)" << std::endl;
+                    std::cout << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " TODO: Vertical bar at the beginning, is this local var init :) ?" << std::endl;
+                    atEnd = true;
+                    break;
                 }
+                // end of var declaration
                 tokenizer->readToken();
                 atEnd = true;
                 break;

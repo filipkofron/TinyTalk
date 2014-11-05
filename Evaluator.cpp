@@ -3,99 +3,81 @@
 #include "common.h"
 #include "Runtime.h"
 #include <cstring>
-#include "Runtime.h"
 
-TTObject *Evaluator::sendSimpleMessageToNonExpression(std::string &simpleMessageName, TTObject *dest, TTObject *env)
+TTObject *Evaluator::executeSimpleExpression(TTObject *expression, TTObject *dest, std::string &msgName, TTObject *thiz)
 {
-    std::cout << "(sendSimpleMessageToNonExpression)" << std::endl;
+    std::cout << "(executeSimpleExpression)" << std::endl;
 
-    TTObject *field = dest->getField(TO_TT_STR(simpleMessageName.c_str()));
+    TTObject *env = TTObject::createObject(TT_ENV);
+    TTObject *blockExpr = expression->getField(TO_TT_STR("blockExpr"));
+    TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
+    TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
 
-    if(field)
+    if(thiz)
     {
-        if(field->type != TT_EXPR)
-        {
-            std::cerr << "Eval: Sorry, value is not a method: " << simpleMessageName << " !!!" << std::endl;
-        }
+        std::cout << "(executeSimpleExpression) has this: " << thiz << std::endl;
+        env->addField(TO_TT_STR("this"), thiz);
+    }
+    std::cout << "(executeSimpleExpression) parent env: " << blockEnv << std::endl;
+    env->addField(TO_TT_STR("parentEnv"), blockEnv);
 
-        return executeSimpleMessage(field, simpleMessageName, env, dest);
-    }
-    else
+    if(blockNativeName)
     {
-        std::cerr << "Eval: Sorry, object doesn't understand message: " << simpleMessageName << " !!!" << std::endl;
-        return TTObject::createObject(TT_NIL);
+        std::string nativeName = (char *) blockNativeName->getLiteral()->data;
+
+        return executeSimpleNativeMessage(nativeName, dest, msgName, thiz);
     }
+
+    return evaluate(blockExpr, env);
 }
 
-TTObject *Evaluator::executeSimpleMessage(TTObject *expression, std::string &msgName, TTObject *env, TTObject *thiz)
+TTObject *Evaluator::executeSimpleNativeMessage(std::string &nativeName, TTObject *dest, std::string &msgName, TTObject *thiz)
 {
-    std::cout << "(executeSimpleMessage) of name=" << msgName << std::endl;
-
-    std::cout << "blockExpression: " << expression << std::endl;
-
-    std::cout << "blockExpression->getField(TO_TT_STR(\"blockFullName\")): " << expression->getField(TO_TT_STR("blockFullName")) << std::endl;
-
-
-    std::string name = (char *) expression->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
-
-    std::cout << "(executeSimpleMessage) with block name=" << name << " empty: " << name.empty() << std::endl;
-
-    bool anon = COMPARE_NAME(msgName.c_str(), "value") == 0 && name.empty();
-
-    if(COMPARE_NAME(msgName.c_str(), name.c_str()) == 0 || anon)
+    std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(nativeName);
+    std::vector<std::string> singleList;
+    singleList.push_back(msgName);
+    if(builtin)
     {
-        TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
-        TTObject *blockExpr = expression->getField(TO_TT_STR("blockExpr"));
-        TTObject *newEnv = TTObject::createObject(TT_ENV);
-        TTObject *nativeName = expression->getField(TO_TT_STR("blockNativeName"));
-        newEnv->addField(TO_TT_STR("parent"), blockEnv);
-
+        std::cout << "(executeSimpleNativeMessage): Builtin function '" << nativeName << "' found." << std::endl;
         if(thiz)
         {
-            newEnv->addField(TO_TT_STR("this"), thiz);
+            return builtin->invoke(thiz, singleList, std::vector<TTObject *>());
         }
-
-        /**
-        * Todo: execute bytecode or native code .. LOL
-        */
-
-        std::cout << "nativeName: " << nativeName << std::endl;
-
-        if(nativeName)
-        {
-            TTLiteral *lit = nativeName->getLiteral();
-            std::string strName = (char *) lit->data;
-
-            std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(strName);
-            std::vector<std::string> singleList;
-            singleList.push_back(msgName);
-            if(builtin)
-            {
-                std::cout << "(executeSimpleMessage): Builtin function '" << strName << "' found." << std::endl;
-                if(thiz)
-                {
-                    return builtin->invoke(thiz, singleList, std::vector<TTObject *>());
-                }
-                return builtin->invoke(env, singleList, std::vector<TTObject *>());
-            }
-            else
-            {
-                std::cerr << "(executeSimpleMessage): Builtin function '" << strName << "' not found!" << std::endl;
-                throw std::exception();
-            }
-        }
-
-        return evaluate(blockExpr, newEnv);
+        return builtin->invoke(dest, singleList, std::vector<TTObject *>());
     }
     else
     {
-        if(anon)
-        {
-            std::cerr << "(executeSimpleMessage): Cannot evaluate anonymous block." << std::endl;
-            return NULL;
-        }
-        return sendSimpleMessageToNonExpression(msgName, expression, env);
+        std::cerr << "(executeSimpleNativeMessage): Builtin function '" << nativeName << "' not found!" << std::endl;
+        throw std::exception();
     }
+    return NULL;
+}
+
+TTObject *Evaluator::executeSimpleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, TTObject *thiz)
+{
+    std::cout << "(executeSimpleExpressionAtNonExpression)" << std::endl;
+
+    TTObject *fieldVal = object->getField(TO_TT_STR(name.c_str()));
+    if(fieldVal)
+    {
+        if(fieldVal->type != TT_EXPR || fieldVal->flags != EXPRESSION_BLOCK)
+        {
+            std::cerr << "(executeSimpleExpressionAtNonExpression): Error: NON EXPRESSION FIELD: " << fieldVal << std::endl;
+            throw std::exception();
+        }
+        return executeSimpleExpression(fieldVal, dest, name, thiz);
+    }
+
+    TTObject *parent = object->getField(TO_TT_STR("parent"));
+
+    if(!parent)
+    {
+        std::cerr << "(executeSimpleExpressionAtNonExpression): Object doesn't understand this message " << fieldVal << std::endl;
+        throw std::exception();
+    }
+
+    // Now, either the field is in this object or in its parents, nowhere else!
+    return executeSimpleExpressionAtNonExpression(parent, dest, name, thiz);
 }
 
 TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *env)
@@ -104,37 +86,54 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
 
     std::string msgName = (char *) simpleMessage->getField(TO_TT_STR("msgName"))->getLiteral()->data;
     TTObject *destExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
-
-    if(!destExpr)
-    {
-        std::cerr << "(evaluateSimpleMessage): destExpr is NULL (message name: "
-                << msgName << ")!" << std::endl;
-        return TTObject::createObject(TT_NIL);
-    }
-
     TTObject *destValue = evaluate(destExpr, env);
 
-    if(!destValue)
+    TTObject *thiz = env->getField(TO_TT_STR("this"));
+
+    if(!thiz)
     {
-        std::cerr << "(evaluateSimpleMessage): destValue is NULL!" << std::endl;
-        return TTObject::createObject(TT_NIL);
+        thiz = destValue;
     }
 
-    if(destValue->type == TT_EXPR)
+    // the accepted destValues types are: Object or Expression, the expression is considered
+    // an object if it doesn't have the same name
+
+    if(destValue->type == TT_EXPR && destValue->flags == EXPRESSION_BLOCK)
     {
-        if(destValue->flags == EXPRESSION_BLOCK)
+        std::string blockName = (char *) destValue->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
+        if(COMPARE_NAME(blockName.c_str(), msgName.c_str()) == 0)
         {
-            return executeSimpleMessage(destValue, msgName, env, NULL);
+            return executeSimpleExpression(destValue, destValue, msgName, thiz); // call named lambda expression
+        }
+        if(blockName.empty() && msgName == "value")
+        {
+            return executeSimpleExpression(destValue, destValue, msgName, thiz); // call nameless lambda expression
+        }
+
+        // since now we expect that the message is sent to the expression considered object
+    }
+
+    return executeSimpleExpressionAtNonExpression(destValue, destValue, msgName, destValue);
+}
+
+TTObject *Evaluator::evaluateSymbolValueInThis(TTObject *thiz, std::string &name)
+{
+    TTObject *resultFromThis = thiz->getField(TO_TT_STR(name.c_str()));
+    if (!resultFromThis)
+    {
+        TTObject *thisParent = thiz->getField(TO_TT_STR("parent"));
+        if(thisParent)
+        {
+            std::cout << "(evaluateSymbolValue): field not found in this, trying parent =>" << std::endl;
+            return evaluateSymbolValueInThis(thisParent, name);
         }
         else
         {
-            return sendSimpleMessageToNonExpression(msgName, destValue, env);
+            std::cout << "(evaluateSymbolValue): field not found in this, no parent, sorry." << std::endl;
+            return NULL;
         }
     }
-    else
-    {
-        return sendSimpleMessageToNonExpression(msgName, destValue, env);
-    }
+    return resultFromThis;
 }
 
 /**
@@ -176,7 +175,7 @@ TTObject *Evaluator::evaluateSymbolValue(TTObject *symbolValue, TTObject *env)
     }
     else
     {
-        TTObject *resultFromThis = thiz->getField(TO_TT_STR(name.c_str()));
+        TTObject *resultFromThis = evaluateSymbolValueInThis(thiz, name);
         if (!resultFromThis)
         {
             std::cout << "(evaluateSymbolValue): field not found in this" << std::endl;
@@ -187,12 +186,21 @@ TTObject *Evaluator::evaluateSymbolValue(TTObject *symbolValue, TTObject *env)
             return resultFromThis;
         }
     }
-    TTObject *parent = env->getField(TO_TT_STR("parent"));
+
+    TTObject *parent = env->getField(TO_TT_STR("parentEnv"));
     if (parent && parent->type == TT_ENV)
     {
         std::cout << "(evaluateSymbolValue): trying parent env" << std::endl;
         return evaluateSymbolValue(symbolValue, parent);
     }
+
+    // we should get to the parent environment
+
+    /*if (env != Runtime::globalEnvironment)
+    {
+        std::cout << "(evaluateSymbolValue): trying gloval env" << std::endl;
+        return evaluateSymbolValue(symbolValue, Runtime::globalEnvironment);
+    }*/
     std::cout << "(evaluateSymbolValue): field not found in anywhere, sorry" << std::endl;
     throw std::exception();
     //return TTObject::createObject(TT_NIL);
@@ -312,121 +320,119 @@ TTObject *Evaluator::evaluateLiteralValue(TTObject *expr, TTObject *env)
     return lit;
 }
 
-TTObject *Evaluator::sendMultipleMessageToNonExpression(std::string &msgFullName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *dest, TTObject *env)
+TTObject *Evaluator::executeMultipleExpression(TTObject *expression, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz)
 {
-    std::cout << "(sendMultipleMessageToNonExpression) msgFullName: '" << msgFullName << "'" << std::endl;
+    std::cout << "(executeMultipleExpression)" << std::endl;
 
-    TTObject *field = dest->getField(TO_TT_STR(msgFullName.c_str()));
+    // TODO: Allocation of env wastes memory
 
-    if(field)
+    TTObject *env = TTObject::createObject(TT_ENV);
+    TTObject *blockExpr = expression->getField(TO_TT_STR("blockExpr"));
+    TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
+    TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
+
+    if(thiz)
     {
-        if(field->type != TT_EXPR)
-        {
-            std::cerr << "(sendMultipleMessageToNonExpression): Sorry, value is not a method: " << field << " !!!" << std::endl;
-            std::cerr << "(sendMultipleMessageToNonExpression): Sorry, value is not a method str hax: '" << (char *) field->getLiteral()->data << "' !!!" << std::endl;
-            throw std::exception();
-        }
+        std::cout << "(executeMultipleExpression) has this: " << thiz << std::endl;
+        env->addField(TO_TT_STR("this"), thiz);
+    }
+    std::cout << "(executeMultipleExpression) parent env: " << blockEnv << std::endl;
+    env->addField(TO_TT_STR("parentEnv"), blockEnv);
 
-        return executeMultipleMessage(field, msgFullName, argNames, values, env, dest);
-    }
-    else
+    if(blockNativeName)
     {
-        std::cerr << "(sendMultipleMessageToNonExpression): Sorry, object doesn't understand message: " << msgFullName << " !!!" << std::endl;
-        return TTObject::createObject(TT_NIL);
+        std::string nativeName = (char *) blockNativeName->getLiteral()->data;
+
+        return executeMultipleNativeMessage(nativeName, dest, msgName, argNames, values, thiz);
     }
+
+    for(size_t i = 0; i < argNames.size(); i++)
+    {
+        env->addField(TO_TT_STR(argNames[i].c_str()), values[i]);
+    }
+
+    return evaluate(blockExpr, env);
 }
 
-TTObject *Evaluator::executeMultipleMessage(TTObject *blockExpression, std::string &msgFullName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *env, TTObject *thiz)
+TTObject *Evaluator::executeMultipleNativeMessage(std::string &nativeName, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz)
 {
-    std::cout << "(executeMultipleMessage)" << std::endl;
+    std::cout << "(executeMultipleNativeMessage)" << std::endl;
 
-    std::cout << "blockExpression: " << blockExpression << std::endl;
-
-    std::cout << "blockExpression->getField(TO_TT_STR(\"blockFullName\")): " << blockExpression->getField(TO_TT_STR("blockFullName")) << std::endl;
-
-    std::string name = (char *) blockExpression->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
-
-    std::cout << "(executeMultipleMessage): blockName:'" << name << "'" << std::endl;
-    std::cout << "(executeMultipleMessage): msgFullName:'" << msgFullName << "'" << std::endl;
-
-    if(COMPARE_NAME(msgFullName.c_str(), name.c_str()) == 0)
+    std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(nativeName);
+    if(builtin)
     {
-        TTObject *blockEnv = blockExpression->getField(TO_TT_STR("blockEnv"));
-        TTObject *blockExpr = blockExpression->getField(TO_TT_STR("blockExpr"));
-        TTObject *nativeName = blockExpression->getField(TO_TT_STR("blockNativeName"));
-        TTObject *newEnv = TTObject::createObject(TT_ENV);
-        newEnv->addField(TO_TT_STR("parent"), blockEnv);
-
+        std::cout << "(executeMultipleNativeMessage): Builtin function '" << nativeName << "' found." << std::endl;
         if(thiz)
         {
-            newEnv->addField(TO_TT_STR("this"), thiz);
+            return builtin->invoke(thiz, argNames, values);
         }
-
-        for(size_t i = 0; i < argNames.size(); i++)
-        {
-            newEnv->addField(TO_TT_STR(argNames[i].c_str()), values[i]);
-        }
-
-        /**
-        * Todo: execute bytecode or native code ... LOL
-        */
-
-        if(nativeName)
-        {
-            TTLiteral *lit = nativeName->getLiteral();
-            std::string strName = (char *) lit->data;
-
-
-            std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(strName);
-            if(builtin)
-            {
-                std::cout << "(executeMultipleMessage): Builtin function '" << strName << "' found." << std::endl;
-                if(thiz)
-                {
-                    return builtin->invoke(thiz, argNames, values);
-                }
-                return builtin->invoke(env, argNames, values);
-            }
-            else
-            {
-                std::cerr << "(executeMultipleMessage): Builtin function '" << strName << "' not found!" << std::endl;
-                throw std::exception();
-            }
-        }
-
-        return evaluate(blockExpr, newEnv);
+        return builtin->invoke(dest, argNames, values);
     }
     else
     {
-        return sendMultipleMessageToNonExpression(msgFullName, argNames, values, blockExpression, env);
+        std::cerr << "(executeMultipleNativeMessage): Builtin function '" << nativeName << "' not found!" << std::endl;
+        throw std::exception();
     }
+    return NULL;
 }
 
+TTObject *Evaluator::executeMultipleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz)
+{
+    TTObject *fieldVal = object->getField(TO_TT_STR(name.c_str()));
+    if(fieldVal)
+    {
+        if(fieldVal->type != TT_EXPR || fieldVal->flags != EXPRESSION_BLOCK)
+        {
+            std::cerr << "(executeMultipleExpressionAtNonExpression): Error: NON EXPRESSION FIELD: " << fieldVal << std::endl;
+            throw std::exception();
+        }
+        return executeMultipleExpression(fieldVal, dest, name, argNames, values, thiz);
+    }
 
-TTObject *Evaluator::evaluateMultipleMessage(TTObject *expr, TTObject *env)
+    TTObject *parent = object->getField(TO_TT_STR("parent"));
+
+    if(!parent)
+    {
+        std::cerr << "(executeMultipleExpressionAtNonExpression): Object doesn't understand this message " << name << std::endl;
+        throw std::exception();
+    }
+
+    // Now, either the field is in this object or in its parents, nowhere else!
+    return executeMultipleExpressionAtNonExpression(parent, dest, name, argNames, values, thiz);
+}
+
+TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *env)
 {
     std::cout << "(evaluateMultipleMessage)" << std::endl;
 
-    TTObject *msgDestExpr = expr->getField(TO_TT_STR("msgDestExpr"));
-    TTObject *msgFullName = expr->getField(TO_TT_STR("msgFullName"));
-    TTObject *msgNameArray = expr->getField(TO_TT_STR("msgNameArray"));
-    TTObject *msgValueArray = expr->getField(TO_TT_STR("msgValueArray"));
+    TTObject *msgDestExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
+    TTObject *msgFullName = simpleMessage->getField(TO_TT_STR("msgFullName"));
+    TTObject *msgNameArray = simpleMessage->getField(TO_TT_STR("msgNameArray"));
+    TTObject *msgValueArray = simpleMessage->getField(TO_TT_STR("msgValueArray"));
 
-    TTObject *msgDest = evaluate(msgDestExpr, env);
+    TTObject *thiz = env->getField(TO_TT_STR("this"));
+
+    TTObject *msgDestValue = evaluate(msgDestExpr, env);
+
+    if(!thiz)
+    {
+        thiz = msgDestValue;
+    }
+
     std::string fullName = (char *) msgFullName->getLiteral()->data;
     std::vector<std::string> names;
     std::vector<TTObject *> valuesExpressions;
     std::vector<TTObject *> values;
 
     uint32_t len = (uint32_t) (msgNameArray->getLiteral()->length / sizeof(TTObject *));
-    TTObject **nameObjects = (TTObject **) msgNameArray->getLiteral()->data; // TODO: fix this, we should not allocate any memory, but if a GC is forced here, the inevitable will happen ... GC will fail
-    TTObject **expressionObjects = (TTObject **) msgValueArray->getLiteral()->data; // TODO: fix this, we should not allocate any memory, but if a GC is forced here, the inevitable will happen ... GC will fail
     for(uint32_t i = 0; i < len; i++)
     {
-        names.push_back((char *) nameObjects[i]->getLiteral()->data);
+        names.push_back((char *) ((TTObject **) msgNameArray->getLiteral()->data)[i]->getLiteral()->data);
         std::cout << "(evaluateMultipleMessage): arg name " << i << " = " << names[i] << std::endl;
-        valuesExpressions.push_back(expressionObjects[i]);
+        valuesExpressions.push_back(((TTObject **) msgValueArray->getLiteral()->data)[i]);
     }
+
+    std::cout << "(evaluateMultipleMessage) before eval values env: " << env << std::endl;
 
     for(uint32_t i = 0; i < len; i++)
     {
@@ -434,28 +440,31 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *expr, TTObject *env)
         values.push_back(value);
     }
 
-    if(!msgDest)
+    if(!msgDestValue)
     {
-        std::cerr << "(evaluateMultipleMessage): destValue is NULL!" << std::endl;
+        std::cerr << "(evaluateMultipleMessage): msgDestValue is NULL!" << std::endl;
         throw std::exception();
-        //return TTObject::createObject(TT_NIL);
     }
 
-    if(msgDest->type == TT_EXPR)
+    std::cout << "(evaluateMultipleMessage): msgDestValue: " << msgDestValue << std::endl;
+
+    // the accepted destValues types are: Object or Expression, the expression is considered
+    // an object if it doesn't have the same name
+
+    if(msgDestValue->type == TT_EXPR && msgDestValue->flags == EXPRESSION_BLOCK)
     {
-        if(msgDest->flags == EXPRESSION_BLOCK)
+        std::string blockName = (char *) msgDestValue->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
+        if(COMPARE_NAME(blockName.c_str(), fullName.c_str()) == 0)
         {
-            return executeMultipleMessage(msgDest, fullName, names, values, env, NULL);
+            return executeMultipleExpression(msgDestValue, msgDestValue, fullName, names, values, thiz); // call named lambda expression
         }
-        else
-        {
-            return sendMultipleMessageToNonExpression(fullName, names, values, msgDest, env);
-        }
+
+        // no anonymous function can happen here
+
+        // since now we expect that the message is sent to the expression considered object
     }
-    else
-    {
-        return sendMultipleMessageToNonExpression(fullName, names, values, msgDest, env);
-    }
+
+    return executeMultipleExpressionAtNonExpression(msgDestValue, msgDestValue, fullName, names, values, thiz);
 }
 
 TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
