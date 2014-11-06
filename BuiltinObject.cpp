@@ -172,7 +172,7 @@ TTObject *BuiltinObjectNew::invoke(TTObject *dest, std::vector<std::string> &arg
     }
 
     TTObject *res = TTObject::createObject(TT_OBJECT);
-    res->addField(TO_TT_STR("parent"), dest);
+    res->setField(TO_TT_STR("parent"), dest);
 
     return res;
 }
