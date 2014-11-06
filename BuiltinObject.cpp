@@ -158,3 +158,19 @@ TTObject *BuiltinObjectNew::invoke(TTObject *dest, std::vector<std::string> &arg
 
     return res;
 }
+
+TTObject *BuiltinObjectToString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    if (argNames.size() != 0 && values.size() != 0)
+    {
+        std::cerr << "[Builtin]: ToString builtin function accepts no arguments." << std::endl;
+        throw std::exception();
+    }
+
+    TTObject *res = TTObject::createObject(TT_LITERAL);
+    TTLiteral *string = TTLiteral::createStringLiteral(TO_TT_STR("toString NOT IMPLEMENTED YET"));
+
+    res->setLiteral(string);
+
+    return res;
+}

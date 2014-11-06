@@ -10,7 +10,7 @@ class Evaluator
 private:
     TTObject *executeSimpleExpression(TTObject *expression, TTObject *dest, std::string &msgName, TTObject *thiz);
     TTObject *executeSimpleNativeMessage(std::string &nativeName, TTObject *dest, std::string &msgName, TTObject *thiz);
-    TTObject *executeSimpleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, TTObject *thiz);
+    TTObject *executeSimpleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name);
     TTObject *evaluateSimpleMessage(TTObject *simpleMessage, TTObject *env);
 
     TTObject *evaluateSymbolValueInThis(TTObject *thiz, std::string &name);
@@ -29,7 +29,7 @@ private:
 
     TTObject *executeMultipleExpression(TTObject *expression, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz);
     TTObject *executeMultipleNativeMessage(std::string &nativeName, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz);
-    TTObject *executeMultipleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz);
+    TTObject *executeMultipleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
     TTObject *evaluateMultipleMessage(TTObject *simpleMessage, TTObject *env);
 
 public:

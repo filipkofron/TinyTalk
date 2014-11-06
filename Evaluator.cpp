@@ -53,7 +53,7 @@ TTObject *Evaluator::executeSimpleNativeMessage(std::string &nativeName, TTObjec
     return NULL;
 }
 
-TTObject *Evaluator::executeSimpleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, TTObject *thiz)
+TTObject *Evaluator::executeSimpleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name)
 {
     std::cout << "(executeSimpleExpressionAtNonExpression)" << std::endl;
 
@@ -65,7 +65,7 @@ TTObject *Evaluator::executeSimpleExpressionAtNonExpression(TTObject *object, TT
             std::cerr << "(executeSimpleExpressionAtNonExpression): Error: NON EXPRESSION FIELD: " << fieldVal << std::endl;
             throw std::exception();
         }
-        return executeSimpleExpression(fieldVal, dest, name, thiz);
+        return executeSimpleExpression(fieldVal, dest, name, dest);
     }
 
     TTObject *parent = object->getField(TO_TT_STR("parent"));
@@ -77,7 +77,7 @@ TTObject *Evaluator::executeSimpleExpressionAtNonExpression(TTObject *object, TT
     }
 
     // Now, either the field is in this object or in its parents, nowhere else!
-    return executeSimpleExpressionAtNonExpression(parent, dest, name, thiz);
+    return executeSimpleExpressionAtNonExpression(parent, dest, name);
 }
 
 TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *env)
@@ -89,11 +89,6 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
     TTObject *destValue = evaluate(destExpr, env);
 
     TTObject *thiz = env->getField(TO_TT_STR("this"));
-
-    if(!thiz)
-    {
-        thiz = destValue;
-    }
 
     // the accepted destValues types are: Object or Expression, the expression is considered
     // an object if it doesn't have the same name
@@ -113,7 +108,7 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
         // since now we expect that the message is sent to the expression considered object
     }
 
-    return executeSimpleExpressionAtNonExpression(destValue, destValue, msgName, destValue);
+    return executeSimpleExpressionAtNonExpression(destValue, destValue, msgName);
 }
 
 TTObject *Evaluator::evaluateSymbolValueInThis(TTObject *thiz, std::string &name)
@@ -376,7 +371,7 @@ TTObject *Evaluator::executeMultipleNativeMessage(std::string &nativeName, TTObj
     return NULL;
 }
 
-TTObject *Evaluator::executeMultipleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz)
+TTObject *Evaluator::executeMultipleExpressionAtNonExpression(TTObject *object, TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
     TTObject *fieldVal = object->getField(TO_TT_STR(name.c_str()));
     if(fieldVal)
@@ -386,7 +381,7 @@ TTObject *Evaluator::executeMultipleExpressionAtNonExpression(TTObject *object, 
             std::cerr << "(executeMultipleExpressionAtNonExpression): Error: NON EXPRESSION FIELD: " << fieldVal << std::endl;
             throw std::exception();
         }
-        return executeMultipleExpression(fieldVal, dest, name, argNames, values, thiz);
+        return executeMultipleExpression(fieldVal, dest, name, argNames, values, dest);
     }
 
     TTObject *parent = object->getField(TO_TT_STR("parent"));
@@ -398,7 +393,7 @@ TTObject *Evaluator::executeMultipleExpressionAtNonExpression(TTObject *object, 
     }
 
     // Now, either the field is in this object or in its parents, nowhere else!
-    return executeMultipleExpressionAtNonExpression(parent, dest, name, argNames, values, thiz);
+    return executeMultipleExpressionAtNonExpression(parent, dest, name, argNames, values);
 }
 
 TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *env)
@@ -413,11 +408,6 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
     TTObject *thiz = env->getField(TO_TT_STR("this"));
 
     TTObject *msgDestValue = evaluate(msgDestExpr, env);
-
-    if(!thiz)
-    {
-        thiz = msgDestValue;
-    }
 
     std::string fullName = (char *) msgFullName->getLiteral()->data;
     std::vector<std::string> names;
@@ -464,7 +454,7 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
         // since now we expect that the message is sent to the expression considered object
     }
 
-    return executeMultipleExpressionAtNonExpression(msgDestValue, msgDestValue, fullName, names, values, thiz);
+    return executeMultipleExpressionAtNonExpression(msgDestValue, msgDestValue, fullName, names, values);
 }
 
 TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
