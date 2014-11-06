@@ -8,6 +8,7 @@ struct TTObject;
 #include <iostream>
 #include "MemAllocator.h"
 #include "TTLiteral.h"
+#include "RefPtr.h"
 
 #define DEFAULT_FIELD_COUNT 8
 
@@ -83,6 +84,8 @@ struct TTObject
     */
     static TTObject *createObject(uint8_t type, uint32_t fieldsPreallocated);
     static TTObject *createObject(uint8_t type);
+
+    static std::vector<std::pair<std::string, RefPtr<TTObject> > > laterFields;
 
     /**
     * Not deep copy. Cannot do that due to cycle references.

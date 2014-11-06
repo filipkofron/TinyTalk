@@ -1,6 +1,7 @@
 #include "TTObject.h"
 #include "Expression.h"
 #include "common.h"
+#include "BuiltinUtil.h"
 #include <cstring>
 
 TTObject *TTObject::gccopy(MemAllocator *allocator)
@@ -21,6 +22,12 @@ TTObject *TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
     newObject->fieldCapacity = fieldsPreallocated;
     newObject->fieldCount = 0;
     newObject->type = type;
+
+    for(auto pairVal : laterFields)
+    {
+        newObject->addField(TO_TT_STR(pairVal.first.c_str()), &(pairVal.second));
+    }
+
     return newObject;
 }
 
@@ -40,6 +47,8 @@ TTObject *TTObject::clone(TTObject *cloned)
 
     return newObject;
 }
+
+std::vector<std::pair<std::string, RefPtr<TTObject> > > TTObject::laterFields;
 
 bool TTObject::addField(const uint8_t *name, TTObject *object)
 {

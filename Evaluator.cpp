@@ -89,7 +89,7 @@ TTObject *Evaluator::executeSimpleExpressionAtNonExpression(TTObject *object, TT
             return object->getLiteral()->onMessage(dest, name, singleList, std::vector<TTObject *>());
         }
 
-        std::cerr << "(executeSimpleExpressionAtNonExpression): Object doesn't understand this message " << fieldVal << std::endl;
+        std::cerr << "(executeSimpleExpressionAtNonExpression): Object doesn't understand this message '" << name << "'" << std::endl;
         throw std::exception();
     }
 
@@ -322,7 +322,7 @@ TTObject *Evaluator::evaluateCreateVariables(TTObject *expr, TTObject *env)
         {
             TTObject *lit = ((TTObject **) varNamesLit->data)[i];
             std::string name = (char *) lit->getLiteral()->data;
-            env->addField(TO_TT_STR(name.c_str()), TTObject::createObject(TT_NIL));
+            env->addField(TO_TT_STR(name.c_str()), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
         }
     }
     else
@@ -330,7 +330,7 @@ TTObject *Evaluator::evaluateCreateVariables(TTObject *expr, TTObject *env)
         std::cerr << "(evaluateCreateVariables): variable array is NULL!!" << std::endl;
         throw std::exception();
     }
-    return TTObject::createObject(TT_NIL);
+    return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
 }
 
 TTObject *Evaluator::evaluateChained(TTObject *expr, TTObject *env)
@@ -584,4 +584,13 @@ TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
     }
 
     return res;
+}
+
+TTObject *Evaluator::sendSimpleMessage(TTObject *object, std::string &name)
+{
+#ifdef DEBUG
+    std::cout << "(sendSimpleMessage)" << std::endl;
+    std::cout << "(sendSimpleMessage) name: " << name << std::endl;
+#endif
+    return executeSimpleExpressionAtNonExpression(object, object, name);
 }

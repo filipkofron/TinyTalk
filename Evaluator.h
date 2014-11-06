@@ -34,6 +34,7 @@ private:
 
 public:
     TTObject *evaluate(TTObject *expression, TTObject *env);
+    TTObject *sendSimpleMessage(TTObject *object, std::string &name);
 };
 
 #endif

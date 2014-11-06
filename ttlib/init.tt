@@ -16,6 +16,13 @@ Object inObject: Object createField: "createField:withValue:" withValue:
 Object createField: "getParent" withValue: [ parent ];
 Object createField: "objectDoesntUnderstand:" withValue: [ nil ];
 
+Object createField: "set:value:" withValue:
+    [ :set: :value: |
+        this object: this set: set value: value
+    ];
+
+Object inObject: nil createField: "toString" withValue: ["nil"];
+
 | Rec1 Rec2 |;
 Rec1 = (Object new);
 Rec2 = (Rec1 new);

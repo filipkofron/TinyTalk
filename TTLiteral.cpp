@@ -1,5 +1,6 @@
 #include "TTLiteral.h"
 #include "common.h"
+#include "Runtime.h"
 #include <cstring>
 
 TTLiteral *TTLiteral::copy(MemAllocator *allocator, TTLiteral *lit)
@@ -26,7 +27,6 @@ TTLiteral *TTLiteral::clone(TTLiteral *lit)
 
 TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    std::cout << "TTLiteral<";
 
     switch(type)
     {
@@ -34,8 +34,7 @@ TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<st
             std::cout << "Integer";
             break;
         case LITERAL_TYPE_STRING:
-            std::cout << "String";
-            break;
+            return dest;
         case LITERAL_TYPE_OBJECT_ARRAY:
             std::cout << "ObjectArray";
             break;
@@ -43,8 +42,8 @@ TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<st
             std::cout << "Invalid literal type" << std::endl;
             throw std::exception();
     }
-    std::cout << ">::onMessage(): " << std::endl;
-    return TTObject::createObject(TT_NIL);
+    std::cout << "::onMessage(): " << std::endl;
+    return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
 }
 
 const char *TTLiteral::getTypeInfo()

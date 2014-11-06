@@ -1,6 +1,7 @@
 #include "Parser.h"
 #include "Expression.h"
 #include "common.h"
+#include "Runtime.h"
 
 Parser::Parser(std::shared_ptr<Tokenizer> tokenizer)
     : tokenizer(tokenizer)
@@ -594,7 +595,7 @@ TTObject *Parser::parse(const bool &parseOnlyOne)
             res = parseCreateVariable(parseOnlyOne);
             break;
         case Token::Type::TEOF:
-            res = TTObject::createObject(TT_NIL);
+            res = Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
             break;
         default:
             std::cerr << "[Parser] Line: " << token.getLine() << ": Token " << token.getTypeInfo()

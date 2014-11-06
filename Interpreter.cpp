@@ -3,7 +3,7 @@
 #include "TokenizerException.h"
 #include "Parser.h"
 #include "Evaluator.h"
-#include "Expression.h"
+#include "BuiltinUtil.h"
 #include "Runtime.h"
 #include <fstream>
 #include <sstream>
@@ -16,13 +16,8 @@ Interpreter::Interpreter()
 void Interpreter::initialize()
 {
     Runtime::globalEnvironment = TTObject::createObject(TT_ENV);
-    Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), TTObject::createObject(TT_NIL));
-
     Runtime::globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
-
-    TTObject *lit = TTObject::createObject(TT_LITERAL);
-    lit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR("Hello, World!")));
-    Runtime::globalEnvironment->addField(TO_TT_STR("testStr"), lit);
+    Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
 
     setupObject();
 
@@ -33,16 +28,23 @@ void Interpreter::initialize()
 void Interpreter::setupObject()
 {
     TTObject *object = TTObject::createObject(TT_OBJECT);
-    TTObject *debug = TTObject::createObject(TT_OBJECT);
 
-    addSimpleMethod(object, "alloc", "object_alloc");
-    addMultipleMethod(object, "object:addField:", {"object", "addField"},"object_add");
-    addMultipleMethod(object, "object:get:", {"object", "get"},"object_get");
-    addMultipleMethod(object, "object:set:value:", {"object", "set", "value"},"object_set");
-    addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
-    addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
-    addMultipleMethod(object, "clone:", {"clone"},"object_clone");
-    addSimpleMethod(object, "new", "object_new");
+    BuiltinUtil::addSimpleMethod(object, "alloc", "object_alloc");
+    BuiltinUtil::addMultipleMethod(object, "object:addField:", {"object", "addField"},"object_add");
+    BuiltinUtil::addMultipleMethod(object, "object:get:", {"object", "get"},"object_get");
+    BuiltinUtil::addMultipleMethod(object, "object:set:value:", {"object", "set", "value"},"object_set");
+    BuiltinUtil::addMultipleMethod(object, "clone:", {"clone"},"object_clone");
+    BuiltinUtil::addSimpleMethod(object, "new", "object_new");
+    BuiltinUtil::addSimpleMethod(object, "toString", "object_tostring");
+
+    TTObject::laterFields.push_back(std::make_pair("parent", RefPtr<TTObject>(object)));
+
+    TTObject *debug = TTObject::createObject(TT_OBJECT);
+    BuiltinUtil::addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
+    BuiltinUtil::addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
+
+
+    object->addField(TO_TT_STR("nil"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
 
     Runtime::globalEnvironment->addField(TO_TT_STR("Object"), object);
     Runtime::globalEnvironment->addField(TO_TT_STR("Debug"), debug);
@@ -64,36 +66,9 @@ void Interpreter::loadTTLib()
         throw std::exception();
     }
 
-    interpretFile(init);
-    interpretFile(control);
-    interpretFile(clazz);
-}
-
-void Interpreter::addSimpleMethod(TTObject *dest, const std::string &msgName, const std::string &buitlinName)
-{
-    std::vector<TTObject *> names;
-    TTObject *objectLit = TTObject::createObject(TT_LITERAL);
-    objectLit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str())));
-    names.push_back(objectLit);
-    TTLiteral *objArray = TTLiteral::createObjectArray(names);
-    TTObject *allocBlock = Expression::createBlock(objArray, TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str())), NULL, TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str())));
-
-    dest->addField(TO_TT_STR(msgName.c_str()), allocBlock);
-}
-
-void Interpreter::addMultipleMethod(TTObject *dest, const std::string &msgName, const std::vector<std::string> &msgArgs, const std::string &buitlinName)
-{
-    std::vector<TTObject *> names;
-    for(auto arg : msgArgs)
-    {
-        TTObject *objectLit = TTObject::createObject(TT_LITERAL);
-        objectLit->setLiteral(TTLiteral::createStringLiteral(TO_TT_STR(arg.c_str())));
-        names.push_back(objectLit);
-    }
-    TTLiteral *objArray = TTLiteral::createObjectArray(names);
-    TTObject *allocBlock = Expression::createBlock(objArray, TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str())), NULL, TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str())));
-
-    dest->addField(TO_TT_STR(msgName.c_str()), allocBlock);
+    interpretFile(init, true);
+    interpretFile(control, true);
+    interpretFile(clazz, true);
 }
 
 Interpreter::~Interpreter()
@@ -101,7 +76,7 @@ Interpreter::~Interpreter()
 
 }
 
-void Interpreter::interpretFile(std::istream &is)
+void Interpreter::interpretFile(std::istream &is, bool silent)
 {
     std::shared_ptr<Reader> reader(new Reader(&is));
     std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
@@ -125,20 +100,48 @@ void Interpreter::interpretFile(std::istream &is)
             {
                 TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
-                std::cout << std::endl << ">>> ======================================" << std::endl;
-                std::cout << "Evaluator result: " << std::endl;
-                result->print(std::cout, 1, false);
-                std::cout << std::endl;
+                if(!silent)
+                {
+#ifdef DEBUG
+                    std::cout << std::endl << ">>> ======================================" << std::endl;
+                    std::cout << "Evaluator result: " << std::endl;
+#endif
+
+                    if(result)
+                    {
+                        std::string toStringName = "toString";
+                        result = evaluator.sendSimpleMessage(result, toStringName);
+                    }
+                    if(result)
+                    {
+                        if(result->type == TT_LITERAL && result->getLiteral()->type == LITERAL_TYPE_STRING)
+                        {
+                            std::string resultStr = (char *) result->getLiteral()->data;
+                            std::cout << resultStr << std::endl;
+                        }
+                        else
+                        {
+                            std::cerr << "Runtime error: Unknown literal result!: ";
+                            result->print(std::cerr, 1, false);
+                            std::cerr << std::endl;
+                        }
+                    }
+                    else
+                    {
+                        std::cerr << "Runtime error: NULL result" << std::endl;
+                    }
+                    std::cout << std::endl;
+                }
             }
         }
         catch (TokenizerException &e)
         {
-            std::cerr << "Caught exception: " << e.what() << std::endl;
+            std::cerr << "Runtime error: Caught exception: " << e.what() << std::endl;
             break;
         }
         catch (std::exception &ex)
         {
-            std::cerr << "Caught exception: " << ex.what() << std::endl;
+            std::cerr << "Runtime error: Caught exception: " << ex.what() << std::endl;
             break;
         }
     } while (!tokenizer->hasReachedEOF());
@@ -168,7 +171,7 @@ void Interpreter::interpretCommandLine(std::istream &is)
             ss << (char) c;
         }
 
-        interpretFile(ss);
+        interpretFile(ss, false);
     }
     while (notEOF && !is.fail());
 }

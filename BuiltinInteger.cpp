@@ -1,4 +1,6 @@
 #include "BuiltinInteger.h"
+#include "common.h"
+#include "Runtime.h"
 #include <iostream>
 
 TTObject *BuiltinIntegerAdd::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
@@ -6,7 +8,7 @@ TTObject *BuiltinIntegerAdd::invoke(TTObject *dest, std::vector<std::string> &ar
     if(dest->type != TT_LITERAL || dest->getLiteral()->type != LITERAL_TYPE_INTEGER)
     {
         std::cerr << "Buitlin integer add expects integer destination." << std::endl;
-        return TTObject::createObject(TT_NIL);
+        return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
     }
 
     std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
