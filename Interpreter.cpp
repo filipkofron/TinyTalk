@@ -114,10 +114,12 @@ void Interpreter::interpretFile(std::istream &is)
         {
             TTObject *expression = parser.parse(false);
 
+#ifdef DEBUG
             std::cout << std::endl << "<<< ======================================" << std::endl;
             std::cout << "Expression result: " << std::endl;
             expression->print(std::cout, 1, true);
             std::cout << std::endl;
+#endif
 
             if(expression != NULL)
             {

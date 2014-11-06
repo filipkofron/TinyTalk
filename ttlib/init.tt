@@ -14,6 +14,7 @@ Object inObject: Object createField: "createField:withValue:" withValue:
     ];
 
 Object createField: "getParent" withValue: [ parent ];
+Object createField: "objectDoesntUnderstand:" withValue: [ nil ];
 
 | Rec1 Rec2 |;
 Rec1 = (Object new);

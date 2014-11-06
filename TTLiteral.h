@@ -24,7 +24,7 @@ struct TTLiteral
 
     static TTLiteral *clone(TTLiteral *lit);
 
-    TTObject *onMessage(TTObject *msg);
+    TTObject *onMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 
     const char *getTypeInfo();
 

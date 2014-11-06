@@ -64,7 +64,9 @@ TTLiteral *Parser::createLiteralArrayOfStrings(std::vector<std::string> &strs)
 
 TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken)
 {
+#ifdef DEBUG
     std::cout << "(parseRightOfValue)" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     switch (tokenizer->peekToken().getType())
@@ -137,8 +139,10 @@ TTObject *Parser::parseSingleValue()
 */
 TTObject *Parser::parseSymbol(const bool &parseOnlyOne)
 {
+#ifdef DEBUG
     std::cout << "(parseSymbol:"
             << (parseOnlyOne ? "parseOnce" : "parseAll") << ")" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     TTObject *result = NULL;
@@ -160,8 +164,10 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne)
 
 TTObject *Parser::parseLiteral(const bool &parseOnlyOne)
 {
+#ifdef DEBUG
     std::cout << "(parseLiteral:"
             << (parseOnlyOne ? "parseOnce" : "parseAll") << ")" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     TTObject *result = NULL;
@@ -183,7 +189,9 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne)
 
 TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr)
 {
+#ifdef DEBUG
     std::cout << "(parseSimpleMessageRest)" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     Token messageNameToken = tokenizer->readToken();
@@ -201,7 +209,9 @@ TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr)
 
 TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
 {
+#ifdef DEBUG
     std::cout << "(parseMultipleMessageRest)" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     std::vector<std::string> argNames;
@@ -217,7 +227,9 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
     {
         Token token = tokenizer->peekToken();
 
+#ifdef DEBUG
         std::cout << "token: " << token.getTypeInfo() << " - " << token.getValue() << std::endl;
+#endif
 
         switch(token.getType())
         {
@@ -258,7 +270,9 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
 
         TTObject *expr = parseSingleValue();
 
+#ifdef DEBUG
         std::cout << "(mul msg val): got expr: " << expr << std::endl;
+#endif
 
         argValues.push_back(expr);
     } while (--maxArgs);
@@ -286,8 +300,10 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
 
 TTObject *Parser::parseBlock(const bool &parseOnlyOne)
 {
+#ifdef DEBUG
     std::cout << "(parseBlock:"
             << (parseOnlyOne ? "parseOnce" : "parseAll") << ")" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     Token lineHolder = tokenizer->readToken(); // eat [ and store token for line number
@@ -336,7 +352,9 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
             case Token::Type::VERTICAL_BAR:
                 if(maxArgs == PARSER_MAX_METHOD_ARGS + 1)
                 {
+#ifdef DEBUG
                     std::cout << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " TODO: Vertical bar at the beginning, is this local var init :) ?" << std::endl;
+#endif
                     atEnd = true;
                     break;
                 }
@@ -366,15 +384,19 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
 
     if(maxArgs == PARSER_MAX_METHOD_ARGS + 1)
     {
+#ifdef DEBUG
         std::cout << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Empty block argument." << std::endl;
+#endif
     }
 
+#ifdef DEBUG
     std::cout << "Block loaded these arguments:";
     for(auto str : argNames)
     {
         std::cout << " '" << str << "'";
     }
     std::cout << std::endl;
+#endif
 
     if(maxArgs == 0)
     {
@@ -415,7 +437,9 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
 
 TTObject *Parser::parseAssignmentRest(const Token &token)
 {
+#ifdef DEBUG
     std::cout << "(parseAssignmentRest)" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     Token assignToken = tokenizer->readToken(); // eat the assign token
@@ -436,8 +460,10 @@ TTObject *Parser::parseAssignmentRest(const Token &token)
 
 TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)
 {
+#ifdef DEBUG
     std::cout << "(parseParenthesis:"
             << (parseOnlyOne ? "parseOnce" : "parseAll") << ")" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     Token lineHolder = tokenizer->readToken(); // eat opening bracket and store line number
@@ -465,7 +491,9 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)
 
 TTObject *Parser::parseChain(TTObject *currExpr, const bool &parseOnlyOne)
 {
+#ifdef DEBUG
     std::cout << "(parseChain)" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     tokenizer->readToken(); // eat ;
@@ -477,8 +505,10 @@ TTObject *Parser::parseChain(TTObject *currExpr, const bool &parseOnlyOne)
 
 TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne)
 {
+#ifdef DEBUG
     std::cout << "(parseCreateVariable:"
             << (parseOnlyOne ? "parseOnce" : "parseAll") << ")" << std::endl;
+#endif
     // ----------------------------------------------------------------------- //
 
     tokenizer->readToken(); // eat |
