@@ -171,7 +171,13 @@ void Interpreter::interpretCommandLine(std::istream &is)
             ss << (char) c;
         }
 
-        interpretFile(ss, false);
+        ss.seekg(0, std::stringstream::end);
+        size_t size = ss.tellg();
+        ss.seekg(0, std::stringstream::beg);
+        if(size != 0)
+        {
+            interpretFile(ss, false);
+        }
     }
     while (notEOF && !is.fail());
 }

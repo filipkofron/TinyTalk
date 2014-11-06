@@ -7,7 +7,6 @@
 #include "TokenizerException.h"
 #include "MemAllocator.h"
 #include "Interpreter.h"
-#include "RefPtr.h"
 
 using namespace std;
 
@@ -22,9 +21,7 @@ int main()
 
     Interpreter interpreter;
     interpreter.interpretCommandLine(std::cin);
-
-    RefPtr<TTObject> ptr(TTObject::createObject(TT_OBJECT));
-    ptr->print(std::cout, 1, false);
+    std::cout << std::endl;
 
     MemAllocator::cleanupDefaultAllocator();
     return 0;
