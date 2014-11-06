@@ -23,9 +23,12 @@ TTObject *TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
     newObject->fieldCount = 0;
     newObject->type = type;
 
-    for(auto pairVal : laterFields)
+    if(type != TT_ENV)
     {
-        newObject->addField(TO_TT_STR(pairVal.first.c_str()), &(pairVal.second));
+        for (auto pairVal : laterFields)
+        {
+            newObject->addField(TO_TT_STR(pairVal.first.c_str()), &(pairVal.second));
+        }
     }
 
     return newObject;

@@ -22,6 +22,7 @@ int main()
     Interpreter interpreter;
     interpreter.interpretCommandLine(std::cin);
     std::cout << std::endl;
+    std::cout << ">> Bye." << std::endl;
 
     MemAllocator::cleanupDefaultAllocator();
     return 0;
