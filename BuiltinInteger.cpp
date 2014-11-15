@@ -38,3 +38,39 @@ TTObject *BuiltinIntegerToString::invoke(TTObject *dest, std::vector<std::string
     std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
     throw std::exception();
 }
+
+TTObject *BuiltinIntegerLessThan::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
+    throw std::exception();
+}
+
+TTObject *BuiltinIntegerGreaterThan::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
+    throw std::exception();
+}
+
+TTObject *BuiltinIntegerEquals::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
+    throw std::exception();
+}
+
+TTObject *BuiltinIntegerLessThanOrEqual::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
+    throw std::exception();
+}
+
+TTObject *BuiltinIntegerGreaterThanOrEqual::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
+    throw std::exception();
+}
+
+TTObject *BuiltinIntegerFromString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cerr << "Function " << __FILE__ << ":" << __FUNCTION__ << " not implemented!" << std::endl;
+    throw std::exception();
+}
