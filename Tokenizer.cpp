@@ -52,6 +52,12 @@ bool Tokenizer::isDigit(const int &c)
     return c >= '0' && c <= '9';
 }
 
+
+bool Tokenizer::isDigitBegin(const int &c)
+{
+    return isDigit(c) || c == '-';
+}
+
 bool Tokenizer::isString(const int &c)
 {
     return c == '"';
@@ -122,9 +128,18 @@ bool Tokenizer::isComment(const int &c)
 std::string Tokenizer::readInteger()
 {
     std::string val;
+    bool neg = reader->peek() == '-';
+    val += reader->read(); // might be minus
+    int digits = 1;
     while(isDigit(reader->peek()))
     {
         val += (char) reader->read();
+        digits++;
+    }
+
+    if(neg && digits == 1)
+    {
+        throw TokenizerException("[Tokenizer]: Only minus not allowed.");
     }
 
     return val;
@@ -287,7 +302,7 @@ Token Tokenizer::reallyReadToken()
             continue;
         }
 
-        if(isDigit(c))
+        if(isDigitBegin(c))
         {
             token = Token(lineCounter, Token::Type::INTEGER, readInteger());
             break;

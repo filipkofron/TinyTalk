@@ -27,14 +27,12 @@ TTLiteral *TTLiteral::clone(TTLiteral *lit)
 
 TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-
     switch(type)
     {
         case LITERAL_TYPE_INTEGER:
-            std::cout << "Integer";
-            break;
+            return integerOnMessage(dest, name, argNames, values);
         case LITERAL_TYPE_STRING:
-            return dest;
+            return stringOnMessage(dest, name, argNames, values);
         case LITERAL_TYPE_OBJECT_ARRAY:
             std::cout << "ObjectArray";
             break;
@@ -44,6 +42,25 @@ TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<st
     }
     std::cout << "::onMessage(): " << std::endl;
     return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
+}
+
+TTObject *TTLiteral::stringOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    return dest;
+}
+
+TTObject *TTLiteral::integerOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::string lookupName = "integer_";
+    lookupName.append(name);
+    std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(lookupName);
+    if(builtin)
+    {
+        return builtin->invoke(dest, argNames, values);
+    }
+
+    std::cerr << "Integer: message not understood: " << name << std::endl;
+    throw std::exception();
 }
 
 const char *TTLiteral::getTypeInfo()

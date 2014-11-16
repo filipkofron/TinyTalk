@@ -33,6 +33,13 @@ public:
     virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 };
 
+class BuiltinIntegerMod : public Builtin
+{
+private:
+public:
+    virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+};
+
 class BuiltinIntegerToString : public Builtin
 {
 private:

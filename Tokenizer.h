@@ -17,6 +17,7 @@ private:
     bool isSymbol(const int &c);
     bool isSymbolStart(const int &c);
     bool isDigit(const int &c);
+    bool isDigitBegin(const int &c);
     bool isString(const int &c);
     bool isCharacter(const int &c);
     bool isEndOfFile(const int &c);

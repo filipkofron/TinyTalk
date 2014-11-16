@@ -175,8 +175,20 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne)
 
     Token literalToken = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(literalToken.getValue().c_str()));
-    result = Expression::createLiteralValue(lit);
+    if(literalToken.getType() == Token::Type::INTEGER)
+    {
+        int32_t a = 0;
+        sscanf(literalToken.getValue().c_str(), "%d", &a);
+        TTLiteral *lit = TTLiteral::createIntegerLiteral(a);
+        result = Expression::createLiteralValue(lit);
+    }
+    else
+    {
+        TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(literalToken.getValue().c_str()));
+        result = Expression::createLiteralValue(lit);
+    }
+
+
 
     if(parseOnlyOne)
     {

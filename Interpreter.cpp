@@ -42,6 +42,7 @@ void Interpreter::setupObject()
     TTObject *debug = TTObject::createObject(TT_OBJECT);
     BuiltinUtil::addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
     BuiltinUtil::addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
+    BuiltinUtil::addMultipleMethod(debug, "printString:", {"printString"}, "object_debugprintstring");
 
 
     object->addField(TO_TT_STR("nil"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
@@ -92,7 +93,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 #ifdef DEBUG
             std::cout << std::endl << "<<< ======================================" << std::endl;
             std::cout << "Expression result: " << std::endl;
-            expression->print(std::cout, 1, true);
+            expression->print(std::cout, 1, false);
             std::cout << std::endl;
 #endif
 

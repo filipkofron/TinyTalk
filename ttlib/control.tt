@@ -1,11 +1,12 @@
 
 // Initialize control structures
 
-| True False |;
-True = (Object alloc);
-False = (Object alloc);
-Object inObject: True createField: "ifTrue:" withValue: [:ifTrue: | ifTrue value];
 
+// True, False
+| True False |;
+True = (Object new);
+False = (Object new);
+Object inObject: True createField: "ifTrue:" withValue: [:ifTrue: | ifTrue value];
 Object inObject: True createField: "ifFalse:" withValue: [:ifFalse: | nil];
 Object inObject: True createField: "ifTrue:ifFalse:" withValue: [:ifTrue: :ifFalse:| ifTrue value];
 Object inObject: True createField: "ifFalse:ifTrue:" withValue: [:ifFalse: :ifTrue:| ifTrue value];
@@ -14,3 +15,34 @@ Object inObject: False createField: "ifFalse:" withValue: [:ifFalse: | ifFalse v
 Object inObject: False createField: "ifTrue:" withValue: [:ifTrue: | nil];
 Object inObject: False createField: "ifTrue:ifFalse:" withValue: [:ifTrue: :ifFalse:| ifFalse value];
 Object inObject: False createField: "ifFalse:ifTrue:" withValue: [:ifFalse: :ifTrue:| ifFalse value];
+
+True createField: "not" withValue: [ False ];
+False createField: "not" withValue: [ True ];
+
+True createField: "toString" withValue: [ "True" ];
+False createField: "toString" withValue: [ "False" ];
+
+// While
+
+| While |;
+While = (Object new);
+
+//While isTrue: [10 equals: 10] do: [ "True" ];
+
+While createField: "toString" withValue: "While";
+
+While
+    createField: "isTrue:do:"
+    withValue:
+        [ :isTrue: :do: |
+            | thisThis |;
+            thisThis = this;
+            (isTrue value)
+                ifTrue:
+                 [
+                    do value;
+                    thisThis isTrue: isTrue do: do
+                    ]
+                ifFalse:
+                 [ thisThis ]
+         ];

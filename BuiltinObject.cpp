@@ -1,6 +1,7 @@
 #include "BuiltinObject.h"
 #include "common.h"
 #include "Runtime.h"
+#include "Evaluator.h"
 
 TTObject *BuiltinObjectAlloc::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
@@ -145,6 +146,28 @@ TTObject *BuiltinObjectDebugPrintRec::invoke(TTObject *dest, std::vector<std::st
     std::cout << "DBG PRINT REC ***************************** BEGIN ********************************" << std::endl;
     values[0]->print(std::cout, 1, true);
     std::cout << "DBG PRINT REC ****************************** END *********************************" << std::endl;
+
+    return dest;
+}
+
+TTObject *BuiltinObjectDebugPrintString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    if (argNames.size() != 1 || values.size() != 1)
+    {
+        std::cerr << "[Builtin]: PrintString object accepts one argument only." << std::endl;
+        throw std::exception();
+    }
+
+    if (values[0]->type != TT_LITERAL || values[0]->getLiteral()->type != LITERAL_TYPE_STRING)
+    {
+        std::cerr << "[Builtin]: PrintString object not string literal!" << std::endl;
+        throw std::exception();
+    }
+
+    std::string str = (const char *) values[0]->getLiteral()->data;
+
+    std::cout << " ** DBG PRINT STRING: " << str << std::endl;
+
 
     return dest;
 }
