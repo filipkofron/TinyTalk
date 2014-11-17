@@ -29,7 +29,7 @@ While = (Object new);
 
 //While isTrue: [10 equals: 10] do: [ "True" ];
 
-While createField: "toString" withValue: "While";
+While createField: "toString" withValue: ["While"];
 
 While
     createField: "isTrue:do:"
