@@ -36,7 +36,11 @@ While
     withValue:
         [ :isTrue: :do: |
             | thisThis |;
+
             thisThis = this;
+
+            // TODO: Improve the recursion.
+
             (isTrue value)
                 ifTrue:
                  [

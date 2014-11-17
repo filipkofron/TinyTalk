@@ -47,7 +47,7 @@ TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &
     }
     else
     {
-        if (values[0]->type != TT_LITERAL)
+        if (values[1]->type != TT_LITERAL)
         {
             std::cerr << "[Builtin]: Getting field accepts literal value only!" << std::endl;
             throw std::exception();

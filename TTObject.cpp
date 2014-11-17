@@ -61,6 +61,17 @@ bool TTObject::addField(const uint8_t *name, TTObject *object)
     }
     if(TTObject::hasField(name))
     {
+#ifdef DEBUG
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
+
+#endif
         return false;
     }
     MemAllocator *alloc = MemAllocator::getCurrent();

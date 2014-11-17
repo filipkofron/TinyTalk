@@ -243,7 +243,11 @@ TTObject *Evaluator::evaluateBlock(TTObject *block, TTObject *env)
     std::cout << "(evaluateBlock)" << std::endl;
 #endif
 
-    block->addField(TO_TT_STR("blockEnv"), env);
+    bool success = block->addField(TO_TT_STR("blockEnv"), env);
+    if(!success)
+    {
+        block->setField(TO_TT_STR("blockEnv"), env);
+    }
     return block;
 }
 
@@ -492,8 +496,6 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
 
     TTObject *thiz = env->getField(TO_TT_STR("this"));
 
-    TTObject *msgDestValue = evaluate(msgDestExpr, env);
-
     std::string fullName = (char *) msgFullName->getLiteral()->data;
     std::vector<std::string> names;
     std::vector<TTObject *> valuesExpressions;
@@ -518,6 +520,8 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
         TTObject *value = evaluate(valuesExpressions[i], env);
         values.push_back(value);
     }
+
+    TTObject *msgDestValue = evaluate(msgDestExpr, env);
 
     if(!msgDestValue)
     {
