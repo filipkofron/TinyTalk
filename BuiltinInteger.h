@@ -1,8 +1,6 @@
 #ifndef BUILTININTEGER_H
 #define BUILTININTEGER_H
 
-class BuiltinInteger;
-
 #include "Builtin.h"
 
 class BuiltinIntegerAdd : public Builtin

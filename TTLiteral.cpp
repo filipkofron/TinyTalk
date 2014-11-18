@@ -46,7 +46,16 @@ TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<st
 
 TTObject *TTLiteral::stringOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    return dest;
+    std::string lookupName = "string_";
+    lookupName.append(name);
+    std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(lookupName);
+    if(builtin)
+    {
+        return builtin->invoke(dest, argNames, values);
+    }
+
+    std::cerr << "String: message not understood: " << name << std::endl;
+    throw std::exception();
 }
 
 TTObject *TTLiteral::integerOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)

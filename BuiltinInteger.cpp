@@ -5,23 +5,11 @@
 
 TTObject *BuiltinIntegerAdd::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: Add builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: Add builtin function cannot add anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: Add builtin function can only add integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     TTLiteral *lit = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             + *((int32_t *) values[0]->getLiteral()->data));
@@ -33,23 +21,11 @@ TTObject *BuiltinIntegerAdd::invoke(TTObject *dest, std::vector<std::string> &ar
 
 TTObject *BuiltinIntegerMinus::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: Minus builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: Minus builtin function cannot sub anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: Minus builtin function can only sub integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     TTLiteral *lit = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             - *((int32_t *) values[0]->getLiteral()->data));
@@ -61,23 +37,11 @@ TTObject *BuiltinIntegerMinus::invoke(TTObject *dest, std::vector<std::string> &
 
 TTObject *BuiltinIntegerMul::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: Mul builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: Mul builtin function cannot multiply anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: Mul builtin function can only multiply integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     TTLiteral *lit = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             * *((int32_t *) values[0]->getLiteral()->data));
@@ -89,23 +53,11 @@ TTObject *BuiltinIntegerMul::invoke(TTObject *dest, std::vector<std::string> &ar
 
 TTObject *BuiltinIntegerDiv::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: Div builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: Div builtin function cannot divide anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: Div builtin function can only divide integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) values[0]->getLiteral()->data) == 0)
     {
@@ -123,23 +75,11 @@ TTObject *BuiltinIntegerDiv::invoke(TTObject *dest, std::vector<std::string> &ar
 
 TTObject *BuiltinIntegerMod::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: Mod builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: Mod builtin function cannot divide anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: Mod builtin function can only divide integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) values[0]->getLiteral()->data) == 0)
     {
@@ -157,11 +97,7 @@ TTObject *BuiltinIntegerMod::invoke(TTObject *dest, std::vector<std::string> &ar
 
 TTObject *BuiltinIntegerToString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 0)
-    {
-        std::cerr << "[Builtin]: ToString builtin function accepts no arguments." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
     std::string val = std::to_string(*((int32_t *) dest->getLiteral()->data));
 
@@ -175,23 +111,11 @@ TTObject *BuiltinIntegerToString::invoke(TTObject *dest, std::vector<std::string
 
 TTObject *BuiltinIntegerLessThan::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: LessThan builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: LessThan builtin function cannot compare anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: LessThan builtin function can only compare integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) dest->getLiteral()->data)
             < *((int32_t *) values[0]->getLiteral()->data))
@@ -204,23 +128,11 @@ TTObject *BuiltinIntegerLessThan::invoke(TTObject *dest, std::vector<std::string
 
 TTObject *BuiltinIntegerGreaterThan::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: GreaterThan builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: GreaterThan builtin function cannot compare anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: GreaterThan builtin function can only compare integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) dest->getLiteral()->data)
             > *((int32_t *) values[0]->getLiteral()->data))
@@ -233,23 +145,11 @@ TTObject *BuiltinIntegerGreaterThan::invoke(TTObject *dest, std::vector<std::str
 
 TTObject *BuiltinIntegerEquals::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: Equals builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: Equals builtin function cannot compare anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: Equals builtin function can only compare integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) dest->getLiteral()->data)
             == *((int32_t *) values[0]->getLiteral()->data))
@@ -262,23 +162,11 @@ TTObject *BuiltinIntegerEquals::invoke(TTObject *dest, std::vector<std::string> 
 
 TTObject *BuiltinIntegerLessThanOrEqual::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: LessThanOrEquals builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: LessThanOrEquals builtin function cannot compare anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: LessThanOrEquals builtin function can only compare integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) dest->getLiteral()->data)
             <= *((int32_t *) values[0]->getLiteral()->data))
@@ -291,23 +179,11 @@ TTObject *BuiltinIntegerLessThanOrEqual::invoke(TTObject *dest, std::vector<std:
 
 TTObject *BuiltinIntegerGreaterThanOrEqual::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: GreaterThanOrEqual builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: GreaterThanOrEqual builtin function cannot compare anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_INTEGER)
-    {
-        std::cerr << "[Builtin]: GreaterThanOrEqual builtin function can only compare integers now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_INTEGER(0);
 
     if(*((int32_t *) dest->getLiteral()->data)
             >= *((int32_t *) values[0]->getLiteral()->data))
@@ -320,23 +196,11 @@ TTObject *BuiltinIntegerGreaterThanOrEqual::invoke(TTObject *dest, std::vector<s
 
 TTObject *BuiltinIntegerFromString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
 {
-    if (argNames.size() != 1 || values.size() != 1)
-    {
-        std::cerr << "[Builtin]: FromString builtin function accepts one argument exactly." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    if (values[0]->type != TT_LITERAL)
-    {
-        std::cerr << "[Builtin]: FromString builtin function cannot load anything else than TT_LITERAL." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_LITERAL(0);
 
-    if (values[0]->getLiteral()->type != LITERAL_TYPE_STRING)
-    {
-        std::cerr << "[Builtin]: FromString builtin function can only load strings now." << std::endl;
-        throw std::exception();
-    }
+    BUILTIN_CHECK_STRING(0);
 
     int32_t a = 0;
     if(sscanf((const char *) values[0]->getLiteral()->data, "%d", &a) != 1)

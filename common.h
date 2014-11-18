@@ -4,6 +4,13 @@
 
 #define TO_TT_STR(a) ((const uint8_t *) (a))
 
+#define NOT_IMPLEMENTED \
+{   \
+std::cerr << "NOT IMPLEMENTED " << __PRETTY_FUNCTION__ << " at " << __FILE__ << ":" << __LINE__ << std::endl;\
+throw std::exception(); \
+}
+
+
 #include <cstdint>
 #include <ostream>
 

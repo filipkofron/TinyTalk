@@ -151,6 +151,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 void Interpreter::interpretCommandLine(std::istream &is)
 {
     bool notEOF = true;
+
     do
     {
         std::stringstream ss;
@@ -158,16 +159,27 @@ void Interpreter::interpretCommandLine(std::istream &is)
         std::cout << "> ";
         std::flush(std::cout);
 
+        bool firstEnd = false;
+
         while(true)
         {
             int c = is.get();
             if(c == '\n' || c == '\r' || c == EOF || ss.fail())
             {
+                if(firstEnd)
+                {
+                    break;
+                }
+                firstEnd = true;
                 if(c == EOF || ss.fail())
                 {
                     notEOF = false;
+                    break;
                 }
-                break;
+            }
+            else
+            {
+                firstEnd = false;
             }
             ss << (char) c;
         }

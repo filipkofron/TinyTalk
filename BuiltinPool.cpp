@@ -1,6 +1,7 @@
 #include "BuiltinPool.h"
 #include "BuiltinInteger.h"
 #include "BuiltinObject.h"
+#include "BuiltinString.h"
 
 BuiltinPool::BuiltinPool()
 {
@@ -29,6 +30,14 @@ BuiltinPool::BuiltinPool()
     registerBultin("integer_lessThanOrEqual:", std::shared_ptr<Builtin> (new BuiltinIntegerLessThanOrEqual));
     registerBultin("integer_greaterThanOrEqual", std::shared_ptr<Builtin> (new BuiltinIntegerGreaterThanOrEqual));
     registerBultin("integer_fromString", std::shared_ptr<Builtin> (new BuiltinIntegerFromString));
+
+    registerBultin("string_charAt:", std::shared_ptr<Builtin> (new BuiltinStringCharAt));
+    registerBultin("string_setCharAt:", std::shared_ptr<Builtin> (new BuiltinStringSetCharAt));
+    registerBultin("string_toLower", std::shared_ptr<Builtin> (new BuiltinStringToLower));
+    registerBultin("string_toUpper", std::shared_ptr<Builtin> (new BuiltinStringToUpper));
+    registerBultin("string_trim", std::shared_ptr<Builtin> (new BuiltinStringTrim));
+    registerBultin("string_append:", std::shared_ptr<Builtin> (new BuiltinStringAppend));
+    registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
 }
 
 void BuiltinPool::registerBultin(const std::string &name, std::shared_ptr<Builtin> builtin)
