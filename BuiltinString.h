@@ -45,6 +45,13 @@ public:
     virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 };
 
+class BuiltinStringLength : public Builtin
+{
+private:
+public:
+    virtual TTObject *invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+};
+
 class BuiltinStringToString : public Builtin
 {
 private:

@@ -29,14 +29,15 @@ BuiltinPool::BuiltinPool()
     registerBultin("integer_equals:", std::shared_ptr<Builtin> (new BuiltinIntegerEquals));
     registerBultin("integer_lessThanOrEqual:", std::shared_ptr<Builtin> (new BuiltinIntegerLessThanOrEqual));
     registerBultin("integer_greaterThanOrEqual", std::shared_ptr<Builtin> (new BuiltinIntegerGreaterThanOrEqual));
-    registerBultin("integer_fromString", std::shared_ptr<Builtin> (new BuiltinIntegerFromString));
+    registerBultin("integer_fromString:", std::shared_ptr<Builtin> (new BuiltinIntegerFromString));
 
     registerBultin("string_charAt:", std::shared_ptr<Builtin> (new BuiltinStringCharAt));
-    registerBultin("string_setCharAt:", std::shared_ptr<Builtin> (new BuiltinStringSetCharAt));
+    registerBultin("string_setChar:at:", std::shared_ptr<Builtin> (new BuiltinStringSetCharAt));
     registerBultin("string_toLower", std::shared_ptr<Builtin> (new BuiltinStringToLower));
     registerBultin("string_toUpper", std::shared_ptr<Builtin> (new BuiltinStringToUpper));
     registerBultin("string_trim", std::shared_ptr<Builtin> (new BuiltinStringTrim));
     registerBultin("string_append:", std::shared_ptr<Builtin> (new BuiltinStringAppend));
+    registerBultin("string_length", std::shared_ptr<Builtin> (new BuiltinStringLength));
     registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
 }
 

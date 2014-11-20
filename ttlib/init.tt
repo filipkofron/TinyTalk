@@ -1,6 +1,7 @@
 // Initial TinyTalk library for basic object operations
 
 Object object: Object addField: "inObject:createField:withValue:";
+
 Object object: Object set: "inObject:createField:withValue:"
 value:
     [ :inObject: :createField: :withValue: |
@@ -30,3 +31,4 @@ Rec2 = (Rec1 new);
 
 Rec1 createField: "foo" withValue: [ Rec2 bar ];
 Rec2 createField: "bar" withValue: [ Rec1 foo ];
+

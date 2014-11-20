@@ -44,7 +44,7 @@ TTObject *TTObject::clone(TTObject *cloned)
     MemAllocator *alloc = MemAllocator::getCurrent();
     TTObject *newObject = alloc->allocateObject();
     memcpy(newObject, cloned, sizeof(*cloned));
-    newObject->fields = (Field *) alloc->allocate(sizeof(newObject->fields) * cloned->fieldCapacity);
+    newObject->fields = (Field *) alloc->allocate(sizeof(*newObject->fields) * cloned->fieldCapacity);
 
     memcpy(newObject->fields, cloned->fields, sizeof(*cloned->fields) * cloned->fieldCapacity);
 
@@ -55,6 +55,9 @@ std::vector<std::pair<std::string, RefPtr<TTObject> > > TTObject::laterFields;
 
 bool TTObject::addField(const uint8_t *name, TTObject *object)
 {
+#ifdef DEBUG
+    std::cout << "======================= Adding field of name: " << ((const char *) name) << std::endl;
+#endif
     if(!*name)
     {
         return false;
@@ -75,6 +78,7 @@ bool TTObject::addField(const uint8_t *name, TTObject *object)
         return false;
     }
     MemAllocator *alloc = MemAllocator::getCurrent();
+
     if(fieldCount == fieldCapacity)
     {
         fieldCapacity *= 2;

@@ -37,6 +37,9 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         top += bytes;
         return nextAddr;
     }
+
+    std::cerr << "OUT OF MEMORY" << std::endl;
+    throw std::exception();
     return 0;
 }
 

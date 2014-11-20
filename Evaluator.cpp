@@ -107,6 +107,13 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
     TTObject *destExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
     TTObject *destValue = evaluate(destExpr, env);
 
+#ifdef DEBUG
+    std::cout << "(evaluateSimpleMessage) destValue:" << std::endl;
+    destValue->print(std::cout, 0, false);
+    std::cout << std::endl;
+#endif
+
+
     TTObject *thiz = env->getField(TO_TT_STR("this"));
 
     // the accepted destValues types are: Object or Expression, the expression is considered
@@ -167,6 +174,13 @@ TTObject *Evaluator::evaluateSymbolValue(TTObject *symbolValue, TTObject *env)
 #ifdef DEBUG
     std::cout << "(evaluateSymbolValue)" << std::endl;
 #endif
+
+#ifdef DEBUG
+    std::cout << "(evaluateSymbolValue) env:" << std::endl;
+    env->print(std::cout, 0, false);
+    env->getField(TO_TT_STR("parentEnv"))->print(std::cout, 0, false);
+#endif
+
 
     std::string name = (char *) symbolValue->getField(TO_TT_STR("symbolName"))->getLiteral()->data;
 #ifdef DEBUG
@@ -241,14 +255,32 @@ TTObject *Evaluator::evaluateBlock(TTObject *block, TTObject *env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateBlock)" << std::endl;
+    std::cout << "(evaluateBlock) env: " << std::endl;
+    env->print(std::cout, 0, false);
+    std::cout << std::endl;
 #endif
 
+    TTObject *newBlock = TTObject::clone(block);
+
+    bool success = newBlock->addField(TO_TT_STR("blockEnv"), env);
+    if(!success)
+    {
+        newBlock->setField(TO_TT_STR("blockEnv"), env);
+    }
+
+#ifdef DEBUG
+    std::cout << "(evaluateBlock) env after: " << std::endl;
+    env->print(std::cout, 0, false);
+    std::cout << std::endl;
+#endif
+    return newBlock;
+    /*
     bool success = block->addField(TO_TT_STR("blockEnv"), env);
     if(!success)
     {
         block->setField(TO_TT_STR("blockEnv"), env);
     }
-    return block;
+    return block;*/
 }
 
 TTObject *Evaluator::evaluateParenthesis(TTObject *parenthesis, TTObject *env)

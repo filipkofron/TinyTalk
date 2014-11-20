@@ -12,6 +12,14 @@
 * 2. assigned expression for value - "assignExpression"
 */
 #define EXPRESSION_ASSIGN 0x01
+/*
+    BC:
+    assign_symbol
+    - assign symbol
+    stack:
+        [sp]..[sp - ptr_size - 1] = object, assigned object
+        [sp - ptr_size]..[sp - ptr_size * 2 - 1] = string object, name
+ */
 
 /**
 * Chained expression.
@@ -22,6 +30,10 @@
 * 2. next expression - "nextExpr"
 */
 #define EXPRESSION_CHAINED 0x02
+/*
+    BC:
+        doesn't exist
+ */
 
 /**
 * Parenthesis expression flag.
@@ -31,6 +43,10 @@
 * 1. inner expression - "innerExpr"
 */
 #define EXPRESSION_PARENTHESIS 0x03
+/*
+    BC:
+        doesn't exist
+ */
 
 /**
 * Simple message expression flag.
@@ -42,6 +58,14 @@
 * 2. message name - "msgName"
 */
 #define EXPRESSION_SIMPLE_MESSAGE 0x04
+/*
+    BC:
+    send_simple
+    - send simple message
+    stack:
+        [sp]..[sp - ptr_size - 1] = dest object
+        [sp - ptr_size]..[sp - ptr_size * 2 - 1] = message name object
+ */
 
 /**
 * Multiple message expression flag.
@@ -55,6 +79,19 @@
 * 4. message valueArray - "msgValueArray"
 */
 #define EXPRESSION_MULTIPLE_MESSAGE 0x05
+/*
+    BC:
+    send_multiple
+    - send multiple message
+    begin stack:
+        [sp]..[sp - ptr_size - 1] = dest object
+        [sp - ptr_size]..[sp - ptr_size * 2 - 1] = message name object
+        [sp - ptr_size * 2]..[sp - ptr_size * 3 - 1] = arg names object
+        [sp - ptr_size * 4]..[sp - ptr_size * 4 - 1] = arg values object
+
+    result stack:
+        [sp]..[sp - ptr_size - 1] = return object
+ */
 
 /**
 * Symbol value expression flag.
@@ -64,6 +101,14 @@
 * 1. symbol name - "symbolName"
 */
 #define EXPRESSION_SYMBOL_VALUE 0x06
+/*
+    BC:
+    load_symbol
+    - load symbol value by name
+    stack:
+        [sp]..[sp - ptr_size - 1] = symbol name
+
+ */
 
 /**
 * Literal value expression flag.
