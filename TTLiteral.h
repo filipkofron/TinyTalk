@@ -10,6 +10,7 @@ struct TTLiteral;
 #define LITERAL_TYPE_STRING 0x00
 #define LITERAL_TYPE_INTEGER 0x01
 #define LITERAL_TYPE_OBJECT_ARRAY 0x02
+#define LITERAL_TYPE_BYTE_ARRAY 0x03
 // TODO: #define LITERAL_TYPE_BIG_INTEGER 0x03
 // TODO: #define LITERAL_TYPE_BYTE_CODE 0x04
 // TODO: #define LITERAL_TYPE_MACHINE_CODE 0x05
@@ -37,6 +38,9 @@ struct TTLiteral
 
     static TTLiteral *createIntegerLiteral();
     static TTLiteral *createIntegerLiteral(const int32_t &value);
+
+    static TTLiteral *createByteArray(uint32_t size);
+    static TTLiteral *createByteArray(const std::vector<uint8_t> &objects);
 
     static TTLiteral *createObjectArray(uint32_t size);
     static TTLiteral *createObjectArray(const std::vector<TTObject *> &objects);

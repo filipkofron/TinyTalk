@@ -35,6 +35,7 @@ uint8_t *MemAllocator::allocate(size_t bytes)
     if ((top + bytes) < capacity)
     {
         top += bytes;
+        memset(nextAddr, 0, bytes);
         return nextAddr;
     }
 

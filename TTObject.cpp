@@ -231,6 +231,9 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
         case TT_OBJECT:
             type = "OBJECT";
             break;
+        case TT_STACK_FRAME:
+            type = "STACT FRAME";
+            break;
         default:
             break;
     }

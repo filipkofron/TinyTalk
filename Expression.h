@@ -58,15 +58,6 @@
 * 2. message name - "msgName"
 */
 #define EXPRESSION_SIMPLE_MESSAGE 0x04
-/*
-    BC:
-    send_simple
-    - send simple message
-    stack:
-        [sp]..[sp - ptr_size - 1] = dest object
-        [sp - ptr_size]..[sp - ptr_size * 2 - 1] = message name object
- */
-
 /**
 * Multiple message expression flag.
 *
@@ -79,19 +70,6 @@
 * 4. message valueArray - "msgValueArray"
 */
 #define EXPRESSION_MULTIPLE_MESSAGE 0x05
-/*
-    BC:
-    send_multiple
-    - send multiple message
-    begin stack:
-        [sp]..[sp - ptr_size - 1] = dest object
-        [sp - ptr_size]..[sp - ptr_size * 2 - 1] = message name object
-        [sp - ptr_size * 2]..[sp - ptr_size * 3 - 1] = arg names object
-        [sp - ptr_size * 4]..[sp - ptr_size * 4 - 1] = arg values object
-
-    result stack:
-        [sp]..[sp - ptr_size - 1] = return object
- */
 
 /**
 * Symbol value expression flag.
@@ -128,6 +106,7 @@
 * 2. full name - "blockFullName"
 * 3. expression - "blockExpr"
 * 4. native name - "blockNativeName"
+* 5. byte code - "blockByteCode"
 *
 * it will later also have "blockEnv" when evaluating
 */

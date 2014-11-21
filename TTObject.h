@@ -12,13 +12,12 @@ struct TTObject;
 
 #define DEFAULT_FIELD_COUNT 8
 
-#define COMPARE_NAME(a, b) strcmp((const char *) a, (const char *) b)
-
 #define TT_NIL 0x00
 #define TT_OBJECT 0x01
 #define TT_EXPR 0x02
 #define TT_LITERAL 0x04
 #define TT_ENV 0x08
+#define TT_STACK_FRAME 0x10
 
 #define IS_SOME_TYPE(a, b) (!(!((a)->type == b)))
 
@@ -27,6 +26,7 @@ struct TTObject;
 #define IS_EXPR(a) IS_SOME_TYPE(a, TT_EXPR)
 #define IS_LITERAL(a) IS_SOME_TYPE(a, TT_LITERAL)
 #define IS_ENV(a) IS_SOME_TYPE(a, TT_ENV)
+#define IS_STACK_FRAME(a) IS_SOME_TYPE(a, TT_STACK_FRAME)
 
 /**
 * TTObject is any object within this VM, that can be directly interfaced from
@@ -46,21 +46,6 @@ struct TTObject
         TTObject *object;
     };
 
-    /**
-    * Types
-    *
-    * Object  :  value     ~   hexa
-    * ====== == ======
-    * nil     :  0000 0000 ~   0x00
-    * object  :  0000 0001 ~   0x01
-    * method  :  0000 0010 ~   0x02
-    * expr    :  0000 0100 ~   0x04
-    * literal :  0000 1000 ~   0x08
-    * symbol  :  0001 0000 ~   0x10
-    * env     :  0010 0000 ~   0x20
-    * message :  0100 0000 ~   0x40
-    *
-    */
     uint8_t type;
 
     /**

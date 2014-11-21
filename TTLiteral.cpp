@@ -36,6 +36,9 @@ TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<st
         case LITERAL_TYPE_OBJECT_ARRAY:
             std::cout << "ObjectArray";
             break;
+        case LITERAL_TYPE_BYTE_ARRAY:
+            std::cout << "ByteArray";
+            break;
         default:
             std::cout << "Invalid literal type" << std::endl;
             throw std::exception();
@@ -87,6 +90,9 @@ const char *TTLiteral::getTypeInfo()
         case LITERAL_TYPE_OBJECT_ARRAY:
             res = "OBJECT ARRAY";
             break;
+        case LITERAL_TYPE_BYTE_ARRAY:
+            res = "BYTE ARRAY";
+            break;
     }
 
     return res;
@@ -113,6 +119,30 @@ void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &
                     if(recursive)
                     {
                         ((TTObject **) data)[i]->print(os, level + 1, recursive);
+                    }
+                    else
+                    {
+                        os << "<non-recursive-print>";
+                    }
+                }
+                else
+                {
+                    os << "NULL";
+                }
+                os << std::endl;
+            }
+            prlvl(os, level - 1);
+        case LITERAL_TYPE_BYTE_ARRAY:
+            os << "size: " << length << std::endl;
+            for(uint32_t i = 0; i < length / sizeof(TTObject *); i++)
+            {
+                prlvl(os, level);
+                os << "[" << i << "] -> ";
+                if(((TTObject **) data)[i])
+                {
+                    if(recursive)
+                    {
+                        os << (unsigned) data[i];
                     }
                     else
                     {
@@ -167,6 +197,18 @@ TTLiteral *TTLiteral::createObjectArray(uint32_t size)
     return lit;
 }
 
+TTLiteral *TTLiteral::createByteArray(uint32_t size)
+{
+    MemAllocator *alloc = MemAllocator::getCurrent();
+    TTLiteral *lit = alloc->allocateLiteral();
+
+    lit->type = LITERAL_TYPE_BYTE_ARRAY;
+    lit->length = size;
+    lit->data = alloc->allocate(lit->length);
+
+    return lit;
+}
+
 TTLiteral *TTLiteral::createStringLiteral(const uint8_t *str)
 {
     TTLiteral *lit = createStringLiteral(strlen((const char *) str));
@@ -193,6 +235,21 @@ TTLiteral *TTLiteral::createObjectArray(const std::vector<TTObject *> &objects)
     {
         *dataObs = object;
         dataObs++;
+    }
+
+    return lit;
+}
+
+TTLiteral *TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
+{
+    TTLiteral *lit = createObjectArray(bytes.size());
+
+    uint8_t *dataBytes = lit->data;
+
+    for(auto byt : bytes)
+    {
+        *dataBytes = byt;
+        dataBytes++;
     }
 
     return lit;
