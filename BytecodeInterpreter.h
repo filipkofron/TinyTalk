@@ -27,15 +27,18 @@ private:
     Stack stack;
 
     void setupStackFrame(TTObject *block, TTObject *parentEnv, TTObject *thiz);
+    void bindStackFrame();
 private:
     TTObject *env;
     uint8_t *byteCode;
     TTObject *stackFrame;
     TTObject *nil;
-    uint32_t pc;    // TODO: must be updated in the stackFrame
+    uint32_t pc;
+    uint32_t pcMax;
 public:
-    BytecodeInterpreter(TTObject *block);
+    BytecodeInterpreter();
     ~BytecodeInterpreter();
+    TTObject *interpret(TTObject *block, TTObject *env, TTObject *thiz);
 };
 
 #endif
