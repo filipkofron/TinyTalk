@@ -114,6 +114,59 @@ TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nex
     return NULL;
 }
 
+TTObject *Runtime::assignSymbol(const uint8_t *safeName, TTObject *assignedVal, TTObject *env, TTObject **nextEnv)
+{
+    *nextEnv = NULL;
+#ifdef DEBUG
+    std::cout << "(assignSymbol)" << std::endl;
+#endif
+
+    if (env->hasField(safeName))
+    {
+        env->setField(safeName, assignedVal);
+        return assignedVal;
+    }
+    else
+    {
+#ifdef DEBUG
+        std::cout << "(assignSymbol): field not found in environment" << std::endl;
+#endif
+    }
+
+    TTObject *thiz = env->getField(TO_TT_STR("this"));
+    if (!thiz)
+    {
+        std::cout << "(assignSymbol): this is NULL" << std::endl;
+    }
+    else
+    {
+        if (thiz->hasField(safeName))
+        {
+            thiz->setField(safeName, assignedVal);
+            return assignedVal;
+        }
+        else
+        {
+#ifdef DEBUG
+            std::cout << "(assignSymbol): field was found in this" << std::endl;
+#endif
+        }
+    }
+
+    TTObject *parent = env->getField(TO_TT_STR("parentEnv"));
+    if (parent && parent->type == TT_ENV)
+    {
+#ifdef DEBUG
+        std::cout << "(assignSymbol): trying parent env" << std::endl;
+#endif
+        *nextEnv = parent;
+        return NULL;
+    }
+
+    std::cerr << "(assignSymbol): field not found in anywhere (not going to parent), sorry" << std::endl;
+    throw std::exception();
+}
+
 TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *safeName, TTObject **next)
 {
 #ifdef DEBUG

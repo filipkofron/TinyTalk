@@ -83,6 +83,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
     std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
     Parser parser(tokenizer);
     Evaluator evaluator;
+    BytecodeInterpreter bytecodeInterpreter;
 
     do
     {
@@ -99,7 +100,11 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             if(expression != NULL)
             {
-                TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
+                //TTObject *result = (expression, Runtime::globalEnvironment);
+
+                TTObject *expr = Expression::createNaiveBlock(expression);
+
+                TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
 
                 if(!silent)
                 {

@@ -122,6 +122,27 @@ namespace Expression
         return res;
     }
 
+    TTObject *createNaiveBlock(TTObject *expr)
+    {
+        TTObject *res = TTObject::createObject(TT_EXPR);
+
+        res->flags = EXPRESSION_BLOCK;
+
+        TTObject *blockArgNames = TTObject::createObject(TT_LITERAL);
+        TTLiteral *nameArrayLit = TTLiteral::createObjectArray(0);
+        blockArgNames->setLiteral(nameArrayLit);
+
+        TTObject *blockFullName = TTObject::createObject(TT_LITERAL);
+        TTLiteral *emptyName = TTLiteral::createStringLiteral(TO_TT_STR(""));
+        blockFullName->setLiteral(emptyName);
+
+        res->addField(TO_TT_STR("blockArgNames"), blockArgNames);
+        res->addField(TO_TT_STR("blockFullName"), blockFullName);
+        res->addField(TO_TT_STR("blockExpr"), expr);
+
+        return res;
+    }
+
     TTObject *createChained(TTObject *currExpr, TTObject *nextExpr)
     {
         TTObject *expr = TTObject::createObject(TT_EXPR);

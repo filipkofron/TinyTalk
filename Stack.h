@@ -11,15 +11,13 @@ struct Stack
 {
     uint8_t *data;
     uint32_t sp;
+    uint32_t len;
 
     Stack();
     ~Stack();
 
-    int32_t topInt();
-    int32_t popInt();
     intptr_t topPtr();
     intptr_t popPtr();
-    void pushInt(int32_t val);
     void pushPtr(intptr_t ptr);
 };
 

@@ -79,14 +79,6 @@
 * 1. symbol name - "symbolName"
 */
 #define EXPRESSION_SYMBOL_VALUE 0x06
-/*
-    BC:
-    load_symbol
-    - load symbol value by name
-    stack:
-        [sp]..[sp - ptr_size - 1] = symbol name
-
- */
 
 /**
 * Literal value expression flag.
@@ -130,6 +122,7 @@ namespace Expression
     TTObject *createLiteralValue(TTLiteral *value);
     TTObject *createParenthesis(TTObject *innerExpr);
     TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr, TTLiteral *nativeName);
+    TTObject *createNaiveBlock(TTObject *expr);
     TTObject *createChained(TTObject *currExpr, TTObject *nextExpr);
     TTObject *createCreateVariables(TTLiteral *varNames);
 

@@ -10,9 +10,11 @@ void createVar(BytecodeInterpreter &bi);
 void loadInteger(BytecodeInterpreter &bi);
 void loadString(BytecodeInterpreter &bi);
 void loadSymbol(BytecodeInterpreter &bi);
+void saveSymbol(BytecodeInterpreter &bi);
 void loadBlock(BytecodeInterpreter &bi);
 void sendSimple(BytecodeInterpreter &bi);
 void sendMultiple(BytecodeInterpreter &bi);
+void pop(BytecodeInterpreter &bi);
 
 class BytecodeInterpreter
 {
@@ -20,9 +22,11 @@ class BytecodeInterpreter
     friend void loadInteger(BytecodeInterpreter &bi);
     friend void loadString(BytecodeInterpreter &bi);
     friend void loadSymbol(BytecodeInterpreter &bi);
+    friend void saveSymbol(BytecodeInterpreter &bi);
     friend void loadBlock(BytecodeInterpreter &bi);
     friend void sendSimple(BytecodeInterpreter &bi);
     friend void sendMultiple(BytecodeInterpreter &bi);
+    friend void pop(BytecodeInterpreter &bi);
 private:
     Stack stack;
 

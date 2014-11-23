@@ -242,7 +242,7 @@ TTLiteral *TTLiteral::createObjectArray(const std::vector<TTObject *> &objects)
 
 TTLiteral *TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
 {
-    TTLiteral *lit = createObjectArray(bytes.size());
+    TTLiteral *lit = createByteArray(bytes.size());
 
     uint8_t *dataBytes = lit->data;
 
