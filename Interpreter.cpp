@@ -100,10 +100,9 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             if(expression != NULL)
             {
-                //TTObject *result = (expression, Runtime::globalEnvironment);
+                //TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
                 TTObject *expr = Expression::createNaiveBlock(expression);
-
                 TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
 
                 if(!silent)

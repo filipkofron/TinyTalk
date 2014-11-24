@@ -45,7 +45,7 @@ TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nex
         std::cout << "(findSymbol) env:" << std::endl;
         env->print(std::cout, 0, false);
         env->getField(TO_TT_STR("parentEnv"))->print(std::cout, 0, false);
-    #endif
+#endif
 
 #ifdef DEBUG
         std::cout << "(findSymbol): of name '" << name << "'" << std::endl;
@@ -172,7 +172,6 @@ TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *saf
 #ifdef DEBUG
     std::cout << "(findBlockAtNonExpression)" << std::endl;
 #endif
-
     TTObject *fieldVal = object->getField(safeName);
     if(fieldVal)
     {
@@ -202,7 +201,6 @@ TTObject *Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTObject *e
 #ifdef DEBUG
     std::cout << "(findBlock)" << std::endl;
 #endif
-
     *thiz = NULL;
 
     TTObject *envThiz = env->getField(TO_TT_STR("this"));

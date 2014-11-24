@@ -1,4 +1,5 @@
-#define DEBUG
+// #define DEBUG
+#define VERBOSE
 
 #define MEMORY_ALLCOATOR_SIZE_DEFAULT (1024 * 1024 * 32)
 

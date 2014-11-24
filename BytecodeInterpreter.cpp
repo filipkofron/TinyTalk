@@ -4,7 +4,9 @@
 
 void createVar(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<createVar>" << std::endl;
+#endif
     TTObject *nameObj = (TTObject *) bi.stack.popPtr();
     std::string name = (const char *) nameObj->getLiteral()->data;
     bi.env->addField(TO_TT_STR(name.c_str()), bi.nil);
@@ -13,22 +15,27 @@ void createVar(BytecodeInterpreter &bi)
 
 void loadInteger(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<loadInteger>" << std::endl;
+#endif
     bi.stack.pushPtr(*(intptr_t *) (intptr_t) &bi.byteCode[bi.pc]);
     bi.pc += sizeof(intptr_t);
 }
 
 void loadString(BytecodeInterpreter &bi)
 {
-    std::cout << "<loadString>" << std::endl;
-    std::cout << "<loadString> string: *(intptr_t *) (intptr_t) &bi.byteCode[bi.pc]: '" << (const char *)((TTObject *)(*(intptr_t *) (intptr_t) &bi.byteCode[bi.pc]))->getLiteral()->data<< "'" << std::endl;
+#ifdef DEFINE
+    std::cout << "<loadString>: '" << (const char *)((TTObject *)(*(intptr_t *) (intptr_t) &bi.byteCode[bi.pc]))->getLiteral()->data<< "'" << std::endl;
+#endif
     bi.stack.pushPtr(*(intptr_t *) (intptr_t) &bi.byteCode[bi.pc]);
     bi.pc += sizeof(intptr_t);
 }
 
 void loadSymbol(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<loadSymbol>" << std::endl;
+#endif
     TTObject *nextEnv = bi.env;
     TTObject *val = NULL;
     TTObject *name = (TTObject *) bi.stack.popPtr();
@@ -48,7 +55,9 @@ void loadSymbol(BytecodeInterpreter &bi)
 
 void saveSymbol(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<saveSymbol>" << std::endl;
+#endif
     TTObject *name = (TTObject *) bi.stack.popPtr();
     TTObject *val = (TTObject *) bi.stack.popPtr();
 
@@ -68,9 +77,23 @@ void saveSymbol(BytecodeInterpreter &bi)
 
 void loadBlock(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<loadBlock>" << std::endl;
+#endif
     TTObject *block = (TTObject *) *(intptr_t *) (intptr_t) &bi.byteCode[bi.pc];
     bi.pc += sizeof(intptr_t);
+
+
+    TTObject *byteCodeObj = block->getField(TO_TT_STR("blockByteCode"));
+    if(!byteCodeObj)
+    {
+#ifdef DEFINE
+        std::cout << "(<setupStackFrame>): compiling" << std::endl;
+#endif
+        byteCodeObj = Runtime::bytecodeGen.generate(block->getField(TO_TT_STR("blockExpr")));
+        block->addField(TO_TT_STR("blockByteCode"), byteCodeObj);
+    }
+
     TTObject *newBlock = TTObject::clone(block);
 
     bool success = newBlock->addField(TO_TT_STR("blockEnv"), bi.env);
@@ -83,7 +106,9 @@ void loadBlock(BytecodeInterpreter &bi)
 
 void sendSimple(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<sendSimple>" << std::endl;
+#endif
     TTObject *dest = (TTObject *) bi.stack.popPtr();
     TTObject *name = (TTObject *) bi.stack.popPtr();
 
@@ -100,6 +125,7 @@ void sendSimple(BytecodeInterpreter &bi)
     }
 
     TTObject *expression = Runtime::findBlock(TO_TT_STR(safeName.c_str()), dest, bi.env, &thiz);
+
     TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
     if(blockNativeName)
     {
@@ -119,7 +145,9 @@ void sendSimple(BytecodeInterpreter &bi)
 
 void sendMultiple(BytecodeInterpreter &bi)
 {
+#ifdef DEFINE
     std::cout << "<sendMultiple>" << std::endl;
+#endif
     TTObject *argCountObj = (TTObject *) bi.stack.popPtr();
     int32_t argCount = *(int32_t *) argCountObj->getLiteral()->data;
     TTObject *fullNameObj = (TTObject *) bi.stack.popPtr();
@@ -145,6 +173,7 @@ void sendMultiple(BytecodeInterpreter &bi)
     }
 
     TTObject *expression = Runtime::findBlock(TO_TT_STR(fullName.c_str()), dest, bi.env, &thiz);
+
     TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
 
     if(blockNativeName)
@@ -163,24 +192,29 @@ void sendMultiple(BytecodeInterpreter &bi)
         return;
     }
 
+    TTObject *pc = bi.stackFrame->getField(TO_TT_STR("pc"));
+    *((uint32_t *) pc->getLiteral()->data) = bi.pc;
+    TTObject *oldStackFrame = bi.stackFrame;
+
+    TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
+    bi.setupStackFrame(expression, blockEnv, thiz);
+    bi.bindStackFrame();
+
     for(int32_t i = 0; i < argCount; i++)
     {
         TTObject *argVal = (TTObject *) bi.stack.popPtr();
         TTObject *argName = (TTObject *) bi.stack.popPtr();
 
         std::string name = (const char *) argName->getLiteral()->data;
-
-        std::cout << "arg name: '" << name << "'" << std::endl;
+#ifdef DEFINE
+        std::cout << "arg name: '" << name << "' val:" << std::endl;
+        argVal->print(std::cout, 1, false);
+#endif
 
         bi.env->addField(TO_TT_STR(name.c_str()), argVal);
     }
 
-    TTObject *pc = bi.stackFrame->getField(TO_TT_STR("pc"));
-    *((uint32_t *) pc->getLiteral()->data) = bi.pc;
-    bi.stack.pushPtr((intptr_t) bi.stackFrame);
-    TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
-    bi.setupStackFrame(expression, blockEnv, thiz);
-    bi.bindStackFrame();
+    bi.stack.pushPtr((intptr_t) oldStackFrame);
 }
 
 void pop(BytecodeInterpreter &bi)
@@ -190,7 +224,9 @@ void pop(BytecodeInterpreter &bi)
 
 void BytecodeInterpreter::bindStackFrame()
 {
+#ifdef DEFINE
     std::cout << "(<bindStackFrame>)" << std::endl;
+#endif
     TTObject *byteCodeObj = stackFrame->getField(TO_TT_STR("byteCode"));
     byteCode = byteCodeObj->getLiteral()->data;
     pcMax = byteCodeObj->getLiteral()->length;
@@ -200,15 +236,19 @@ void BytecodeInterpreter::bindStackFrame()
 
 void BytecodeInterpreter::setupStackFrame(TTObject *block, TTObject *parentEnv, TTObject *thiz)
 {
+#ifdef DEFINE
     std::cout << "(<setupStackFrame>)" << std::endl;
+#endif
     stackFrame = TTObject::createObject(TT_STACK_FRAME);
 
     TTObject *byteCodeObj = block->getField(TO_TT_STR("blockByteCode"));
     if(!byteCodeObj)
     {
+#ifdef DEFINE
         std::cout << "(<setupStackFrame>): compiling" << std::endl;
+#endif
         byteCodeObj = Runtime::bytecodeGen.generate(block->getField(TO_TT_STR("blockExpr")));
-        block->setField(TO_TT_STR("blockByteCode"), byteCodeObj);
+        block->addField(TO_TT_STR("blockByteCode"), byteCodeObj);
     }
 
     stackFrame->addField(TO_TT_STR("byteCode"), byteCodeObj);
@@ -242,7 +282,9 @@ BytecodeInterpreter::~BytecodeInterpreter()
 
 TTObject *BytecodeInterpreter::interpret(TTObject *block, TTObject *env, TTObject *thiz)
 {
+#ifdef DEFINE
     std::cout << " --> Interpreting!" << std::endl;
+#endif
     setupStackFrame(block, env, thiz);
     bindStackFrame();
 
@@ -254,18 +296,12 @@ TTObject *BytecodeInterpreter::interpret(TTObject *block, TTObject *env, TTObjec
 
     do
     {
-        std::cout << "[LOOP]: start pc: " << pc << " pcMax: " << pcMax << std::endl;
         while (pc < pcMax)
         {
             *(intptr_t *) &instr = *(intptr_t *) &byteCode[pc];
-            std::cout << "load instr at pc: " << pc << std::endl;
             pc += sizeof(intptr_t);
-            std::cout << "executing with: " << pc << std::endl;
             (*instr)(*this);
-
-            std::cout << "[LOOP]: SP size now: " << (stack.len - stack.sp) << std::endl;
         }
-        std::cout << "[LOOP]: END pc: " << pc << " pcMax: " << pcMax << std::endl;
 
         if(stack.sp > stack.len - 2 * sizeof(intptr_t))
         {
