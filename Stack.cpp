@@ -29,6 +29,11 @@ intptr_t Stack::popPtr()
 
 void Stack::pushPtr(intptr_t ptr)
 {
+    if(sp == 0)
+    {
+        std::cerr << "STACK OVERFLOW" << std::endl;
+        throw std::exception();
+    }
     sp -= sizeof(intptr_t);
     //std::cout << " push: " << ptr << std::endl;
     *((intptr_t *)(intptr_t) &data[sp]) = ptr;

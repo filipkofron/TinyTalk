@@ -137,7 +137,10 @@ void sendSimple(BytecodeInterpreter &bi)
 
     TTObject *pc = bi.stackFrame->getField(TO_TT_STR("pc"));
     *((uint32_t *) pc->getLiteral()->data) = bi.pc;
-    bi.stack.pushPtr((intptr_t) bi.stackFrame);
+    if(bi.pc < bi.pcMax)
+    {
+        bi.stack.pushPtr((intptr_t) bi.stackFrame);
+    }
     TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
     bi.setupStackFrame(expression, blockEnv, thiz);
     bi.bindStackFrame();
@@ -214,7 +217,10 @@ void sendMultiple(BytecodeInterpreter &bi)
         bi.env->addField(TO_TT_STR(name.c_str()), argVal);
     }
 
-    bi.stack.pushPtr((intptr_t) oldStackFrame);
+    if(bi.pc < bi.pcMax)
+    {
+        bi.stack.pushPtr((intptr_t) oldStackFrame);
+    }
 }
 
 void pop(BytecodeInterpreter &bi)
@@ -312,6 +318,8 @@ TTObject *BytecodeInterpreter::interpret(TTObject *block, TTObject *env, TTObjec
         stack.pushPtr(retVal);
         bindStackFrame();
     } while(true);
+
+    std::cout << "End sp: " << stack.sp << std::endl;
 
     return (TTObject *) stack.popPtr();
 }

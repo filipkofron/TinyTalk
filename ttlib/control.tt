@@ -39,8 +39,6 @@ While
 
             thisThis = this;
 
-            // TODO: Improve the recursion.
-
             (isTrue value)
                 ifTrue:
                  [
