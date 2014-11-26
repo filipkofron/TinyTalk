@@ -8,10 +8,10 @@
 #define COMPARE_NAME(a, b) strcmp((const char *) a, (const char *) b)
 
 #define NOT_IMPLEMENTED \
-{   \
+do {   \
 std::cerr << "NOT IMPLEMENTED " << __PRETTY_FUNCTION__ << " at " << __FILE__ << ":" << __LINE__ << std::endl;\
 throw std::exception(); \
-}
+} while(false)
 
 
 #include <cstdint>

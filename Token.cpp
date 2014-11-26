@@ -33,7 +33,7 @@ const std::string &Token::getValue() const
     return value;
 }
 
-const static char *TypeStrings[14] =
+const static char *TypeStrings[17] =
         {
                 "SYMBOL",
                 "INTEGER",
@@ -49,6 +49,9 @@ const static char *TypeStrings[14] =
                 "EXPRESSION_END",
                 "RETURN",
                 "VERTICAL_BAR",
+                "ARRAY_OPEN",
+                "ARRAY_CLOSE",
+                "ARRAY_SEPARATOR",
         };
 
 const char *Token::getTypeInfo() const
@@ -69,6 +72,9 @@ const char *Token::getTypeInfo() const
         case Type::EXPRESSION_END:
         case Type::RETURN:
         case Type::VERTICAL_BAR:
+        case Type::ARRAY_OPEN:
+        case Type::ARRAY_CLOSE:
+        case Type::ARRAY_SEPARATEOR:
             return TypeStrings[getType()];
         default:
             return "Unknown";

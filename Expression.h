@@ -113,6 +113,15 @@
 */
 #define EXPRESSION_CREATE_VARIABLES 0x09
 
+/**
+* Array expression.
+*
+* Consists of expression array.
+*
+* 1. expressions - "expressions"
+*/
+#define EXPRESSION_ARRAY 0x0A
+
 namespace Expression
 {
     TTObject *createSimpleMessage(TTObject *destExpr, TTLiteral *name);
@@ -125,6 +134,7 @@ namespace Expression
     TTObject *createNaiveBlock(TTObject *expr);
     TTObject *createChained(TTObject *currExpr, TTObject *nextExpr);
     TTObject *createCreateVariables(TTLiteral *varNames);
+    TTObject *createArray(TTLiteral *expressions);
 
     const char *getTypeInfo(TTObject *expr);
 }

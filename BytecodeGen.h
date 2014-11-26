@@ -21,6 +21,7 @@ private:
     void genChained(TTObject *expr, std::vector<uint8_t> &byteCode);
     void genLiteralValue(TTObject *expr, std::vector<uint8_t> &byteCode);
     void genParenthesis(TTObject *expr, std::vector<uint8_t> &byteCode);
+    void genArray(TTObject *expr, std::vector<uint8_t> &byteCode);
     void gen(TTObject *expr, std::vector<uint8_t> &byteCode);
 public:
     TTObject *generate(TTObject *expression);

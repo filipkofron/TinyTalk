@@ -1,6 +1,7 @@
 #include "BytecodeGen.h"
 #include "common.h"
 #include "BytecodeInterpreter.h"
+#include "Runtime.h"
 
 void BytecodeGen::putTTObj(TTObject *obj, std::vector<uint8_t> &byteCode)
 {
@@ -182,8 +183,41 @@ void BytecodeGen::genParenthesis(TTObject *expr, std::vector<uint8_t> &byteCode)
     gen(innerExpr, byteCode);
 }
 
+void BytecodeGen::genArray(TTObject *expr, std::vector<uint8_t> &byteCode)
+{
+#ifdef DEFINE
+    std::cout << "{genArray}" << std::endl;
+#endif
+    TTObject *expressions = expr->getField(TO_TT_STR("expressions"));
+    TTLiteral *array = expressions->getLiteral();
+
+    size_t len = array->length / sizeof(TTObject *);
+
+    for(size_t i = 0; i < len; i++)
+    {
+        TTObject *innerExpr = ((TTObject **) array->data)[i];
+
+        gen(innerExpr, byteCode);
+    }
+
+    TTLiteral *sizeLit = TTLiteral::createIntegerLiteral((uint32_t) len);
+    TTObject *sizeObj = TTObject::createObject(TT_LITERAL);
+    sizeObj->setLiteral(sizeLit);
+
+    putInstr(loadInteger, byteCode);
+    putTTObj(sizeObj, byteCode);
+
+    putInstr(loadArray, byteCode);
+}
+
 void BytecodeGen::gen(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
+    if(expr == NULL || expr->type == TT_NIL)
+    {
+        putInstr(push, byteCode);
+        putTTObj(Runtime::globalEnvironment->getField(TO_TT_STR("nul")), byteCode);
+        return;
+    }
     switch (expr->flags)
     {
         case EXPRESSION_SYMBOL_VALUE:
@@ -212,6 +246,9 @@ void BytecodeGen::gen(TTObject *expr, std::vector<uint8_t> &byteCode)
             break;
         case EXPRESSION_PARENTHESIS:
             genParenthesis(expr, byteCode);
+            break;
+        case EXPRESSION_ARRAY:
+            genArray(expr, byteCode);
             break;
         default:
             std::cerr << "[BytecodeGen]: Invalid expression" << std::endl;

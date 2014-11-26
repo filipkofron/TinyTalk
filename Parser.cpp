@@ -63,7 +63,7 @@ TTLiteral *Parser::createLiteralArrayOfStrings(std::vector<std::string> &strs)
     return TTLiteral::createObjectArray(literals);
 }
 
-TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken)
+TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseRightOfValue)" << std::endl;
@@ -76,11 +76,11 @@ TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken)
             // may be either message
             if (isSimpleMessage(tokenizer->peekToken()))
             {
-                return parseSimpleMessageRest(destExpr);
+                return parseSimpleMessageRest(destExpr, untilChain);
             }
             else
             {
-                return parseMultipleMessageRest(destExpr);
+                return parseMultipleMessageRest(destExpr, untilChain);
             }
         case Token::Type::ASSIGNMENT:
             if(prevToken.getType() != Token::Type::SYMBOL)
@@ -94,11 +94,17 @@ TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken)
         case Token::Type::PARENTHESIS_OPEN:
             std::cerr << "[Parser]: cannot send the resutl of parenthesis to object (not yet)" << std::endl;
             return NULL;
+        case Token::Type::ARRAY_OPEN:
+            std::cerr << "[Parser]: cannot send array to object yet" << std::endl;
+                return NULL;
         case Token::Type::STRING:
             std::cerr << "[Parser]: cannot send a literal to object (not yet)" << std::endl;
             return NULL;
         case Token::Type::EXPRESSION_END:
-            return parseChain(destExpr, false); // TODO: Is this correct to put it forward ?
+            if(untilChain)
+                return destExpr;
+            else
+                return parseChain(destExpr, false); // TODO: Is this correct to put it forward ?
         default:
             return destExpr;
     }
@@ -112,17 +118,20 @@ TTObject *Parser::parseSingleValue()
     switch(token.getType())
     {
         case Token::Type::SYMBOL:
-            expr = parseSymbol(true);
+            expr = parseSymbol(true, false);
             break;
         case Token::Type::STRING:
         case Token::Type::INTEGER:
-            expr = parseLiteral(true);
+            expr = parseLiteral(true, false);
             break;
         case Token::Type::PARENTHESIS_OPEN:
-            expr = parseParenthesis(true);
+            expr = parseParenthesis(true, false);
+            break;
+        case Token::Type::ARRAY_OPEN:
+            expr = parseArray(true, false);
             break;
         case Token::Type::BLOCK_OPEN:
-            expr = parseBlock(true);
+            expr = parseBlock(true, false);
             break;
         default:
             std::cerr << "[Parser]: Error: Single value expected only." << std::endl;
@@ -138,7 +147,7 @@ TTObject *Parser::parseSingleValue()
 * Now we can get either message (simple, multiple),
 * anything else will interrupt and the result will be symbol.
 */
-TTObject *Parser::parseSymbol(const bool &parseOnlyOne)
+TTObject *Parser::parseSymbol(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseSymbol:"
@@ -159,11 +168,11 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne)
     }
     else
     {
-        return parseRightOfValue(result, symbolToken);
+        return parseRightOfValue(result, symbolToken, untilChain);
     }
 }
 
-TTObject *Parser::parseLiteral(const bool &parseOnlyOne)
+TTObject *Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseLiteral:"
@@ -196,11 +205,11 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne)
     }
     else
     {
-        return parseRightOfValue(result, literalToken);
+        return parseRightOfValue(result, literalToken, untilChain);
     }
 }
 
-TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr)
+TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseSimpleMessageRest)" << std::endl;
@@ -217,10 +226,10 @@ TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr)
     TODO: Provide more from the type. The message name is symbol and therefore this will fail at runtime ..
 
      */
-    return parseRightOfValue(result, messageNameToken);
+    return parseRightOfValue(result, messageNameToken, untilChain);
 }
 
-TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
+TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseMultipleMessageRest)" << std::endl;
@@ -262,6 +271,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
                 break;
             case Token::Type::BLOCK_CLOSE:
             case Token::Type::PARENTHESIS_CLOSE:
+            case Token::Type::ARRAY_CLOSE:
             case Token::Type::TEOF:
                 atEnd = true;
                 break;
@@ -311,7 +321,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr)
     return res;
 }
 
-TTObject *Parser::parseBlock(const bool &parseOnlyOne)
+TTObject *Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseBlock:"
@@ -417,7 +427,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
         return NULL;
     }
 
-    TTObject *rightSideExpression = parse(false);
+    TTObject *rightSideExpression = parse(false, false);
 
     if(rightSideExpression == NULL)
     {
@@ -444,7 +454,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne)
     }
     else
     {
-        return parseRightOfValue(res, blockEnd);
+        return parseRightOfValue(res, blockEnd, untilChain);
     }
 }
 
@@ -459,19 +469,19 @@ TTObject *Parser::parseAssignmentRest(const Token &token)
 
     TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(token.getValue().c_str()));
 
-    TTObject* result = Expression::createAssignment(lit, parse(true)); // recursively parse the right side
+    TTObject* result = Expression::createAssignment(lit, parse(false, true)); // recursively parse the right side
 
-    /*Token nextToken = tokenizer->peekToken();
+    Token nextToken = tokenizer->peekToken();
     if(nextToken.getType() == Token::Type::EXPRESSION_END)
     {
-
-    }*/
+        return parseChain(result, false);
+    }
     // TODO: Is this correct after assign?
 
-    return parseRightOfValue(result, assignToken);
+    return parseRightOfValue(result, assignToken, true);
 }
 
-TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)
+TTObject *Parser::parseParenthesis(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseParenthesis:"
@@ -481,7 +491,7 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)
 
     Token lineHolder = tokenizer->readToken(); // eat opening bracket and store line number
 
-    TTObject *expr = parse(false);
+    TTObject *expr = parse(false, untilChain);
 
     Token closedBracket = tokenizer->readToken();
     if(closedBracket.getType() != Token::Type::PARENTHESIS_CLOSE)
@@ -498,8 +508,45 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne)
     }
     else
     {
-        return parseRightOfValue(result, closedBracket);
+        return parseRightOfValue(result, closedBracket, untilChain);
     }
+}
+
+TTObject *Parser::parseArray(const bool &parseOnlyOne, const bool &untilChain)
+{
+    Token lineHolder = tokenizer->readToken();
+
+    std::vector<TTObject *> expressions;
+
+    while(tokenizer->peekToken().getType() != Token::Type::ARRAY_CLOSE)
+    {
+        TTObject *expr = parse(false, false);
+        expressions.push_back(expr);
+
+        switch(tokenizer->peekToken().getType())
+        {
+            case Token::Type::ARRAY_SEPARATEOR:
+                tokenizer->readToken();
+                break;
+            case Token::Type::ARRAY_CLOSE:
+                break;
+            default:
+                std::cerr << "[Parser]: " << " Line: " << lineHolder.getLine()
+                        << ": Error: Array didn't end correctly" << std::endl;
+                return NULL;
+        }
+    }
+
+    Token close = tokenizer->readToken();
+
+    TTLiteral *lit = TTLiteral::createObjectArray(expressions);
+    TTObject *result = Expression::createArray(lit);
+
+    if(parseOnlyOne)
+    {
+        return result;
+    }
+    return parseRightOfValue(result, close, untilChain);
 }
 
 TTObject *Parser::parseChain(TTObject *currExpr, const bool &parseOnlyOne)
@@ -511,12 +558,12 @@ TTObject *Parser::parseChain(TTObject *currExpr, const bool &parseOnlyOne)
 
     tokenizer->readToken(); // eat ;
 
-    TTObject *expr = Expression::createChained(currExpr, parse(parseOnlyOne));
+    TTObject *expr = Expression::createChained(currExpr, parse(parseOnlyOne, false));
 
     return expr;
 }
 
-TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne)
+TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseCreateVariable:"
@@ -582,7 +629,7 @@ TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne)
     }
 }
 
-TTObject *Parser::parse(const bool &parseOnlyOne)
+TTObject *Parser::parse(const bool &parseOnlyOne, const bool &untilChain)
 {
     Token token = tokenizer->peekToken();
 
@@ -591,20 +638,23 @@ TTObject *Parser::parse(const bool &parseOnlyOne)
     switch(token.getType())
     {
         case Token::Type::SYMBOL:
-            res = parseSymbol(parseOnlyOne);
+            res = parseSymbol(parseOnlyOne, untilChain);
             break;
         case Token::Type::INTEGER:
         case Token::Type::STRING:
-            res = parseLiteral(parseOnlyOne);
+            res = parseLiteral(parseOnlyOne, untilChain);
             break;
         case Token::Type::PARENTHESIS_OPEN:
-            res = parseParenthesis(parseOnlyOne);
+            res = parseParenthesis(parseOnlyOne, untilChain);
+            break;
+        case Token::Type::ARRAY_OPEN:
+            res = parseArray(parseOnlyOne, untilChain);
             break;
         case Token::Type::BLOCK_OPEN:
-            res = parseBlock(parseOnlyOne);
+            res = parseBlock(parseOnlyOne, untilChain);
             break;
         case Token::Type::VERTICAL_BAR:
-            res = parseCreateVariable(parseOnlyOne);
+            res = parseCreateVariable(parseOnlyOne, untilChain);
             break;
         case Token::Type::TEOF:
             res = Runtime::globalEnvironment->getField(TO_TT_STR("nil"));

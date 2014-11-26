@@ -24,6 +24,9 @@ private:
     bool isAssignment(const int &c);
     bool isParenthesisOpen(const int &c);
     bool isParenthesisClose(const int &c);
+    bool isArraySeparator(const int &c);
+    bool isArrayOpen(const int &c);
+    bool isArrayClose(const int &c);
     bool isBlockOpen(const int &c);
     bool isBlockClose(const int &c);
     bool isExpressionEnd(const int &c);
@@ -37,6 +40,9 @@ private:
     void readAssignment();
     void readParenthesisOpen();
     void readParenthesisClose();
+    void readArraySeparator();
+    void readArrayOpen();
+    void readArrayClose();
     void readBlockOpen();
     void readBlockClose();
     void readExpressionEnd();

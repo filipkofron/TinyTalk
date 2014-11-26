@@ -223,9 +223,39 @@ void sendMultiple(BytecodeInterpreter &bi)
     }
 }
 
+void loadArray(BytecodeInterpreter &bi)
+{
+#ifdef DEFINE
+    std::cout << "(<loadArray>)" << std::endl;
+#endif
+
+    TTObject *sizeObj = (TTObject *) bi.stack.popPtr();
+    int32_t size = (int32_t)  *(uint32_t *) sizeObj->getLiteral()->data;
+
+    TTObject *arrayObj = TTObject::createObject(TT_LITERAL);
+    TTLiteral *lit = TTLiteral::createObjectArray(size);
+    arrayObj->setLiteral(lit);
+
+    std::cout << "(<loadArray>) size: " << size << std::endl;
+
+    for(int32_t i = size - 1; i >= 0; i--)
+    {
+        std::cout << "(<loadArray>) [" << i << "]:" << std::endl;
+        ((TTObject **) lit->data)[i] = (TTObject *) bi.stack.popPtr();
+    }
+
+    bi.stack.pushPtr((intptr_t) arrayObj);
+}
+
 void pop(BytecodeInterpreter &bi)
 {
     bi.stack.popPtr();
+}
+
+void push(BytecodeInterpreter &bi)
+{
+    bi.stack.pushPtr(*(intptr_t *) (intptr_t) &bi.byteCode[bi.pc]);
+    bi.pc += sizeof(intptr_t);
 }
 
 void BytecodeInterpreter::bindStackFrame()

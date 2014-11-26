@@ -169,6 +169,20 @@ namespace Expression
         return expr;
     }
 
+    TTObject *createArray(TTLiteral *expressions)
+    {
+        TTObject *expr = TTObject::createObject(TT_EXPR);
+
+        expr->flags = EXPRESSION_ARRAY;
+
+        TTObject *varNamesLit = TTObject::createObject(TT_LITERAL);
+        varNamesLit->setLiteral(expressions);
+
+        expr->addField(TO_TT_STR("expressions"), varNamesLit);
+
+        return expr;
+    }
+
     const char *getTypeInfo(TTObject *expr)
     {
         switch(expr->flags)
@@ -191,6 +205,8 @@ namespace Expression
                 return "BLOCK";
             case EXPRESSION_CREATE_VARIABLES:
                 return "CREATE VARIABLES";
+            case EXPRESSION_ARRAY:
+                return "ARRAY";
             default:
                 return "INVALID";
         }

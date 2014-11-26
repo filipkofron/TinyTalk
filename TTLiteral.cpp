@@ -34,8 +34,7 @@ TTObject *TTLiteral::onMessage(TTObject *dest, std::string &name, std::vector<st
         case LITERAL_TYPE_STRING:
             return stringOnMessage(dest, name, argNames, values);
         case LITERAL_TYPE_OBJECT_ARRAY:
-            std::cout << "ObjectArray";
-            break;
+            return objectArrayOnMessage(dest, name, argNames, values);
         case LITERAL_TYPE_BYTE_ARRAY:
             std::cout << "ByteArray";
             break;
@@ -73,6 +72,13 @@ TTObject *TTLiteral::integerOnMessage(TTObject *dest, std::string &name, std::ve
 
     std::cerr << "Integer: message not understood: " << name << std::endl;
     throw std::exception();
+}
+
+TTObject *TTLiteral::objectArrayOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+{
+    std::cout << " HAAAX ObjectArray " << std::endl;
+
+    return dest;
 }
 
 const char *TTLiteral::getTypeInfo()

@@ -28,6 +28,7 @@ struct TTLiteral
     TTObject *onMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
     TTObject *stringOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
     TTObject *integerOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
+    TTObject *objectArrayOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
 
     const char *getTypeInfo();
 

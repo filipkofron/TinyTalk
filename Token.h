@@ -23,7 +23,10 @@ public:
         TEOF = 10,
         EXPRESSION_END = 11,
         RETURN = 12,
-        VERTICAL_BAR = 13
+        VERTICAL_BAR = 13,
+        ARRAY_OPEN = 14,
+        ARRAY_CLOSE = 15,
+        ARRAY_SEPARATEOR = 16,
     };
 
 private:

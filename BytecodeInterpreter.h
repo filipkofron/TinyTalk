@@ -14,7 +14,9 @@ void saveSymbol(BytecodeInterpreter &bi);
 void loadBlock(BytecodeInterpreter &bi);
 void sendSimple(BytecodeInterpreter &bi);
 void sendMultiple(BytecodeInterpreter &bi);
+void loadArray(BytecodeInterpreter &bi);
 void pop(BytecodeInterpreter &bi);
+void push(BytecodeInterpreter &bi);
 
 class BytecodeInterpreter
 {
@@ -26,7 +28,9 @@ class BytecodeInterpreter
     friend void loadBlock(BytecodeInterpreter &bi);
     friend void sendSimple(BytecodeInterpreter &bi);
     friend void sendMultiple(BytecodeInterpreter &bi);
+    friend void loadArray(BytecodeInterpreter &bi);
     friend void pop(BytecodeInterpreter &bi);
+    friend void push(BytecodeInterpreter &bi);
 private:
     Stack stack;
 

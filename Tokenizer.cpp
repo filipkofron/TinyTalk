@@ -88,6 +88,21 @@ bool Tokenizer::isParenthesisClose(const int &c)
     return c == ')';
 }
 
+bool Tokenizer::isArraySeparator(const int &c)
+{
+    return c == ',';
+}
+
+bool Tokenizer::isArrayOpen(const int &c)
+{
+    return c == '{';
+}
+
+bool Tokenizer::isArrayClose(const int &c)
+{
+    return c == '}';
+}
+
 bool Tokenizer::isBlockOpen(const int &c)
 {
     return c == '[';
@@ -230,6 +245,21 @@ void Tokenizer::readParenthesisClose()
     reader->read();
 }
 
+void Tokenizer::readArraySeparator()
+{
+    reader->read();
+}
+
+void Tokenizer::readArrayOpen()
+{
+    reader->read();
+}
+
+void Tokenizer::readArrayClose()
+{
+    reader->read();
+}
+
 void Tokenizer::readBlockOpen()
 {
     reader->read();
@@ -344,6 +374,27 @@ Token Tokenizer::reallyReadToken()
         {
             readParenthesisClose();
             token = Token(lineCounter, Token::Type::PARENTHESIS_CLOSE);
+            break;
+        }
+
+        if(isArraySeparator(c))
+        {
+            readArraySeparator();
+            token = Token(lineCounter, Token::Type::ARRAY_SEPARATEOR);
+            break;
+        }
+
+        if(isArrayOpen(c))
+        {
+            readArrayOpen();
+            token = Token(lineCounter, Token::Type::ARRAY_OPEN);
+            break;
+        }
+
+        if(isArrayClose(c))
+        {
+            readArrayClose();
+            token = Token(lineCounter, Token::Type::ARRAY_CLOSE);
             break;
         }
 

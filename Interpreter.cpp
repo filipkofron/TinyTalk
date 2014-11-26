@@ -89,7 +89,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
     {
         try
         {
-            TTObject *expression = parser.parse(false);
+            TTObject *expression = parser.parse(false, false);
 
 #ifdef DEBUG
             std::cout << std::endl << "<<< ======================================" << std::endl;

@@ -20,22 +20,23 @@ private:
 
     TTLiteral *createLiteralArrayOfStrings(std::vector<std::string> &strs);
 
-    TTObject *parseRightOfValue(TTObject *destExpr, Token &prevToken);
+    TTObject *parseRightOfValue(TTObject *destExpr, Token &prevToken, const bool &untilChain);
     TTObject *parseSingleValue();
 
-    TTObject *parseSymbol(const bool &parseOnlyOne);
-    TTObject *parseLiteral(const bool &parseOnlyOne);
-    TTObject *parseSimpleMessageRest(TTObject *destExpr);
-    TTObject *parseMultipleMessageRest(TTObject *destExpr);
-    TTObject *parseBlock(const bool &parseOnlyOne);
+    TTObject *parseSymbol(const bool &parseOnlyOne, const bool &untilChain);
+    TTObject *parseLiteral(const bool &parseOnlyOne, const bool &untilChain);
+    TTObject *parseSimpleMessageRest(TTObject *destExpr, const bool &untilChain);
+    TTObject *parseMultipleMessageRest(TTObject *destExpr, const bool &untilChain);
+    TTObject *parseBlock(const bool &parseOnlyOne, const bool &untilChain);
     TTObject *parseAssignmentRest(const Token &token);
-    TTObject *parseParenthesis(const bool &parseOnlyOne);
+    TTObject *parseParenthesis(const bool &parseOnlyOne, const bool &untilChain);
+    TTObject *parseArray(const bool &parseOnlyOne, const bool &untilChain);
     TTObject *parseChain(TTObject *currExpr, const bool &parseOnlyOne);
-    TTObject *parseCreateVariable(const bool &parseOnlyOne);
+    TTObject *parseCreateVariable(const bool &parseOnlyOne, const bool &untilChain);
 
 public:
     Parser(std::shared_ptr<Tokenizer> tokenizer);
-    TTObject *parse(const bool &parseOnlyOne);
+    TTObject *parse(const bool &parseOnlyOne, const bool &untilChain);
 };
 
 #endif
