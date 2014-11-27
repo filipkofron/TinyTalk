@@ -42,6 +42,10 @@ BuiltinPool::BuiltinPool()
     registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
 
     registerBultin("array_size", std::shared_ptr<Builtin> (new BuiltinObjectArraySize));
+    registerBultin("array_at:", std::shared_ptr<Builtin> (new BuiltinObjectArrayAt));
+    registerBultin("array_at:set:", std::shared_ptr<Builtin> (new BuiltinObjectArrayAtSet));
+    registerBultin("array_empty", std::shared_ptr<Builtin> (new BuiltinObjectArrayEmpty));
+    registerBultin("array_toString", std::shared_ptr<Builtin> (new BuiltinObjectArrayToString));
 }
 
 void BuiltinPool::registerBultin(const std::string &name, std::shared_ptr<Builtin> builtin)

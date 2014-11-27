@@ -99,6 +99,10 @@ void Interpreter::setupLiterals()
     array->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
     BuiltinUtil::addSimpleMethod(array, "size", "array_size");
     BuiltinUtil::addSimpleMethod(array, "length", "array_size");
+    BuiltinUtil::addMultipleMethod(array, "at:", {"at"}, "array_at:");
+    BuiltinUtil::addMultipleMethod(array, "at:set:", {"at", "set"}, "array_at:set:");
+    BuiltinUtil::addSimpleMethod(array, "empty", "array_empty");
+    BuiltinUtil::addSimpleMethod(array, "toString", "array_toString");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("Integer"), integer);
     Runtime::globalEnvironment->addField(TO_TT_STR("String"), string);
