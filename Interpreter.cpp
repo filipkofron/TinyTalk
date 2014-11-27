@@ -20,6 +20,7 @@ void Interpreter::initialize()
     Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
 
     setupObject();
+    setupLiterals();
 
    // std::cout << "### test global env: " << Runtime::globalEnvironment << std::endl;
    // std::cout << "### test field parent: " << Runtime::globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
@@ -53,6 +54,53 @@ void Interpreter::setupObject()
     std::cout << "%% Loading TTLib." << std::endl;
     loadTTLib();
     std::cout << "%% Loading TTLib done." << std::endl;
+}
+/*
+
+    registerBultin("string_charAt:", std::shared_ptr<Builtin> (new BuiltinStringCharAt));
+    registerBultin("string_setChar:at:", std::shared_ptr<Builtin> (new BuiltinStringSetCharAt));
+    registerBultin("string_toLower", std::shared_ptr<Builtin> (new BuiltinStringToLower));
+    registerBultin("string_toUpper", std::shared_ptr<Builtin> (new BuiltinStringToUpper));
+    registerBultin("string_trim", std::shared_ptr<Builtin> (new BuiltinStringTrim));
+    registerBultin("string_append:", std::shared_ptr<Builtin> (new BuiltinStringAppend));
+    registerBultin("string_length", std::shared_ptr<Builtin> (new BuiltinStringLength));
+    registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
+ */
+void Interpreter::setupLiterals()
+{
+    TTObject *integer = TTObject::createObject(TT_LITERAL);
+    TTLiteral *integerLit = TTLiteral::createIntegerLiteral();
+    integer->setLiteral(integerLit);
+    integer->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+    BuiltinUtil::addMultipleMethod(integer, "add:", {"add"},"integer_add:");
+    BuiltinUtil::addMultipleMethod(integer, "minus:", {"minus"},"integer_minus:");
+    BuiltinUtil::addMultipleMethod(integer, "mul:", {"mul"},"integer_mul:");
+    BuiltinUtil::addMultipleMethod(integer, "div:", {"div"},"integer_div:");
+    BuiltinUtil::addMultipleMethod(integer, "mod:", {"mod"},"integer_mod:");
+    BuiltinUtil::addSimpleMethod(integer, "toString", "integer_toString");
+    BuiltinUtil::addMultipleMethod(integer, "lessThan:", {"lessThan"},"integer_lessThan:");
+    BuiltinUtil::addMultipleMethod(integer, "greaterThan:", {"greaterThan"},"integer_greaterThan:");
+    BuiltinUtil::addMultipleMethod(integer, "equals:", {"equals"},"integer_equals:");
+    BuiltinUtil::addMultipleMethod(integer, "lessThanOrEqual:", {"lessThanOrEqual"},"integer_lessThanOrEqual:");
+    BuiltinUtil::addMultipleMethod(integer, "greaterThanOrEqual:", {"greaterThanOrEqual"},"integer_greaterThanOrEqual:");
+    BuiltinUtil::addMultipleMethod(integer, "fromString:", {"fromString"},"integer_fromString:");
+
+
+    TTObject *string = TTObject::createObject(TT_LITERAL);
+    TTLiteral *stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""));
+    string->setLiteral(stringLit);
+    string->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+
+
+    TTObject *array = TTObject::createObject(TT_LITERAL);
+    TTLiteral *arrayLit = TTLiteral::createObjectArray(0);
+    array->setLiteral(arrayLit);
+    array->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+
+
+    Runtime::globalEnvironment->addField(TO_TT_STR("Integer"), integer);
+    Runtime::globalEnvironment->addField(TO_TT_STR("String"), string);
+    Runtime::globalEnvironment->addField(TO_TT_STR("Array"), array);
 }
 
 void Interpreter::loadTTLib()
@@ -100,10 +148,10 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             if(expression != NULL)
             {
-                //TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
+                TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
-                TTObject *expr = Expression::createNaiveBlock(expression);
-                TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
+                //TTObject *expr = Expression::createNaiveBlock(expression);
+                //TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
 
                 if(!silent)
                 {

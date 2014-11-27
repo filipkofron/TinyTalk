@@ -23,6 +23,8 @@ private:
     TTObject *executeMultipleExpression(TTObject *expression, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz);
     TTObject *evaluateMultipleMessage(TTObject *simpleMessage, TTObject *env);
 
+    TTObject *evaluateArray(TTObject *expr, TTObject *env);
+
 public:
     TTObject *evaluate(TTObject *expression, TTObject *env);
     TTObject *sendSimpleMessage(TTObject *object, std::string &name);

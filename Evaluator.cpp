@@ -379,6 +379,37 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
     return executeMultipleExpression(expr, msgDestValue, fullName, names, values, thiz); // call named lambda expression
 }
 
+TTObject *Evaluator::evaluateArray(TTObject *expr, TTObject *env)
+{
+    TTObject *expressions = expr->getField(TO_TT_STR("expressions"));
+    TTLiteral *expressionsLit = expressions->getLiteral();
+    uint32_t size = (uint32_t) (expressionsLit->length / sizeof(TTObject));
+
+    TTObject *array = TTObject::createObject(TT_LITERAL);
+    TTLiteral *arrayLit = TTLiteral::createObjectArray(size);
+    array->setLiteral(arrayLit);
+
+    for(uint32_t i = 0; i < size; i++)
+    {
+        TTObject *exprItem = ((TTObject **) expressionsLit->data)[i];
+        TTObject *val = NULL;
+        if(exprItem)
+        {
+            val = evaluate(exprItem, env);
+        }
+        else
+        {
+            val = Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
+        }
+
+
+        ((TTObject **) arrayLit->data)[i] = val;
+    }
+
+    return array;
+
+}
+
 TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
 {
 #ifdef DEBUG
@@ -425,6 +456,12 @@ TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
         case EXPRESSION_PARENTHESIS:
             res = evaluateParenthesis(expression, env);
             break;
+        case EXPRESSION_ARRAY:
+            res = evaluateArray(expression, env);
+            break;
+        default:
+            std::cerr << "[Runtime]: Error: Invalid expression flags: " << (uint32_t) expression->flags << std::endl;
+            throw std::exception();
     }
 
     return res;
