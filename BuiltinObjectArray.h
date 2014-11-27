@@ -1,6 +1,8 @@
 #ifndef BUILTINOBJECTARRAY_H
 #define BUILTINOBJECTARRAY_H
 
+#include "Builtin.h"
+
 class BuiltinObjectArraySize : public Builtin
 {
 public:

@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -ggdb -Wall")
 
 set(SOURCE_FILES    BuiltinInteger.cpp
                     BuiltinObject.cpp
+                    BuiltinObjectArray.cpp
                     BuiltinPool.cpp
                     BuiltinString.h
                     BuiltinString.cpp

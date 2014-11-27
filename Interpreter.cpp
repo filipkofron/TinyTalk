@@ -97,7 +97,8 @@ void Interpreter::setupLiterals()
     TTLiteral *arrayLit = TTLiteral::createObjectArray(0)->getLiteral(); // to override null parent
     array->setLiteral(arrayLit);
     array->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
-
+    BuiltinUtil::addSimpleMethod(array, "size", "array_size");
+    BuiltinUtil::addSimpleMethod(array, "length", "array_size");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("Integer"), integer);
     Runtime::globalEnvironment->addField(TO_TT_STR("String"), string);

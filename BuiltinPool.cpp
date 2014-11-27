@@ -2,6 +2,7 @@
 #include "BuiltinInteger.h"
 #include "BuiltinObject.h"
 #include "BuiltinString.h"
+#include "BuiltinObjectArray.h"
 
 BuiltinPool::BuiltinPool()
 {
@@ -39,6 +40,8 @@ BuiltinPool::BuiltinPool()
     registerBultin("string_append:", std::shared_ptr<Builtin> (new BuiltinStringAppend));
     registerBultin("string_length", std::shared_ptr<Builtin> (new BuiltinStringLength));
     registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
+
+    registerBultin("array_size", std::shared_ptr<Builtin> (new BuiltinObjectArraySize));
 }
 
 void BuiltinPool::registerBultin(const std::string &name, std::shared_ptr<Builtin> builtin)
