@@ -55,17 +55,7 @@ void Interpreter::setupObject()
     loadTTLib();
     std::cout << "%% Loading TTLib done." << std::endl;
 }
-/*
 
-    registerBultin("string_charAt:", std::shared_ptr<Builtin> (new BuiltinStringCharAt));
-    registerBultin("string_setChar:at:", std::shared_ptr<Builtin> (new BuiltinStringSetCharAt));
-    registerBultin("string_toLower", std::shared_ptr<Builtin> (new BuiltinStringToLower));
-    registerBultin("string_toUpper", std::shared_ptr<Builtin> (new BuiltinStringToUpper));
-    registerBultin("string_trim", std::shared_ptr<Builtin> (new BuiltinStringTrim));
-    registerBultin("string_append:", std::shared_ptr<Builtin> (new BuiltinStringAppend));
-    registerBultin("string_length", std::shared_ptr<Builtin> (new BuiltinStringLength));
-    registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
- */
 void Interpreter::setupLiterals()
 {
     TTObject *integer = TTObject::createObject(TT_LITERAL);
@@ -90,7 +80,14 @@ void Interpreter::setupLiterals()
     TTLiteral *stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""))->getLiteral(); // to override null parent
     string->setLiteral(stringLit);
     string->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
-    //BuiltinUtil::addMultipleMethod(integer, "add:", {"add"},"integer_add:");
+    BuiltinUtil::addMultipleMethod(string, "charAt:", {"charAt"},"string_charAt:");
+    BuiltinUtil::addMultipleMethod(string, "setChar:at:", {"setChar", "at"},"string_setChar:at:");
+    BuiltinUtil::addSimpleMethod(string, "toLower", "string_toLower");
+    BuiltinUtil::addSimpleMethod(string, "toUpper", "string_toUpper");
+    BuiltinUtil::addSimpleMethod(string, "trim", "string_trim");
+    BuiltinUtil::addMultipleMethod(string, "append:", {"append"},"string_append:");
+    BuiltinUtil::addSimpleMethod(string, "length", "string_length");
+    BuiltinUtil::addSimpleMethod(string, "toString", "string_toString");
 
 
     TTObject *array = TTObject::createObject(TT_LITERAL);

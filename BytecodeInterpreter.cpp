@@ -210,11 +210,8 @@ void loadArray(BytecodeInterpreter &bi)
 
     TTObject *arrayObj = TTLiteral::createObjectArray(size);
 
-    std::cout << "(<loadArray>) size: " << size << std::endl;
-
     for(int32_t i = size - 1; i >= 0; i--)
     {
-        std::cout << "(<loadArray>) [" << i << "]:" << std::endl;
         ((TTObject **) arrayObj->getLiteral()->data)[i] = (TTObject *) bi.stack.popPtr();
     }
 
