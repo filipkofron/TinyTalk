@@ -21,13 +21,11 @@ TTObject *BuiltinStringCharAt::invoke(TTObject *dest, std::vector<std::string> &
         throw std::exception();
     }
 
-    uint8_t lel[2] = {0, 0};
+    uint8_t cr[2] = {0, 0};
 
-    lel[0] = (uint8_t) thisStr->data[index];
+    cr[0] = (uint8_t) thisStr->data[index];
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(lel));
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(lit);
+    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(cr));
 
     return res;
 }
@@ -60,11 +58,8 @@ TTObject *BuiltinStringSetCharAt::invoke(TTObject *dest, std::vector<std::string
         throw std::exception();
     }
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(thisStr->data);
-    lit->data[index] = argStr->data[0];
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(lit);
-
+    TTObject *res = TTLiteral::createStringLiteral(thisStr->data);
+    res->getLiteral()->data[index] = argStr->data[0];
     return res;
 }
 
@@ -78,10 +73,7 @@ TTObject *BuiltinStringToLower::invoke(TTObject *dest, std::vector<std::string> 
 
     std::transform(str.begin(), str.end(),str.begin(), ::tolower);
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
-
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(lit);
+    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
     return res;
 }
@@ -96,10 +88,7 @@ TTObject *BuiltinStringToUpper::invoke(TTObject *dest, std::vector<std::string> 
 
     std::transform(str.begin(), str.end(),str.begin(), ::toupper);
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
-
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(lit);
+    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
     return res;
 }
@@ -128,10 +117,7 @@ TTObject *BuiltinStringTrim::invoke(TTObject *dest, std::vector<std::string> &ar
 
     str = trim(str);
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
-
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(lit);
+    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
     return res;
 }
@@ -146,9 +132,9 @@ TTObject *BuiltinStringAppend::invoke(TTObject *dest, std::vector<std::string> &
     TTLiteral *thisStr = dest->getLiteral();
     TTLiteral *rightStr = values[0]->getLiteral();
 
-    TTLiteral *appended = TTLiteral::createStringLiteral(thisStr->length + rightStr->length - 1);
+    TTObject *appendedObj = TTLiteral::createStringLiteral(thisStr->length + rightStr->length - 1);
 
-    uint8_t *destStr = appended->data;
+    uint8_t *destStr = appendedObj->getLiteral()->data;
     uint8_t *left = thisStr->data;
     uint8_t *right = rightStr->data;
 
@@ -163,10 +149,7 @@ TTObject *BuiltinStringAppend::invoke(TTObject *dest, std::vector<std::string> &
     }
     *destStr = '\0';
 
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(appended);
-
-    return res;
+    return appendedObj;
 }
 
 TTObject *BuiltinStringLength::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
@@ -175,9 +158,7 @@ TTObject *BuiltinStringLength::invoke(TTObject *dest, std::vector<std::string> &
 
     TTLiteral *thisStr = dest->getLiteral();
 
-    TTLiteral *lit = TTLiteral::createIntegerLiteral(thisStr->length - 1);
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    res->setLiteral(lit);
+    TTObject *res = TTLiteral::createIntegerLiteral(thisStr->length - 1);
 
     return res;
 }

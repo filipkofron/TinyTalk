@@ -54,13 +54,12 @@ TTLiteral *Parser::createLiteralArrayOfStrings(std::vector<std::string> &strs)
     std::vector<TTObject *> literals;
     for(auto str : strs)
     {
-        TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
-        TTObject *obj = TTObject::createObject(TT_LITERAL);
-        obj->setLiteral(lit);
+        TTObject *obj = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
+
         literals.push_back(obj);
     }
 
-    return TTLiteral::createObjectArray(literals);
+    return TTLiteral::createObjectArray(literals)->getLiteral();
 }
 
 TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken, const bool &untilChain)
@@ -159,7 +158,7 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne, const bool &untilChain)
 
     Token symbolToken = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(symbolToken.getValue().c_str()));
+    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(symbolToken.getValue().c_str()))->getLiteral();
     result = Expression::createSymbolValue(lit);
 
     if(parseOnlyOne)
@@ -188,12 +187,12 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
     {
         int32_t a = 0;
         sscanf(literalToken.getValue().c_str(), "%d", &a);
-        TTLiteral *lit = TTLiteral::createIntegerLiteral(a);
+        TTLiteral *lit = TTLiteral::createIntegerLiteral(a)->getLiteral();
         result = Expression::createLiteralValue(lit);
     }
     else
     {
-        TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(literalToken.getValue().c_str()));
+        TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(literalToken.getValue().c_str()))->getLiteral();
         result = Expression::createLiteralValue(lit);
     }
 
@@ -218,7 +217,7 @@ TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr, const bool &untilCh
 
     Token messageNameToken = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(messageNameToken.getValue().c_str()));
+    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(messageNameToken.getValue().c_str()))->getLiteral();
     TTObject *result = Expression::createSimpleMessage(destExpr, lit);
 
     /*
@@ -306,11 +305,11 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &until
         return NULL;
     }
 
-    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()));
+    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()))->getLiteral();
 
     TTLiteral *nameArrayLit = createLiteralArrayOfStrings(argNames);
 
-    TTLiteral *valueArrayLit = TTLiteral::createObjectArray(argValues);
+    TTLiteral *valueArrayLit = TTLiteral::createObjectArray(argValues)->getLiteral();
 
     TTObject *res = Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
 
@@ -445,7 +444,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
     }
 
     TTLiteral *nameArray = createLiteralArrayOfStrings(argNames);
-    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()));
+    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()))->getLiteral();
 
     TTObject *res = Expression::createBlock(nameArray, fullNameLit, rightSideExpression, NULL);
     if(parseOnlyOne)
@@ -467,7 +466,7 @@ TTObject *Parser::parseAssignmentRest(const Token &token)
 
     Token assignToken = tokenizer->readToken(); // eat the assign token
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(token.getValue().c_str()));
+    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(token.getValue().c_str()))->getLiteral();
 
     TTObject* result = Expression::createAssignment(lit, parse(false, true)); // recursively parse the right side
 
@@ -539,7 +538,7 @@ TTObject *Parser::parseArray(const bool &parseOnlyOne, const bool &untilChain)
 
     Token close = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createObjectArray(expressions);
+    TTLiteral *lit = TTLiteral::createObjectArray(expressions)->getLiteral();
     TTObject *result = Expression::createArray(lit);
 
     if(parseOnlyOne)

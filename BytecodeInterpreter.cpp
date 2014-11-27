@@ -115,15 +115,6 @@ void sendSimple(BytecodeInterpreter &bi)
     TTObject *thiz = NULL;
     std::string safeName = (const char *) name->getLiteral()->data;
 
-    if(dest->type == TT_LITERAL)
-    {
-        std::vector<std::string> singleList;
-        singleList.push_back(safeName);
-        TTObject *res = dest->getLiteral()->onMessage(dest, safeName, singleList, std::vector<TTObject *>());
-        bi.stack.pushPtr((intptr_t) res);
-        return;
-    }
-
     TTObject *expression = Runtime::findBlock(TO_TT_STR(safeName.c_str()), dest, bi.env, &thiz);
 
     TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
@@ -159,21 +150,6 @@ void sendMultiple(BytecodeInterpreter &bi)
     std::string fullName = (const char *) fullNameObj->getLiteral()->data;
 
     TTObject *thiz = NULL;
-
-    if(dest->type == TT_LITERAL)
-    {
-        std::vector<std::string> argNames(argCount);
-        std::vector<TTObject *> argValues(argCount);
-        for(int32_t i = 0; i < argCount; i++)
-        {
-            argValues[i] = (TTObject *) bi.stack.popPtr();
-            TTObject *argName = (TTObject *) bi.stack.popPtr();
-            argNames[i] = (const char *) argName->getLiteral()->data;
-        }
-        TTObject *res = dest->getLiteral()->onMessage(dest, fullName, argNames, argValues);
-        bi.stack.pushPtr((intptr_t) res);
-        return;
-    }
 
     TTObject *expression = Runtime::findBlock(TO_TT_STR(fullName.c_str()), dest, bi.env, &thiz);
 
@@ -232,16 +208,14 @@ void loadArray(BytecodeInterpreter &bi)
     TTObject *sizeObj = (TTObject *) bi.stack.popPtr();
     int32_t size = (int32_t)  *(uint32_t *) sizeObj->getLiteral()->data;
 
-    TTObject *arrayObj = TTObject::createObject(TT_LITERAL);
-    TTLiteral *lit = TTLiteral::createObjectArray(size);
-    arrayObj->setLiteral(lit);
+    TTObject *arrayObj = TTLiteral::createObjectArray(size);
 
     std::cout << "(<loadArray>) size: " << size << std::endl;
 
     for(int32_t i = size - 1; i >= 0; i--)
     {
         std::cout << "(<loadArray>) [" << i << "]:" << std::endl;
-        ((TTObject **) lit->data)[i] = (TTObject *) bi.stack.popPtr();
+        ((TTObject **) arrayObj->getLiteral()->data)[i] = (TTObject *) bi.stack.popPtr();
     }
 
     bi.stack.pushPtr((intptr_t) arrayObj);
@@ -294,10 +268,9 @@ void BytecodeInterpreter::setupStackFrame(TTObject *block, TTObject *parentEnv, 
 
     stackFrame->addField(TO_TT_STR("env"), newEnv);
 
-    TTObject *pc = TTObject::createObject(TT_LITERAL);
-    TTLiteral *pcLit = TTLiteral::createByteArray(sizeof(uint32_t));
-    *((uint32_t *)pcLit->data) = 0;
-    pc->setLiteral(pcLit);
+    TTObject *pc = TTLiteral::createByteArray(sizeof(uint32_t));
+    *((uint32_t *)pc->getLiteral()->data) = 0;
+
     stackFrame->addField(TO_TT_STR("pc"), pc);
 
     if(thiz)

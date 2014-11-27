@@ -128,13 +128,8 @@ namespace Expression
 
         res->flags = EXPRESSION_BLOCK;
 
-        TTObject *blockArgNames = TTObject::createObject(TT_LITERAL);
-        TTLiteral *nameArrayLit = TTLiteral::createObjectArray(0);
-        blockArgNames->setLiteral(nameArrayLit);
-
-        TTObject *blockFullName = TTObject::createObject(TT_LITERAL);
-        TTLiteral *emptyName = TTLiteral::createStringLiteral(TO_TT_STR(""));
-        blockFullName->setLiteral(emptyName);
+        TTObject *blockArgNames = TTLiteral::createObjectArray(0);
+        TTObject *blockFullName = TTLiteral::createStringLiteral(TO_TT_STR(""));
 
         res->addField(TO_TT_STR("blockArgNames"), blockArgNames);
         res->addField(TO_TT_STR("blockFullName"), blockFullName);

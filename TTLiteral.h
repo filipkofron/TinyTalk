@@ -25,26 +25,21 @@ struct TTLiteral
 
     static TTLiteral *clone(TTLiteral *lit);
 
-    TTObject *onMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
-    TTObject *stringOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
-    TTObject *integerOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
-    TTObject *objectArrayOnMessage(TTObject *dest, std::string &name, std::vector<std::string> &argNames, std::vector<TTObject *> values);
-
     const char *getTypeInfo();
 
     void printValue(std::ostream &os, const uint32_t &level, const bool &recursive);
 
-    static TTLiteral *createStringLiteral(uint32_t length);
-    static TTLiteral *createStringLiteral(const uint8_t *str);
+    static TTObject *createStringLiteral(uint32_t length);
+    static TTObject *createStringLiteral(const uint8_t *str);
 
-    static TTLiteral *createIntegerLiteral();
-    static TTLiteral *createIntegerLiteral(const int32_t &value);
+    static TTObject *createIntegerLiteral();
+    static TTObject *createIntegerLiteral(const int32_t &value);
 
-    static TTLiteral *createByteArray(uint32_t size);
-    static TTLiteral *createByteArray(const std::vector<uint8_t> &objects);
+    static TTObject *createByteArray(uint32_t size);
+    static TTObject *createByteArray(const std::vector<uint8_t> &objects);
 
-    static TTLiteral *createObjectArray(uint32_t size);
-    static TTLiteral *createObjectArray(const std::vector<TTObject *> &objects);
+    static TTObject *createObjectArray(uint32_t size);
+    static TTObject *createObjectArray(const std::vector<TTObject *> &objects);
 };
 
 #endif

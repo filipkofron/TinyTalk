@@ -69,7 +69,7 @@ void Interpreter::setupObject()
 void Interpreter::setupLiterals()
 {
     TTObject *integer = TTObject::createObject(TT_LITERAL);
-    TTLiteral *integerLit = TTLiteral::createIntegerLiteral();
+    TTLiteral *integerLit = TTLiteral::createIntegerLiteral()->getLiteral(); // to override null parent
     integer->setLiteral(integerLit);
     integer->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
     BuiltinUtil::addMultipleMethod(integer, "add:", {"add"},"integer_add:");
@@ -87,13 +87,14 @@ void Interpreter::setupLiterals()
 
 
     TTObject *string = TTObject::createObject(TT_LITERAL);
-    TTLiteral *stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""));
+    TTLiteral *stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""))->getLiteral(); // to override null parent
     string->setLiteral(stringLit);
     string->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+    //BuiltinUtil::addMultipleMethod(integer, "add:", {"add"},"integer_add:");
 
 
     TTObject *array = TTObject::createObject(TT_LITERAL);
-    TTLiteral *arrayLit = TTLiteral::createObjectArray(0);
+    TTLiteral *arrayLit = TTLiteral::createObjectArray(0)->getLiteral(); // to override null parent
     array->setLiteral(arrayLit);
     array->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
 
@@ -148,10 +149,10 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             if(expression != NULL)
             {
-                TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
+                //TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
-                //TTObject *expr = Expression::createNaiveBlock(expression);
-                //TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
+                TTObject *expr = Expression::createNaiveBlock(expression);
+                TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
 
                 if(!silent)
                 {

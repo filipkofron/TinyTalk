@@ -59,13 +59,6 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
         throw std::exception();
     }
 
-    if(destValue->type == TT_LITERAL)
-    {
-        std::vector<std::string> singleList;
-        singleList.push_back(msgName);
-        return destValue->getLiteral()->onMessage(destValue, msgName, singleList, std::vector<TTObject *>());
-    }
-
     TTObject *thiz = NULL;
 
     TTObject *expr = Runtime::findBlock(TO_TT_STR(msgName.c_str()), destValue, env, &thiz);
@@ -366,12 +359,6 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
     std::cout << "(evaluateMultipleMessage): msgDestValue: " << msgDestValue << std::endl;
 #endif
 
-
-    if(msgDestValue->type == TT_LITERAL)
-    {
-        return msgDestValue->getLiteral()->onMessage(msgDestValue, fullName, names, values);
-    }
-
     TTObject *thiz = NULL;
 
     TTObject *expr = Runtime::findBlock(TO_TT_STR(fullName.c_str()), msgDestValue, env, &thiz);
@@ -385,9 +372,7 @@ TTObject *Evaluator::evaluateArray(TTObject *expr, TTObject *env)
     TTLiteral *expressionsLit = expressions->getLiteral();
     uint32_t size = (uint32_t) (expressionsLit->length / sizeof(TTObject));
 
-    TTObject *array = TTObject::createObject(TT_LITERAL);
-    TTLiteral *arrayLit = TTLiteral::createObjectArray(size);
-    array->setLiteral(arrayLit);
+    TTObject *array = TTLiteral::createObjectArray(size);
 
     for(uint32_t i = 0; i < size; i++)
     {
@@ -403,7 +388,7 @@ TTObject *Evaluator::evaluateArray(TTObject *expr, TTObject *env)
         }
 
 
-        ((TTObject **) arrayLit->data)[i] = val;
+        ((TTObject **) array->getLiteral()->data)[i] = val;
     }
 
     return array;

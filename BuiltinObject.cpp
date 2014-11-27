@@ -214,16 +214,13 @@ TTObject *BuiltinObjectToString::invoke(TTObject *dest, std::vector<std::string>
     {
         resStr = "NULL";
     }
-
+/*
     if(dest->type == TT_LITERAL)
     {
        return dest->getLiteral()->onMessage(dest, argNames[0], argNames, values);
     }
-
-    TTObject *res = TTObject::createObject(TT_LITERAL);
-    TTLiteral *string = TTLiteral::createStringLiteral(TO_TT_STR(resStr));
-
-    res->setLiteral(string);
+*/
+    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(resStr));
 
     return res;
 }

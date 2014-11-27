@@ -139,7 +139,7 @@ bool TTObject::setField(const uint8_t *name, TTObject *object)
             return true;
         }
     }
-    return false;
+    return addField(name, object);
 }
 
 TTLiteral *TTObject::getLiteral()
