@@ -40,6 +40,8 @@ struct TTLiteral
 
     static TTObject *createObjectArray(uint32_t size);
     static TTObject *createObjectArray(const std::vector<TTObject *> &objects);
+
+    static void setLiteralParent(TTObject *obj, TTLiteral *lit);
 };
 
 #endif

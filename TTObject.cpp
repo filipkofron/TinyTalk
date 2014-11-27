@@ -166,6 +166,9 @@ bool TTObject::setLiteral(TTLiteral *lit)
         std::cerr << "Object is not literal: Cannot set literal value!" << std::endl;
         throw  std::exception();
     }
+
+    TTLiteral::setLiteralParent(this, lit);
+
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(!*fields[i].name)

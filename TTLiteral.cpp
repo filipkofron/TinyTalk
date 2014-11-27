@@ -226,3 +226,25 @@ TTObject *TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
 
     return obj;
 }
+
+void TTLiteral::setLiteralParent(TTObject *obj, TTLiteral *lit)
+{
+    switch(lit->type)
+    {
+        case LITERAL_TYPE_STRING:
+            obj->setField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("String")));
+            break;
+        case LITERAL_TYPE_INTEGER:
+            obj->setField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Integer")));
+            break;
+        case LITERAL_TYPE_OBJECT_ARRAY:
+            obj->setField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Array")));
+            break;
+        case LITERAL_TYPE_BYTE_ARRAY:
+            // TODO: add parent
+            break;
+        default:
+            std::cerr << "Unsupported literal type!" << std::endl;
+            throw std::exception();
+    }
+}
