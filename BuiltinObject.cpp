@@ -166,7 +166,7 @@ TTObject *BuiltinObjectDebugPrintString::invoke(TTObject *dest, std::vector<std:
 
     std::string str = (const char *) values[0]->getLiteral()->data;
 
-    std::cout << " ** DBG PRINT STRING: " << str << std::endl;
+    std::cout << "DBG: " << str << std::endl;
 
 
     return dest;

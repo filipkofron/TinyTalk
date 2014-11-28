@@ -210,6 +210,7 @@ TTObject *Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTObject *e
 
     if(obj->type == TT_EXPR && obj->flags == EXPRESSION_BLOCK)
     {
+
         std::string blockName = (char *) obj->getField(TO_TT_STR("blockFullName"))->getLiteral()->data;
         if(COMPARE_NAME(blockName.c_str(), safeName) == 0)
         {

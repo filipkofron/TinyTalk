@@ -51,5 +51,15 @@ While
 
 Array createField: "inject:" withValue:
     [ :inject: |
-        inject
+        |i thisArray |;
+        i = 0;
+        thisArray = this;
+        While
+            isTrue:
+                [i lessThan: (thisArray size)]
+            do:
+                [
+                    inject value: (thisArray at: i);
+                    i = i add: 1
+                ]
     ]
