@@ -175,11 +175,19 @@ std::string Tokenizer::readString()
 {
     std::string val;
     reader->read(); // eat "
+    bool escape = false;
     for(;;)
     {
         int c = reader->peek();
 
-        if(c == '\"')
+        if(!escape && c == '\\')
+        {
+            escape = true;
+            reader->read();
+            continue;
+        }
+
+        if(!escape && c == '\"')
         {
             reader->read();
             break;
@@ -188,6 +196,39 @@ std::string Tokenizer::readString()
         if(c == EOF)
         {
             break;
+        }
+
+        if(escape)
+        {
+            switch(c)
+            {
+                case 'a':
+                    c = '\a';
+                    break;
+                case 'b':
+                    c = '\b';
+                    break;
+                case 'f':
+                    c = '\f';
+                    break;
+                case 'n':
+                    c = '\n';
+                    break;
+                case 'r':
+                    c = '\r';
+                    break;
+                case 't':
+                    c = '\t';
+                    break;
+                case 'v':
+                    c = '\v';
+                    break;
+                case '?':
+                    c = '\?';
+                    break;
+            }
+
+            escape = false;
         }
 
         val += c;
