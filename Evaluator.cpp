@@ -327,13 +327,29 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
     std::vector<TTObject *> valuesExpressions;
     std::vector<TTObject *> values;
 
+    bool replace = false;
+    if(fullName == "value:")
+    {
+        replace = true;
+    }
+
     uint32_t len = (uint32_t) (msgNameArray->getLiteral()->length / sizeof(TTObject *));
     for(uint32_t i = 0; i < len; i++)
     {
-        names.push_back((char *) ((TTObject **) msgNameArray->getLiteral()->data)[i]->getLiteral()->data);
+        if(!replace)
+        {
+            names.push_back((char *) ((TTObject **) msgNameArray->getLiteral()->data)[i]->getLiteral()->data);
 #ifdef DEBUG
-        std::cout << "(evaluateMultipleMessage): arg name " << i << " = " << names[i] << std::endl;
+            std::cout << "(evaluateMultipleMessage): arg name " << i << " = " << names[i] << std::endl;
 #endif
+        }
+        else
+        {
+#ifdef DEBUG
+            std::cout << "(evaluateMultipleMessage): skipping because of value:" << std::endl;
+#endif
+        }
+
         valuesExpressions.push_back(((TTObject **) msgValueArray->getLiteral()->data)[i]);
     }
 
@@ -363,14 +379,26 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
 
     TTObject *expr = Runtime::findBlock(TO_TT_STR(fullName.c_str()), msgDestValue, env, &thiz);
 
+    if(replace)
+    {
+        names.push_back((const char *) ((TTObject **) expr->getField(TO_TT_STR("blockArgNames"))->getLiteral()->data)[0]->getLiteral()->data);
+    }
+
     return executeMultipleExpression(expr, msgDestValue, fullName, names, values, thiz); // call named lambda expression
 }
 
 TTObject *Evaluator::evaluateArray(TTObject *expr, TTObject *env)
 {
+#ifdef DEBUG
+    std::cout << "(evaluateArray): expr: " << expr << std::endl;
+#endif
     TTObject *expressions = expr->getField(TO_TT_STR("expressions"));
     TTLiteral *expressionsLit = expressions->getLiteral();
-    uint32_t size = (uint32_t) (expressionsLit->length / sizeof(TTObject));
+    uint32_t size = (uint32_t) (expressionsLit->length / sizeof(TTObject *));
+
+#ifdef DEBUG
+    std::cout << "(evaluateArray): size: " << size << std::endl;
+#endif
 
     TTObject *array = TTLiteral::createObjectArray(size);
 

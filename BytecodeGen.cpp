@@ -21,7 +21,7 @@ void BytecodeGen::putInstr(void (*instr)(BytecodeInterpreter &bi), std::vector<u
 
 void BytecodeGen::genSymbolVal(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genSymbolVal}" << std::endl;
 #endif
     putInstr(loadString, byteCode);
@@ -31,7 +31,7 @@ void BytecodeGen::genSymbolVal(TTObject *expr, std::vector<uint8_t> &byteCode)
 
 void BytecodeGen::genSimpleMessage(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genSimpleMessage}" << std::endl;
 #endif
     putInstr(loadString, byteCode);
@@ -43,7 +43,7 @@ void BytecodeGen::genSimpleMessage(TTObject *expr, std::vector<uint8_t> &byteCod
 
 void BytecodeGen::genAssign(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genAssign}" << std::endl;
 #endif
     TTObject *assignedExpr = expr->getField(TO_TT_STR("assignExpression"));
@@ -55,7 +55,7 @@ void BytecodeGen::genAssign(TTObject *expr, std::vector<uint8_t> &byteCode)
 
 void BytecodeGen::genMultipleMessage(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genMultipleMessage}" << std::endl;
 #endif
     TTObject *msgDestExpr = expr->getField(TO_TT_STR("msgDestExpr"));
@@ -71,7 +71,7 @@ void BytecodeGen::genMultipleMessage(TTObject *expr, std::vector<uint8_t> &byteC
         TTObject *argExpr = ((TTObject **) msgValueArray->getLiteral()->data)[i];
 
         putInstr(loadString, byteCode);
-#ifdef DEFINE
+#ifdef DEBUG
         std::cout << "{genMultipleMessage}: argname: '" << (const char *) argName->getLiteral()->data << "'" << std::endl;
 #endif
         putTTObj(argName, byteCode);
@@ -94,7 +94,7 @@ void BytecodeGen::genMultipleMessage(TTObject *expr, std::vector<uint8_t> &byteC
 
 void BytecodeGen::genCreateVar(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genCreateVar}" << std::endl;
 #endif
     TTObject *varNames = expr->getField(TO_TT_STR("varNames"));
@@ -105,7 +105,7 @@ void BytecodeGen::genCreateVar(TTObject *expr, std::vector<uint8_t> &byteCode)
     for(size_t i = 0; i < len; i++)
     {
         TTObject *name = ((TTObject **) varNamesLit->data)[i];
-#ifdef DEFINE
+#ifdef DEBUG
         std::cout << "{genCreateVar} for name ='" << (const char *) name->getLiteral()->data << "'" << std::endl;
 #endif
         putInstr(loadString, byteCode);
@@ -120,7 +120,7 @@ void BytecodeGen::genCreateVar(TTObject *expr, std::vector<uint8_t> &byteCode)
 
 void BytecodeGen::genBlock(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genBlock}" << std::endl;
 #endif
     putInstr(loadBlock, byteCode);
@@ -129,7 +129,7 @@ void BytecodeGen::genBlock(TTObject *expr, std::vector<uint8_t> &byteCode)
 
 void BytecodeGen::genChained(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genChained}" << std::endl;
 #endif
     TTObject *currExpr = expr->getField(TO_TT_STR("currExpr"));
@@ -149,7 +149,7 @@ void BytecodeGen::genChained(TTObject *expr, std::vector<uint8_t> &byteCode)
 
 void BytecodeGen::genLiteralValue(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genLiteralValue}" << std::endl;
 #endif
     TTObject *obj = expr->getField(TO_TT_STR("literalValue"));
@@ -174,7 +174,7 @@ void BytecodeGen::genLiteralValue(TTObject *expr, std::vector<uint8_t> &byteCode
 
 void BytecodeGen::genParenthesis(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genParenthesis}" << std::endl;
 #endif
     TTObject *innerExpr = expr->getField(TO_TT_STR("innerExpr"));
@@ -183,7 +183,7 @@ void BytecodeGen::genParenthesis(TTObject *expr, std::vector<uint8_t> &byteCode)
 
 void BytecodeGen::genArray(TTObject *expr, std::vector<uint8_t> &byteCode)
 {
-#ifdef DEFINE
+#ifdef DEBUG
     std::cout << "{genArray}" << std::endl;
 #endif
     TTObject *expressions = expr->getField(TO_TT_STR("expressions"));

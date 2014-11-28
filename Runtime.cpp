@@ -221,6 +221,12 @@ TTObject *Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTObject *e
             *thiz = envThiz;
             return obj;
         }
+        size_t argNamesCount = obj->getField(TO_TT_STR("blockArgNames"))->getLiteral()->length / sizeof(TTObject *);
+        if(argNamesCount == 1 && COMPARE_NAME(safeName, TO_TT_STR("value:")) == 0) // we ignore the name and put the value is to be put in the single argument
+        {
+            *thiz = envThiz;
+            return obj;
+        }
 
         // since now we expect that the message is sent to the expression considered object
     }

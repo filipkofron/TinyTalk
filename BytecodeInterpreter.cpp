@@ -166,6 +166,10 @@ void sendMultiple(BytecodeInterpreter &bi)
             TTObject *argName = (TTObject *) bi.stack.popPtr();
             argNames[i] = (const char *) argName->getLiteral()->data;
         }
+        if(fullName == "value:")
+        {
+            argNames[0] = (const char *) ((TTObject **) expression->getField(TO_TT_STR("blockArgNames"))->getLiteral()->data)[0]->getLiteral()->data;
+        }
         TTObject *res = Runtime::executeMultipleNativeMessage(nativeName, dest, fullName, argNames, argValues, thiz);
         bi.stack.pushPtr((intptr_t) res);
         return;
@@ -179,16 +183,29 @@ void sendMultiple(BytecodeInterpreter &bi)
     bi.setupStackFrame(expression, blockEnv, thiz);
     bi.bindStackFrame();
 
+    std::string valueReplacementName;
+    bool replace = false;
+    if(fullName == "value:")
+    {
+        valueReplacementName = (const char *) ((TTObject **) expression->getField(TO_TT_STR("blockArgNames"))->getLiteral()->data)[0]->getLiteral()->data;
+        replace = true;
+    }
+
     for(int32_t i = 0; i < argCount; i++)
     {
         TTObject *argVal = (TTObject *) bi.stack.popPtr();
         TTObject *argName = (TTObject *) bi.stack.popPtr();
 
         std::string name = (const char *) argName->getLiteral()->data;
-#ifdef DEFINE
+#ifdef DEBUG
         std::cout << "arg name: '" << name << "' val:" << std::endl;
         argVal->print(std::cout, 1, false);
 #endif
+
+        if(replace)
+        {
+            name = valueReplacementName;
+        }
 
         bi.env->addField(TO_TT_STR(name.c_str()), argVal);
     }
