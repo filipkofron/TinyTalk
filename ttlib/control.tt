@@ -49,3 +49,7 @@ While
                  [ thisThis ]
          ];
 
+Array createField: "inject:" withValue:
+    [ :inject: |
+        inject
+    ]

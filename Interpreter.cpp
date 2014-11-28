@@ -22,6 +22,10 @@ void Interpreter::initialize()
     setupObject();
     setupLiterals();
 
+    std::cout << "%% Loading TTLib." << std::endl;
+    loadTTLib();
+    std::cout << "%% Loading TTLib done." << std::endl;
+
    // std::cout << "### test global env: " << Runtime::globalEnvironment << std::endl;
    // std::cout << "### test field parent: " << Runtime::globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
 }
@@ -49,19 +53,18 @@ void Interpreter::setupObject()
     object->addField(TO_TT_STR("nil"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
 
     Runtime::globalEnvironment->addField(TO_TT_STR("Object"), object);
-    Runtime::globalEnvironment->addField(TO_TT_STR("Debug"), debug);
 
-    std::cout << "%% Loading TTLib." << std::endl;
-    loadTTLib();
-    std::cout << "%% Loading TTLib done." << std::endl;
+    Runtime::globalEnvironment->addField(TO_TT_STR("Debug"), debug);
 }
 
 void Interpreter::setupLiterals()
 {
+    TTObject *object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
+
     TTObject *integer = TTObject::createObject(TT_LITERAL);
     TTLiteral *integerLit = TTLiteral::createIntegerLiteral()->getLiteral(); // to override null parent
     integer->setLiteral(integerLit);
-    integer->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+    integer->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addMultipleMethod(integer, "add:", {"add"},"integer_add:");
     BuiltinUtil::addMultipleMethod(integer, "minus:", {"minus"},"integer_minus:");
     BuiltinUtil::addMultipleMethod(integer, "mul:", {"mul"},"integer_mul:");
@@ -79,7 +82,7 @@ void Interpreter::setupLiterals()
     TTObject *string = TTObject::createObject(TT_LITERAL);
     TTLiteral *stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""))->getLiteral(); // to override null parent
     string->setLiteral(stringLit);
-    string->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+    string->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addMultipleMethod(string, "charAt:", {"charAt"},"string_charAt:");
     BuiltinUtil::addMultipleMethod(string, "setChar:at:", {"setChar", "at"},"string_setChar:at:");
     BuiltinUtil::addSimpleMethod(string, "toLower", "string_toLower");
@@ -93,7 +96,7 @@ void Interpreter::setupLiterals()
     TTObject *array = TTObject::createObject(TT_LITERAL);
     TTLiteral *arrayLit = TTLiteral::createObjectArray(0)->getLiteral(); // to override null parent
     array->setLiteral(arrayLit);
-    array->addField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Object")));
+    array->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addSimpleMethod(array, "size", "array_size");
     BuiltinUtil::addSimpleMethod(array, "length", "array_size");
     BuiltinUtil::addMultipleMethod(array, "at:", {"at"}, "array_at:");
