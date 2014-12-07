@@ -1,5 +1,10 @@
 #include "RefPtrMap.h"
 
+RefPtrMap::RefPtrMap()
+{
+    std::cout << "RefPtrMap constructor" << std::endl;
+}
+
 void RefPtrMap::reg(RefPtrBase *refPtr, bool object)
 {
     refs.insert(std::make_pair(refPtr, Ptr(refPtr->ptr, object)));

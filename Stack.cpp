@@ -21,12 +21,12 @@ intptr_t Stack::topPtr()
 
 intptr_t Stack::popPtr()
 {
-    intptr_t val = *((intptr_t *)(intptr_t) &data[sp]);
-    if(sp > len - sizeof(intptr_t))
+    if(sp > (len - sizeof(intptr_t)))
     {
-        std::cerr << "STACK OVERFLOW" << std::endl;
+        std::cerr << "STACK UNDERFLOW" << std::endl;
         throw std::exception();
     }
+    intptr_t val = *((intptr_t *)(intptr_t) &data[sp]);
     sp += sizeof(intptr_t);
 //    std::cout << " pop: " << val << std::endl;
     return val;

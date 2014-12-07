@@ -1,3 +1,4 @@
+#include "TTLiteral.h"
 #include "Parser.h"
 #include "Expression.h"
 #include "common.h"
@@ -49,12 +50,12 @@ std::string Parser::getMultipleMessageName(const Token &token)
     return str;
 }
 
-TTLiteral *Parser::createLiteralArrayOfStrings(std::vector<std::string> &strs)
+RefPtr<TTLiteral> Parser::createLiteralArrayOfStrings(std::vector<std::string> &strs)
 {
-    std::vector<TTObject *> literals;
+    std::vector<RefPtr<TTObject> > literals;
     for(auto str : strs)
     {
-        TTObject *obj = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
+        RefPtr<TTObject> obj = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
         literals.push_back(obj);
     }
@@ -62,7 +63,7 @@ TTLiteral *Parser::createLiteralArrayOfStrings(std::vector<std::string> &strs)
     return TTLiteral::createObjectArray(literals)->getLiteral();
 }
 
-TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken, const bool &untilChain)
+RefPtr<TTObject> Parser::parseRightOfValue(RefPtr<TTObject> destExpr, Token &prevToken, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseRightOfValue)" << std::endl;
@@ -109,11 +110,11 @@ TTObject *Parser::parseRightOfValue(TTObject *destExpr, Token &prevToken, const 
     }
 }
 
-TTObject *Parser::parseSingleValue()
+RefPtr<TTObject> Parser::parseSingleValue()
 {
     Token token = tokenizer->peekToken();
 
-    TTObject *expr = NULL;
+    RefPtr<TTObject> expr = NULL;
     switch(token.getType())
     {
         case Token::Type::SYMBOL:
@@ -146,7 +147,7 @@ TTObject *Parser::parseSingleValue()
 * Now we can get either message (simple, multiple),
 * anything else will interrupt and the result will be symbol.
 */
-TTObject *Parser::parseSymbol(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parseSymbol(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseSymbol:"
@@ -154,11 +155,11 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne, const bool &untilChain)
 #endif
     // ----------------------------------------------------------------------- //
 
-    TTObject *result = NULL;
+    RefPtr<TTObject> result = NULL;
 
     Token symbolToken = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(symbolToken.getValue().c_str()))->getLiteral();
+    RefPtr<TTLiteral> lit = TTLiteral::createStringLiteral(TO_TT_STR(symbolToken.getValue().c_str()))->getLiteral();
     result = Expression::createSymbolValue(lit);
 
     if(parseOnlyOne)
@@ -171,7 +172,7 @@ TTObject *Parser::parseSymbol(const bool &parseOnlyOne, const bool &untilChain)
     }
 }
 
-TTObject *Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseLiteral:"
@@ -179,7 +180,7 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
 #endif
     // ----------------------------------------------------------------------- //
 
-    TTObject *result = NULL;
+    RefPtr<TTObject> result = NULL;
 
     Token literalToken = tokenizer->readToken();
 
@@ -187,12 +188,12 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
     {
         int32_t a = 0;
         sscanf(literalToken.getValue().c_str(), "%d", &a);
-        TTLiteral *lit = TTLiteral::createIntegerLiteral(a)->getLiteral();
+        RefPtr<TTLiteral> lit = TTLiteral::createIntegerLiteral(a)->getLiteral();
         result = Expression::createLiteralValue(lit);
     }
     else
     {
-        TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(literalToken.getValue().c_str()))->getLiteral();
+        RefPtr<TTLiteral> lit = TTLiteral::createStringLiteral(TO_TT_STR(literalToken.getValue().c_str()))->getLiteral();
         result = Expression::createLiteralValue(lit);
     }
 
@@ -208,7 +209,7 @@ TTObject *Parser::parseLiteral(const bool &parseOnlyOne, const bool &untilChain)
     }
 }
 
-TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr, const bool &untilChain)
+RefPtr<TTObject> Parser::parseSimpleMessageRest(RefPtr<TTObject> destExpr, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseSimpleMessageRest)" << std::endl;
@@ -217,8 +218,8 @@ TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr, const bool &untilCh
 
     Token messageNameToken = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(messageNameToken.getValue().c_str()))->getLiteral();
-    TTObject *result = Expression::createSimpleMessage(destExpr, lit);
+    RefPtr<TTLiteral> lit = TTLiteral::createStringLiteral(TO_TT_STR(messageNameToken.getValue().c_str()))->getLiteral();
+    RefPtr<TTObject> result = Expression::createSimpleMessage(destExpr, lit);
 
     /*
 
@@ -228,7 +229,7 @@ TTObject *Parser::parseSimpleMessageRest(TTObject *destExpr, const bool &untilCh
     return parseRightOfValue(result, messageNameToken, untilChain);
 }
 
-TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &untilChain)
+RefPtr<TTObject> Parser::parseMultipleMessageRest(RefPtr<TTObject> destExpr, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseMultipleMessageRest)" << std::endl;
@@ -236,7 +237,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &until
     // ----------------------------------------------------------------------- //
 
     std::vector<std::string> argNames;
-    std::vector<TTObject *> argValues;
+    std::vector<RefPtr<TTObject> > argValues;
     std::string fullName;
 
     bool finishedWithExpressionEnd = false;
@@ -257,7 +258,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &until
             case Token::Type::SYMBOL:
                 if(isSimpleMessage(token))
                 {
-                    std::cerr << "[Parser]: Error: Multiple message can only store single value or parenthesis." << std::endl;
+                    std::cerr << "[Parser]: Line: " << token.getLine() << " Error: Multiple message can only store single value or parenthesis." << std::endl;
                     return NULL;
                 }
                 else
@@ -290,7 +291,7 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &until
             break;
         }
 
-        TTObject *expr = parseSingleValue();
+        RefPtr<TTObject> expr = parseSingleValue();
 
 #ifdef DEBUG
         std::cout << "(mul msg val): got expr: " << expr << std::endl;
@@ -305,22 +306,26 @@ TTObject *Parser::parseMultipleMessageRest(TTObject *destExpr, const bool &until
         return NULL;
     }
 
-    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()))->getLiteral();
+    RefPtr<TTLiteral> fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()))->getLiteral();
 
-    TTLiteral *nameArrayLit = createLiteralArrayOfStrings(argNames);
+    RefPtr<TTLiteral> nameArrayLit = createLiteralArrayOfStrings(argNames);
 
-    TTLiteral *valueArrayLit = TTLiteral::createObjectArray(argValues)->getLiteral();
+    RefPtr<TTLiteral> valueArrayLit = TTLiteral::createObjectArray(argValues)->getLiteral();
 
-    TTObject *res = Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
+    RefPtr<TTObject> res = Expression::createMultipleMessage(destExpr, fullNameLit, nameArrayLit, valueArrayLit);
 
     if(finishedWithExpressionEnd)
     {
+        if(untilChain)
+        {
+            return res;
+        }
         return parseChain(res, false);
     }
     return res;
 }
 
-TTObject *Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseBlock:"
@@ -426,9 +431,9 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
         return NULL;
     }
 
-    TTObject *rightSideExpression = parse(false, false);
+    RefPtr<TTObject> rightSideExpression = parse(false, false);
 
-    if(rightSideExpression == NULL)
+    if(&rightSideExpression == NULL)
     {
         std::cerr << "[Parser]: Line:" << lineHolder.getLine() << " the block expression is invalid." << std::endl;
         return NULL;
@@ -443,10 +448,10 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
         return NULL;
     }
 
-    TTLiteral *nameArray = createLiteralArrayOfStrings(argNames);
-    TTLiteral *fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()))->getLiteral();
+    RefPtr<TTLiteral> nameArray = createLiteralArrayOfStrings(argNames);
+    RefPtr<TTLiteral> fullNameLit = TTLiteral::createStringLiteral(TO_TT_STR(fullName.c_str()))->getLiteral();
 
-    TTObject *res = Expression::createBlock(nameArray, fullNameLit, rightSideExpression, NULL);
+    RefPtr<TTObject> res = Expression::createBlock(nameArray, fullNameLit, rightSideExpression, NULL);
     if(parseOnlyOne)
     {
         return res;
@@ -457,7 +462,7 @@ TTObject *Parser::parseBlock(const bool &parseOnlyOne, const bool &untilChain)
     }
 }
 
-TTObject *Parser::parseAssignmentRest(const Token &token)
+RefPtr<TTObject> Parser::parseAssignmentRest(const Token &token)
 {
 #ifdef DEBUG
     std::cout << "(parseAssignmentRest)" << std::endl;
@@ -466,9 +471,9 @@ TTObject *Parser::parseAssignmentRest(const Token &token)
 
     Token assignToken = tokenizer->readToken(); // eat the assign token
 
-    TTLiteral *lit = TTLiteral::createStringLiteral(TO_TT_STR(token.getValue().c_str()))->getLiteral();
+    RefPtr<TTLiteral> lit = TTLiteral::createStringLiteral(TO_TT_STR(token.getValue().c_str()))->getLiteral();
 
-    TTObject* result = Expression::createAssignment(lit, parse(false, true)); // recursively parse the right side
+    RefPtr<TTObject> result = Expression::createAssignment(lit, parse(false, true)); // recursively parse the right side
 
     Token nextToken = tokenizer->peekToken();
     if(nextToken.getType() == Token::Type::EXPRESSION_END)
@@ -480,7 +485,7 @@ TTObject *Parser::parseAssignmentRest(const Token &token)
     return parseRightOfValue(result, assignToken, true);
 }
 
-TTObject *Parser::parseParenthesis(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parseParenthesis(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseParenthesis:"
@@ -490,7 +495,7 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne, const bool &untilCh
 
     Token lineHolder = tokenizer->readToken(); // eat opening bracket and store line number
 
-    TTObject *expr = parse(false, untilChain);
+    RefPtr<TTObject> expr = parse(false, untilChain);
 
     Token closedBracket = tokenizer->readToken();
     if(closedBracket.getType() != Token::Type::PARENTHESIS_CLOSE)
@@ -500,7 +505,7 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne, const bool &untilCh
         return NULL;
     }
 
-    TTObject *result = Expression::createParenthesis(expr);
+    RefPtr<TTObject> result = Expression::createParenthesis(expr);
     if(parseOnlyOne)
     {
         return result;
@@ -511,15 +516,15 @@ TTObject *Parser::parseParenthesis(const bool &parseOnlyOne, const bool &untilCh
     }
 }
 
-TTObject *Parser::parseArray(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parseArray(const bool &parseOnlyOne, const bool &untilChain)
 {
     Token lineHolder = tokenizer->readToken();
 
-    std::vector<TTObject *> expressions;
+    std::vector<RefPtr<TTObject> > expressions;
 
     while(tokenizer->peekToken().getType() != Token::Type::ARRAY_CLOSE)
     {
-        TTObject *expr = parse(false, false);
+        RefPtr<TTObject> expr = parse(false, false);
         expressions.push_back(expr);
 
         switch(tokenizer->peekToken().getType())
@@ -538,8 +543,8 @@ TTObject *Parser::parseArray(const bool &parseOnlyOne, const bool &untilChain)
 
     Token close = tokenizer->readToken();
 
-    TTLiteral *lit = TTLiteral::createObjectArray(expressions)->getLiteral();
-    TTObject *result = Expression::createArray(lit);
+    RefPtr<TTLiteral> lit = TTLiteral::createObjectArray(expressions)->getLiteral();
+    RefPtr<TTObject> result = Expression::createArray(lit);
 
     if(parseOnlyOne)
     {
@@ -548,7 +553,7 @@ TTObject *Parser::parseArray(const bool &parseOnlyOne, const bool &untilChain)
     return parseRightOfValue(result, close, untilChain);
 }
 
-TTObject *Parser::parseChain(TTObject *currExpr, const bool &parseOnlyOne)
+RefPtr<TTObject> Parser::parseChain(RefPtr<TTObject> currExpr, const bool &parseOnlyOne)
 {
 #ifdef DEBUG
     std::cout << "(parseChain)" << std::endl;
@@ -557,12 +562,12 @@ TTObject *Parser::parseChain(TTObject *currExpr, const bool &parseOnlyOne)
 
     tokenizer->readToken(); // eat ;
 
-    TTObject *expr = Expression::createChained(currExpr, parse(parseOnlyOne, false));
+    RefPtr<TTObject> expr = Expression::createChained(currExpr, parse(parseOnlyOne, false));
 
     return expr;
 }
 
-TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parseCreateVariable(const bool &parseOnlyOne, const bool &untilChain)
 {
 #ifdef DEBUG
     std::cout << "(parseCreateVariable:"
@@ -597,8 +602,8 @@ TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne, const bool &unti
         }
     } while(!atEnd);
 
-    TTLiteral *nameArray = createLiteralArrayOfStrings(names);
-    TTObject *res = Expression::createCreateVariables(nameArray);
+    RefPtr<TTLiteral> nameArray = createLiteralArrayOfStrings(names);
+    RefPtr<TTObject> res = Expression::createCreateVariables(nameArray);
 
     if(parseOnlyOne)
     {
@@ -628,11 +633,11 @@ TTObject *Parser::parseCreateVariable(const bool &parseOnlyOne, const bool &unti
     }
 }
 
-TTObject *Parser::parse(const bool &parseOnlyOne, const bool &untilChain)
+RefPtr<TTObject> Parser::parse(const bool &parseOnlyOne, const bool &untilChain)
 {
     Token token = tokenizer->peekToken();
 
-    TTObject *res = NULL;
+    RefPtr<TTObject> res = NULL;
 
     switch(token.getType())
     {
@@ -664,7 +669,7 @@ TTObject *Parser::parse(const bool &parseOnlyOne, const bool &untilChain)
             throw std::exception();
     }
 
-    if(!res && token.getType() != Token::Type::TEOF)
+    if(!&res && token.getType() != Token::Type::TEOF)
     {
         // an error occures, gonna eat the next token
         std::cerr << "parse error, eating next token" << std::endl;

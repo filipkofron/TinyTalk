@@ -1,9 +1,12 @@
 #include "MemAllocator.h"
 #include "common.h"
+#include "Runtime.h"
 #include <cstring>
 #include <iostream>
 
 #undef DEBUG
+
+MemAllocator *MemAllocator::defaultAllocator = NULL;
 
 MemAllocator::MemAllocator(size_t poolCapacity)
         : capacity(poolCapacity), top(0)
@@ -18,10 +21,15 @@ MemAllocator::MemAllocator(size_t poolCapacity)
 
 MemAllocator::~MemAllocator()
 {
-#ifdef DEBUG
+#ifdef VERBOSE
     std::cout << "~MemAllocator(): " << std::dec << top << " bytes allocated" << std::endl;
 #endif
     free(pool);
+}
+
+bool MemAllocator::isInside(intptr_t ptr)
+{
+    return ptr >= (intptr_t ) pool && ptr < (intptr_t) &pool[capacity];
 }
 
 uint8_t *MemAllocator::allocate(size_t bytes)
@@ -39,9 +47,9 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         return nextAddr;
     }
 
-    std::cerr << "OUT OF MEMORY" << std::endl;
-    throw std::exception();
-    return 0;
+    Runtime::runCopyGC();
+
+    return getCurrent()->allocate(bytes);
 }
 
 uint8_t *MemAllocator::allocateString(const uint8_t *str)
@@ -60,17 +68,15 @@ uint8_t *MemAllocator::cloneString(const uint8_t *str)
     return newStr;
 }
 
-TTObject *MemAllocator::allocateObject()
+TTObject* MemAllocator::allocateObject()
 {
     return (TTObject *) allocate(sizeof(TTObject));
 }
 
-TTLiteral *MemAllocator::allocateLiteral()
+TTLiteral* MemAllocator::allocateLiteral()
 {
     return (TTLiteral *) allocate(sizeof(TTLiteral));
 }
-
-MemAllocator *MemAllocator::defaultAllocator = NULL;
 
 MemAllocator *MemAllocator::getCurrent()
 {
@@ -80,6 +86,11 @@ MemAllocator *MemAllocator::getCurrent()
 void MemAllocator::initializeDefaultAllocator(size_t poolCapacity)
 {
     defaultAllocator = new MemAllocator(poolCapacity);
+}
+
+void MemAllocator::setDefaultAllocator(MemAllocator *allocator)
+{
+    defaultAllocator = allocator;
 }
 
 void MemAllocator::cleanupDefaultAllocator()

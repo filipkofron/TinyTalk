@@ -62,20 +62,20 @@ struct TTObject
     /**
     * For future stuff (GC) only!
     */
-    TTObject *gccopy(MemAllocator *allocator);
+    TTObject *_gc_COPY_copy(MemAllocator *allocator);
 
     /**
     * Objects must only be created using these functions.
     */
-    static TTObject *createObject(uint8_t type, uint32_t fieldsPreallocated);
-    static TTObject *createObject(uint8_t type);
+    static RefPtr<TTObject> createObject(uint8_t type, uint32_t fieldsPreallocated);
+    static RefPtr<TTObject> createObject(uint8_t type);
 
     static std::vector<std::pair<std::string, RefPtr<TTObject> > > laterFields;
 
     /**
     * Not deep copy. Cannot do that due to cycle references.
     */
-    static TTObject *clone(TTObject *cloned);
+    static RefPtr<TTObject> clone(RefPtr<TTObject> cloned);
 
 
     /**
@@ -85,7 +85,7 @@ struct TTObject
     /**
     * Add a new field. Will return false if it alread exists.
     */
-    bool addField(const uint8_t *name, TTObject *object);
+    bool addField(const uint8_t *name, RefPtr<TTObject> object);
 
     /**
     * Returns true if the field name exists.
@@ -101,18 +101,18 @@ struct TTObject
     * Sets an object overwriting the old one, returns false and does nothing if
     * an old one is not found.
     */
-    bool setField(const uint8_t *name, TTObject *object);
+    bool setField(const uint8_t *name, RefPtr<TTObject> object);
 
     /**
     * Returns an object from field by given name or NULL if not found.
     */
-    TTLiteral *getLiteral();
+    RefPtr<TTLiteral> getLiteral();
 
     /**
     * Sets an object overwriting the old one, returns false and does nothing if
     * an old one is not found.
     */
-    bool setLiteral(TTLiteral *object);
+    bool setLiteral(RefPtr<TTLiteral> object);
 
     /**
     * Prints the object to a human readable format.
@@ -123,6 +123,6 @@ struct TTObject
 /**
 * Outputs rich object info.
 */
-std::ostream &operator << (std::ostream &os, TTObject *object);
+std::ostream &operator << (std::ostream &os, RefPtr<TTObject> object);
 
 #endif

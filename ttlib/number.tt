@@ -1,0 +1,79 @@
+|Number|;
+Number = Object createWith:
+{
+	"new", [
+		Object createWith:
+		{
+			"num", 0,
+			"den", 1,
+			"getNum", [
+				num
+			],
+			"getDen", [
+				den
+			],
+			"setNum:", [ :setNum: |
+				num = setNum
+			],
+			"setDen:", [ :setDen: |
+				den = setDen
+			],
+			"toString", [
+				|strRes|;
+				strRes = num toString;
+				strRes = strRes append: " / ";
+				strRes = strRes append: (den toString);
+				strRes
+			],
+			"add:", [ :add: |
+				| fullDen fullNum res |;
+				fullDen = den mul: (add getDen);
+				fullNum = num mul: (add getDen);
+				fullNum = fullNum add: (add getNum mul: den);
+				res = Number new;
+				res setNum: fullNum;
+				res setDen: fullDen;
+				res
+			],
+			"sub:", [ :sub: |
+			    | fullDen fullNum res |;
+                sub setNum: ((sub getNum) mul: -1);
+                fullDen = den mul: (sub getDen);
+                fullNum = num mul: (sub getDen);
+                fullNum = fullNum add: (sub getNum mul: den);
+                res = Number new;
+                res setNum: fullNum;
+                res setDen: fullDen;
+                res
+			],
+			"mul:", [ :mul: |
+                | res |;
+                res = Number new;
+                res setNum: (num mul: (mul getNum));
+                res setDen: (den mul: (mul getDen));
+                res
+            ],
+            "div:", [ :div: |
+                | res |;
+                res = Number new;
+                res setNum: (num mul: (div getDen));
+                res setDen: (den mul: (div getNum));
+                res
+             ]
+        }
+	],
+	"num:den:", [ :num: :den: |
+	    | newNumber |;
+	    newNumber = Number new;
+	    newNumber setNum: num;
+	    newNumber setDen: den;
+	    newNumber
+	],
+	"den:num:", [ :den: :num: |
+    	    | newNumber |;
+    	    newNumber = Number new;
+    	    newNumber setNum: num;
+    	    newNumber setDen: den;
+    	    newNumber
+    	]
+}

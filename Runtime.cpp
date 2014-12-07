@@ -5,22 +5,22 @@
 BuiltinPool Runtime::builtinPool;
 RefPtrMap Runtime::refPtrMap;
 BytecodeGen Runtime::bytecodeGen;
-TTObject *Runtime::globalEnvironment = NULL;
+RefPtr<TTObject> Runtime::globalEnvironment = NULL;
 
 
-TTObject *Runtime::findSymbolValueInThis(TTObject *thiz, const uint8_t *name, TTObject **nextThis)
+RefPtr<TTObject> Runtime::findSymbolValueInThis(RefPtr<TTObject> thiz, const uint8_t *name, RefPtr<TTObject> &nextThis)
 {
-    *nextThis = NULL;
-    TTObject *resultFromThis = thiz->getField(name);
-    if (!resultFromThis)
+    nextThis = NULL;
+    RefPtr<TTObject> resultFromThis = thiz->getField(name);
+    if (!&resultFromThis)
     {
-        TTObject *thisParent = thiz->getField(TO_TT_STR("parent"));
-        if(thisParent)
+        RefPtr<TTObject> thisParent = thiz->getField(TO_TT_STR("parent"));
+        if(&thisParent)
         {
 #ifdef DEBUG
             std::cout << "(evaluateSymbolValue): field not found in this, trying parent =>" << std::endl;
 #endif
-            *nextThis = thisParent;
+            nextThis = thisParent;
             return NULL;
         }
         else
@@ -34,9 +34,9 @@ TTObject *Runtime::findSymbolValueInThis(TTObject *thiz, const uint8_t *name, TT
     return resultFromThis;
 }
 
-TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nextEnv)
+RefPtr<TTObject> Runtime::findSymbol(const uint8_t *name, RefPtr<TTObject> env, RefPtr<TTObject> &nextEnv)
 {
-    *nextEnv = NULL;
+    nextEnv = NULL;
 #ifdef DEBUG
         std::cout << "(findSymbol)" << std::endl;
     #endif
@@ -51,8 +51,8 @@ TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nex
         std::cout << "(findSymbol): of name '" << name << "'" << std::endl;
     #endif
 
-    TTObject *resultFromEnv = env->getField(name);
-    if (!resultFromEnv)
+    RefPtr<TTObject> resultFromEnv = env->getField(name);
+    if (!&resultFromEnv)
     {
 #ifdef DEBUG
             std::cout << "(findSymbol): field name '"
@@ -70,8 +70,8 @@ TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nex
         return resultFromEnv;
     }
 
-    TTObject *thiz = env->getField(TO_TT_STR("this"));
-    if (!thiz)
+    RefPtr<TTObject> thiz = env->getField(TO_TT_STR("this"));
+    if (!&thiz)
     {
 #ifdef DEBUG
             std::cout << "(findSymbol): this is NULL" << std::endl;
@@ -79,13 +79,13 @@ TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nex
     }
     else
     {
-        TTObject *resultFromThis = NULL;
-        TTObject *nextThis = thiz;
+        RefPtr<TTObject> resultFromThis = NULL;
+        RefPtr<TTObject> nextThis = thiz;
         do
         {
-            resultFromThis = findSymbolValueInThis(nextThis, name, &nextThis);
-        } while(!resultFromThis && nextThis);
-        if (!resultFromThis)
+            resultFromThis = findSymbolValueInThis(nextThis, name, nextThis);
+        } while(!&resultFromThis && &nextThis);
+        if (!&resultFromThis)
         {
 #ifdef DEBUG
                 std::cout << "(findSymbol): field not found in this" << std::endl;
@@ -100,23 +100,23 @@ TTObject *Runtime::findSymbol(const uint8_t *name, TTObject *env, TTObject **nex
         }
     }
 
-    TTObject *parent = env->getField(TO_TT_STR("parentEnv"));
-    if (parent && parent->type == TT_ENV)
+    RefPtr<TTObject> parent = env->getField(TO_TT_STR("parentEnv"));
+    if (&parent && parent->type == TT_ENV)
     {
 #ifdef DEBUG
             std::cout << "(findSymbol): trying parent env" << std::endl;
     #endif
 
-        *nextEnv = parent;
+        nextEnv = parent;
         return NULL;
     }
 
     return NULL;
 }
 
-TTObject *Runtime::assignSymbol(const uint8_t *safeName, TTObject *assignedVal, TTObject *env, TTObject **nextEnv)
+RefPtr<TTObject> Runtime::assignSymbol(const uint8_t *safeName, RefPtr<TTObject> assignedVal, RefPtr<TTObject> env, RefPtr<TTObject> &nextEnv)
 {
-    *nextEnv = NULL;
+    nextEnv = NULL;
 #ifdef DEBUG
     std::cout << "(assignSymbol)" << std::endl;
 #endif
@@ -133,8 +133,8 @@ TTObject *Runtime::assignSymbol(const uint8_t *safeName, TTObject *assignedVal, 
 #endif
     }
 
-    TTObject *thiz = env->getField(TO_TT_STR("this"));
-    if (!thiz)
+    RefPtr<TTObject> thiz = env->getField(TO_TT_STR("this"));
+    if (!&thiz)
     {
         std::cout << "(assignSymbol): this is NULL" << std::endl;
     }
@@ -153,13 +153,13 @@ TTObject *Runtime::assignSymbol(const uint8_t *safeName, TTObject *assignedVal, 
         }
     }
 
-    TTObject *parent = env->getField(TO_TT_STR("parentEnv"));
-    if (parent && parent->type == TT_ENV)
+    RefPtr<TTObject> parent = env->getField(TO_TT_STR("parentEnv"));
+    if (&parent && parent->type == TT_ENV)
     {
 #ifdef DEBUG
         std::cout << "(assignSymbol): trying parent env" << std::endl;
 #endif
-        *nextEnv = parent;
+        nextEnv = parent;
         return NULL;
     }
 
@@ -172,6 +172,9 @@ TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *saf
 #ifdef DEBUG
     std::cout << "(findBlockAtNonExpression)" << std::endl;
 #endif
+
+    *next = NULL;
+
     TTObject *fieldVal = object->getField(safeName);
     if(fieldVal)
     {
@@ -196,7 +199,7 @@ TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *saf
     return NULL;
 }
 
-TTObject *Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTObject *env, TTObject **thiz)
+RefPtr<TTObject> Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTObject *env, TTObject **thiz)
 {
 #ifdef DEBUG
     std::cout << "(findBlock)" << std::endl;
@@ -244,7 +247,7 @@ TTObject *Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTObject *e
     return resExpr;
 }
 
-TTObject *Runtime::executeSimpleNativeMessage(std::string &nativeName, TTObject *dest, std::string &msgName, TTObject *thiz)
+RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> thiz)
 {
     std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(nativeName);
     std::vector<std::string> singleList;
@@ -254,11 +257,11 @@ TTObject *Runtime::executeSimpleNativeMessage(std::string &nativeName, TTObject 
 #ifdef DEBUG
         std::cout << "(executeSimpleNativeMessage): Builtin function '" << nativeName << "' found." << std::endl;
 #endif
-        if(thiz)
+        if(&thiz)
         {
-            return builtin->invoke(thiz, singleList, std::vector<TTObject *>());
+            return builtin->invoke(&thiz, singleList, std::vector<RefPtr<TTObject> >());
         }
-        return builtin->invoke(dest, singleList, std::vector<TTObject *>());
+        return builtin->invoke(&dest, singleList, std::vector<RefPtr<TTObject> >());
     }
     else
     {
@@ -268,7 +271,7 @@ TTObject *Runtime::executeSimpleNativeMessage(std::string &nativeName, TTObject 
     return NULL;
 }
 
-TTObject *Runtime::executeMultipleNativeMessage(std::string &nativeName, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz)
+RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> thiz)
 {
 #ifdef DEBUG
     std::cout << "(executeMultipleNativeMessage)" << std::endl;
@@ -280,7 +283,7 @@ TTObject *Runtime::executeMultipleNativeMessage(std::string &nativeName, TTObjec
 #ifdef DEBUG
         std::cout << "(executeMultipleNativeMessage): Builtin function '" << nativeName << "' found." << std::endl;
 #endif
-        if(thiz)
+        if(&thiz)
         {
             return builtin->invoke(thiz, argNames, values);
         }
@@ -292,4 +295,29 @@ TTObject *Runtime::executeMultipleNativeMessage(std::string &nativeName, TTObjec
         throw std::exception();
     }
     return NULL;
+}
+
+void Runtime::runCopyGC()
+{
+    MemAllocator *newAllocator = new MemAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
+
+    std::cout << "GC: Starting copying garbage collection." << std::endl;
+    /*
+    Traverse and copy all things
+     */
+
+    std::cout << "GC: Referenced objects from runtime stack:" << std::endl;
+    for(Ptr &ptr : refPtrMap.collectRoots())
+    {
+        std::cout << "ptr: " << (unsigned long) ptr.ptr << " object: " << ptr.object << std::endl;
+    }
+
+    std::cout << "GC: Finished copying garbage collection." << std::endl;
+
+    std::cout << "GC: Debug exit." << std::endl;
+
+    exit(0);
+
+    MemAllocator::cleanupDefaultAllocator();
+    MemAllocator::setDefaultAllocator(newAllocator);
 }

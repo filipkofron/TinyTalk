@@ -15,6 +15,8 @@ Interpreter::Interpreter()
 
 void Interpreter::initialize()
 {
+    std::cout << "%% Interpreter::initializing." << std::endl;
+
     Runtime::globalEnvironment = TTObject::createObject(TT_ENV);
     Runtime::globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
     Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
@@ -28,11 +30,12 @@ void Interpreter::initialize()
 
    // std::cout << "### test global env: " << Runtime::globalEnvironment << std::endl;
    // std::cout << "### test field parent: " << Runtime::globalEnvironment->getField(TO_TT_STR("parent")) << std::endl;
+    std::cout << "%% Interpreter::initialized." << std::endl;
 }
 
 void Interpreter::setupObject()
 {
-    TTObject *object = TTObject::createObject(TT_OBJECT);
+    RefPtr<TTObject> object = TTObject::createObject(TT_OBJECT);
 
     BuiltinUtil::addSimpleMethod(object, "alloc", "object_alloc");
     BuiltinUtil::addMultipleMethod(object, "object:addField:", {"object", "addField"},"object_add");
@@ -44,7 +47,7 @@ void Interpreter::setupObject()
 
     TTObject::laterFields.push_back(std::make_pair("parent", RefPtr<TTObject>(object)));
 
-    TTObject *debug = TTObject::createObject(TT_OBJECT);
+    RefPtr<TTObject> debug = TTObject::createObject(TT_OBJECT);
     BuiltinUtil::addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
     BuiltinUtil::addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
     BuiltinUtil::addMultipleMethod(debug, "printString:", {"printString"}, "object_debugprintstring");
@@ -59,10 +62,10 @@ void Interpreter::setupObject()
 
 void Interpreter::setupLiterals()
 {
-    TTObject *object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
+    RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
 
-    TTObject *integer = TTObject::createObject(TT_LITERAL);
-    TTLiteral *integerLit = TTLiteral::createIntegerLiteral()->getLiteral(); // to override null parent
+    RefPtr<TTObject> integer = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTLiteral> integerLit = TTLiteral::createIntegerLiteral()->getLiteral(); // to override null parent
     integer->setLiteral(integerLit);
     integer->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addMultipleMethod(integer, "add:", {"add"},"integer_add:");
@@ -79,8 +82,8 @@ void Interpreter::setupLiterals()
     BuiltinUtil::addMultipleMethod(integer, "fromString:", {"fromString"},"integer_fromString:");
 
 
-    TTObject *string = TTObject::createObject(TT_LITERAL);
-    TTLiteral *stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""))->getLiteral(); // to override null parent
+    RefPtr<TTObject> string = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTLiteral> stringLit = TTLiteral::createStringLiteral(TO_TT_STR(""))->getLiteral(); // to override null parent
     string->setLiteral(stringLit);
     string->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addMultipleMethod(string, "charAt:", {"charAt"},"string_charAt:");
@@ -93,8 +96,8 @@ void Interpreter::setupLiterals()
     BuiltinUtil::addSimpleMethod(string, "toString", "string_toString");
 
 
-    TTObject *array = TTObject::createObject(TT_LITERAL);
-    TTLiteral *arrayLit = TTLiteral::createObjectArray(0)->getLiteral(); // to override null parent
+    RefPtr<TTObject> array = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTLiteral> arrayLit = TTLiteral::createObjectArray(0)->getLiteral(); // to override null parent
     array->setLiteral(arrayLit);
     array->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addSimpleMethod(array, "size", "array_size");
@@ -114,6 +117,7 @@ void Interpreter::loadTTLib()
     std::ifstream init("../TinyTalk/ttlib/init.tt", std::ifstream::in);
     std::ifstream control("../TinyTalk/ttlib/control.tt", std::ifstream::in);
     std::ifstream clazz("../TinyTalk/ttlib/class.tt", std::ifstream::in);
+    std::ifstream number("../TinyTalk/ttlib/number.tt", std::ifstream::in);
 
     if(init.fail() || control.fail() || clazz.fail())
     {
@@ -124,6 +128,7 @@ void Interpreter::loadTTLib()
     interpretFile(init, true);
     interpretFile(control, true);
     interpretFile(clazz, true);
+    interpretFile(number, true);
 }
 
 Interpreter::~Interpreter()
@@ -143,7 +148,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
     {
         try
         {
-            TTObject *expression = parser.parse(false, false);
+            RefPtr<TTObject> expression = parser.parse(false, false);
 
 #ifdef DEBUG
             std::cout << std::endl << "<<< ======================================" << std::endl;
@@ -152,12 +157,12 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
             std::cout << std::endl;
 #endif
 
-            if(expression != NULL)
+            if(&expression != NULL)
             {
-                //TTObject *result = evaluator.evaluate(expression, Runtime::globalEnvironment);
+                //RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
-                TTObject *expr = Expression::createNaiveBlock(expression);
-                TTObject *result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
+                RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
+                RefPtr<TTObject> result = bytecodeInterpreter.interpret(expr, &Runtime::globalEnvironment, NULL);
 
                 if(!silent)
                 {
@@ -166,12 +171,12 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
                     std::cout << "Evaluator result: " << std::endl;
 #endif
 
-                    if(result)
+                    if(&result)
                     {
                         std::string toStringName = "toString";
                         result = evaluator.sendSimpleMessage(result, toStringName);
                     }
-                    if(result)
+                    if(&result)
                     {
                         if(result->type == TT_LITERAL && result->getLiteral()->type == LITERAL_TYPE_STRING)
                         {

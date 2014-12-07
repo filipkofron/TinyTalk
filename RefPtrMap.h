@@ -14,6 +14,8 @@ class RefPtrMap
 private:
     std::map<RefPtrBase *, Ptr> refs;
 public:
+    RefPtrMap();
+
     void reg(RefPtrBase *refPtr, bool object);
     void unreg(RefPtrBase *refPtr);
 

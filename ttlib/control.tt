@@ -49,17 +49,44 @@ While
                  [ thisThis ]
          ];
 
-Array createField: "inject:" withValue:
-    [ :inject: |
-        |i thisArray |;
-        i = 0;
-        thisArray = this;
-        While
-            isTrue:
-                [i lessThan: (thisArray size)]
-            do:
-                [
-                    inject value: (thisArray at: i);
-                    i = i add: 1
-                ]
-    ]
+Array
+    createField: "inject:"
+    withValue:
+        [ :inject: |
+            |i thisArray |;
+            i = 0;
+            thisArray = this;
+            While
+                isTrue:
+                    [i lessThan: (thisArray size)]
+                do:
+                    [
+                        inject
+                            value: (thisArray at: i);
+                        i = i add: 1
+                    ]
+        ];
+
+Object
+    createField: "createWith:"
+    withValue:
+        [ :createWith: |
+            | first object name |;
+            first = True;
+            object = Object new;
+            createWith
+                inject:
+                    [ :item: |
+                        first
+                            ifTrue: [name = item];
+                        first
+                            ifFalse:
+                                [
+                                    object
+                                        createField: name
+                                        withValue: item
+                                ];
+                        first = first not
+                    ];
+            object
+        ]

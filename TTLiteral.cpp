@@ -1,16 +1,17 @@
 #include "TTLiteral.h"
+#include "TTObject.h"
 #include "common.h"
 #include "Runtime.h"
 #include <cstring>
 
-TTLiteral *TTLiteral::copy(MemAllocator *allocator, TTLiteral *lit)
+RefPtr<TTLiteral> TTLiteral::copy(MemAllocator *allocator, RefPtr<TTLiteral> lit)
 {
     // TODO: simple copy, since we don't need to recurse and this value is held as a single instance
     // TODO: only, so the GC will be ok with this.
     // TODO: Also, no object references can be yet referenced from these data.
 
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTLiteral *newLit = alloc->allocateLiteral();
+    RefPtr<TTLiteral> newLit = alloc->allocateLiteral();
 
     newLit->type = lit->type;
     newLit->length = lit->length;
@@ -20,7 +21,7 @@ TTLiteral *TTLiteral::copy(MemAllocator *allocator, TTLiteral *lit)
     return newLit;
 }
 
-TTLiteral *TTLiteral::clone(TTLiteral *lit)
+RefPtr<TTLiteral> TTLiteral::clone(RefPtr<TTLiteral> lit)
 {
     return copy(MemAllocator::getCurrent(), lit);
 }
@@ -64,7 +65,7 @@ void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &
             {
                 prlvl(os, level);
                 os << "[" << i << "] -> ";
-                if(((TTObject **) data)[i])
+                if(&((TTObject **) data)[i])
                 {
                     if(recursive)
                     {
@@ -84,12 +85,10 @@ void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &
             prlvl(os, level - 1);
         case LITERAL_TYPE_BYTE_ARRAY:
             os << "size: " << length << std::endl;
-            for(uint32_t i = 0; i < length / sizeof(TTObject *); i++)
+            for(uint32_t i = 0; i < length; i++)
             {
                 prlvl(os, level);
                 os << "[" << i << "] -> ";
-                if(((TTObject **) data)[i])
-                {
                     if(recursive)
                     {
                         os << (unsigned) data[i];
@@ -98,11 +97,6 @@ void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &
                     {
                         os << "<non-recursive-print>";
                     }
-                }
-                else
-                {
-                    os << "NULL";
-                }
                 os << std::endl;
             }
             prlvl(os, level - 1);
@@ -110,13 +104,13 @@ void TTLiteral::printValue(std::ostream &os, const uint32_t &level, const bool &
     }
 }
 
-TTObject *TTLiteral::createStringLiteral(uint32_t length)
+RefPtr<TTObject> TTLiteral::createStringLiteral(uint32_t length)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTLiteral *lit = alloc->allocateLiteral();
+    RefPtr<TTLiteral> lit = alloc->allocateLiteral();
 
-    TTObject *obj = TTObject::createObject(TT_LITERAL);
-    TTObject *parent = Runtime::globalEnvironment->getField(TO_TT_STR("String"));
+    RefPtr<TTObject> obj = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTObject> parent = Runtime::globalEnvironment->getField(TO_TT_STR("String"));
     obj->setField(TO_TT_STR("parent"), parent);
 
     lit->type = LITERAL_TYPE_STRING;
@@ -129,13 +123,13 @@ TTObject *TTLiteral::createStringLiteral(uint32_t length)
     return obj;
 }
 
-TTObject *TTLiteral::createIntegerLiteral()
+RefPtr<TTObject> TTLiteral::createIntegerLiteral()
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTLiteral *lit = alloc->allocateLiteral();
+    RefPtr<TTLiteral> lit = alloc->allocateLiteral();
 
-    TTObject *obj = TTObject::createObject(TT_LITERAL);
-    TTObject *parent = Runtime::globalEnvironment->getField(TO_TT_STR("Integer"));
+    RefPtr<TTObject> obj = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTObject> parent = Runtime::globalEnvironment->getField(TO_TT_STR("Integer"));
     obj->setField(TO_TT_STR("parent"), parent);
 
     lit->type = LITERAL_TYPE_INTEGER;
@@ -147,13 +141,13 @@ TTObject *TTLiteral::createIntegerLiteral()
     return obj;
 }
 
-TTObject *TTLiteral::createObjectArray(uint32_t size)
+RefPtr<TTObject> TTLiteral::createObjectArray(uint32_t size)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTLiteral *lit = alloc->allocateLiteral();
+    RefPtr<TTLiteral> lit = alloc->allocateLiteral();
 
-    TTObject *obj = TTObject::createObject(TT_LITERAL);
-    TTObject *parent = Runtime::globalEnvironment->getField(TO_TT_STR("Array"));
+    RefPtr<TTObject> obj = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTObject> parent = Runtime::globalEnvironment->getField(TO_TT_STR("Array"));
     obj->setField(TO_TT_STR("parent"), parent);
 
     lit->type = LITERAL_TYPE_OBJECT_ARRAY;
@@ -165,60 +159,60 @@ TTObject *TTLiteral::createObjectArray(uint32_t size)
     return obj;
 }
 
-TTObject *TTLiteral::createByteArray(uint32_t size)
+RefPtr<TTObject> TTLiteral::createByteArray(uint32_t size)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTLiteral *lit = alloc->allocateLiteral();
+    RefPtr<TTLiteral> lit = alloc->allocateLiteral();
 
-    TTObject *obj = TTObject::createObject(TT_LITERAL);
+    RefPtr<TTObject> obj = TTObject::createObject(TT_LITERAL);
 
     lit->type = LITERAL_TYPE_BYTE_ARRAY;
     lit->length = size;
     lit->data = alloc->allocate(lit->length);
 
-    obj->setLiteral(lit);
+    obj->setLiteral(&lit);
 
     return obj;
 }
 
-TTObject *TTLiteral::createStringLiteral(const uint8_t *str)
+RefPtr<TTObject> TTLiteral::createStringLiteral(const uint8_t *str)
 {
-    TTObject *obj = createStringLiteral(strlen((const char *) str));
+    RefPtr<TTObject> obj = createStringLiteral(strlen((const char *) str));
     strcpy((char *)obj->getLiteral()->data, (const char *)str);
     return obj;
 }
 
-TTObject *TTLiteral::createIntegerLiteral(const int32_t &value)
+RefPtr<TTObject> TTLiteral::createIntegerLiteral(const int32_t &value)
 {
-    TTObject *obj = createIntegerLiteral();
+    RefPtr<TTObject> obj = createIntegerLiteral();
 
     *((int32_t *) obj->getLiteral()->data) = value;
 
     return obj;
 }
 
-TTObject *TTLiteral::createObjectArray(const std::vector<TTObject *> &objects)
+RefPtr<TTObject> TTLiteral::createObjectArray(const std::vector<RefPtr<TTObject> > &objects)
 {
-    TTObject *obj = createObjectArray(objects.size());
+    RefPtr<TTObject> obj = createObjectArray(objects.size());
 
     TTObject **dataObs = ((TTObject **) obj->getLiteral()->data);
 
     for(auto object : objects)
     {
-        *dataObs = object;
+        *dataObs = &object;
         dataObs++;
     }
 
     return obj;
 }
 
-TTObject *TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
+RefPtr<TTObject> TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
 {
-    TTObject *obj = createByteArray(bytes.size());
+    RefPtr<TTObject> obj = createByteArray(bytes.size());
 
     uint8_t *dataBytes = obj->getLiteral()->data;
 
-    for(auto byt : bytes)
+    for(auto &byt : bytes)
     {
         *dataBytes = byt;
         dataBytes++;
@@ -227,7 +221,7 @@ TTObject *TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
     return obj;
 }
 
-void TTLiteral::setLiteralParent(TTObject *obj, TTLiteral *lit)
+void TTLiteral::setLiteralParent(RefPtr<TTObject> obj, RefPtr<TTLiteral> lit)
 {
     switch(lit->type)
     {

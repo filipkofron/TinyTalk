@@ -27,6 +27,25 @@ RefPtrBase::~RefPtrBase()
     }
 }
 
+RefPtrBase &RefPtrBase::operator =(const RefPtrBase& orig)
+{
+    if(&orig != this)
+    {
+        if (ptr)
+        {
+            Runtime::refPtrMap.unreg(this);
+        }
+        ptr = orig.ptr;
+        object = orig.object;
+        if (ptr)
+        {
+            Runtime::refPtrMap.reg(this, object);
+        }
+    }
+
+    return *this;
+}
+
 void RefPtrBase::setBasePtr(uintptr_t ptr)
 {
     if(this->ptr)

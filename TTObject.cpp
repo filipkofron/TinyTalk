@@ -4,7 +4,7 @@
 #include "BuiltinUtil.h"
 #include <cstring>
 
-TTObject *TTObject::gccopy(MemAllocator *allocator)
+TTObject *TTObject::_gc_COPY_copy(MemAllocator *allocator)
 {
     TTObject *newObject = allocator->allocateObject();
     memcpy(newObject, this, sizeof(*this));
@@ -14,10 +14,10 @@ TTObject *TTObject::gccopy(MemAllocator *allocator)
     return newObject;
 }
 
-TTObject *TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
+RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTObject *newObject = alloc->allocateObject();
+    RefPtr<TTObject> newObject = alloc->allocateObject();
     newObject->fields = (Field *) alloc->allocate(sizeof(Field) * fieldsPreallocated);
     newObject->fieldCapacity = fieldsPreallocated;
     newObject->fieldCount = 0;
@@ -34,16 +34,16 @@ TTObject *TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
     return newObject;
 }
 
-TTObject *TTObject::createObject(uint8_t type)
+RefPtr<TTObject> TTObject::createObject(uint8_t type)
 {
     return createObject(type, DEFAULT_FIELD_COUNT);
 }
 
-TTObject *TTObject::clone(TTObject *cloned)
+RefPtr<TTObject> TTObject::clone(RefPtr<TTObject> cloned)
 {
     MemAllocator *alloc = MemAllocator::getCurrent();
-    TTObject *newObject = alloc->allocateObject();
-    memcpy(newObject, cloned, sizeof(*cloned));
+    RefPtr<TTObject> newObject = alloc->allocateObject();
+    memcpy(&newObject, &cloned, sizeof(*cloned));
     newObject->fields = (Field *) alloc->allocate(sizeof(*newObject->fields) * cloned->fieldCapacity);
 
     memcpy(newObject->fields, cloned->fields, sizeof(*cloned->fields) * cloned->fieldCapacity);
@@ -53,7 +53,7 @@ TTObject *TTObject::clone(TTObject *cloned)
 
 std::vector<std::pair<std::string, RefPtr<TTObject> > > TTObject::laterFields;
 
-bool TTObject::addField(const uint8_t *name, TTObject *object)
+bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
 {
 #ifdef DEBUG
     std::cout << "======================= Adding field of name: " << ((const char *) name) << std::endl;
@@ -87,7 +87,7 @@ bool TTObject::addField(const uint8_t *name, TTObject *object)
         fields = newFields;
     }
     fields[fieldCount].name = alloc->cloneString(name);
-    fields[fieldCount].object = object;
+    fields[fieldCount].object = &object;
     fieldCount++;
 
     return true;
@@ -125,7 +125,7 @@ TTObject *TTObject::getField(const uint8_t *name)
     return NULL;
 }
 
-bool TTObject::setField(const uint8_t *name, TTObject *object)
+bool TTObject::setField(const uint8_t *name, RefPtr<TTObject> object)
 {
     if(!*name)
     {
@@ -135,14 +135,14 @@ bool TTObject::setField(const uint8_t *name, TTObject *object)
     {
         if(COMPARE_NAME(name, fields[i].name) == 0)
         {
-            fields[i].object = object;
+            fields[i].object = &object;
             return true;
         }
     }
     return addField(name, object);
 }
 
-TTLiteral *TTObject::getLiteral()
+RefPtr<TTLiteral> TTObject::getLiteral()
 {
     if(type != TT_LITERAL)
     {
@@ -159,7 +159,7 @@ TTLiteral *TTObject::getLiteral()
     return NULL;
 }
 
-bool TTObject::setLiteral(TTLiteral *lit)
+bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
 {
     if(type != TT_LITERAL)
     {
@@ -167,13 +167,13 @@ bool TTObject::setLiteral(TTLiteral *lit)
         throw  std::exception();
     }
 
-    TTLiteral::setLiteralParent(this, lit);
+    TTLiteral::setLiteralParent(this, &lit);
 
     for(uint32_t i = 0; i < fieldCount; i++)
     {
         if(!*fields[i].name)
         {
-            fields[i].object = (TTObject *) lit;
+            fields[i].object = (TTObject *) &lit;
             return true;
         }
     }
@@ -187,7 +187,7 @@ bool TTObject::setLiteral(TTLiteral *lit)
         fields = newFields;
     }
     fields[fieldCount].name = alloc->cloneString(TO_TT_STR(""));
-    fields[fieldCount].object = (TTObject *) lit;
+    fields[fieldCount].object = (TTObject *) &lit;
     fieldCount++;
 
     return true;
@@ -249,7 +249,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             os << "Expression type: " << Expression::getTypeInfo(this) << std::endl;
             break;
         case TT_LITERAL:
-            if(this->getLiteral())
+            if(&this->getLiteral())
             {
                 prlvl(os, level);
                 os << "Literal type: " << this->getLiteral()->getTypeInfo() << std::endl;
@@ -279,7 +279,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
     {
         if(*this->fields[i].name)
         {
-            if(this->fields[i].object)
+            if(&this->fields[i].object)
             {
                 prlvl(os, level);
                 os << "[" << this->fields[i].name << "]" << " -> ";
@@ -312,7 +312,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
         {
             prlvl(os, level);
             os << "[" << this->fields[i].name << "]" << " -> " << "LITERAL <";
-            if(this->getLiteral())
+            if(&this->getLiteral())
             {
                 if(recursive)
                 {
@@ -334,9 +334,9 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
     os << "}";
 }
 
-std::ostream &operator << (std::ostream &os, TTObject *object)
+std::ostream &operator << (std::ostream &os, RefPtr<TTObject> object)
 {
-    if(!object)
+    if(!&object)
     {
         os << "Object" << std::endl << "{" << std::endl;
         os << "  Address: NULL" << std::endl;

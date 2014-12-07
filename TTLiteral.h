@@ -6,6 +6,7 @@ struct TTLiteral;
 #include <vector>
 #include "TTObject.h"
 #include "MemAllocator.h"
+#include "RefPtr.h"
 
 #define LITERAL_TYPE_STRING 0x00
 #define LITERAL_TYPE_INTEGER 0x01
@@ -21,27 +22,27 @@ struct TTLiteral
     uint32_t length;
     uint8_t *data;
 
-    static TTLiteral *copy(MemAllocator *allocator, TTLiteral *lit);
+    static RefPtr<TTLiteral> copy(MemAllocator *allocator, RefPtr<TTLiteral> lit);
 
-    static TTLiteral *clone(TTLiteral *lit);
+    static RefPtr<TTLiteral> clone(RefPtr<TTLiteral> lit);
 
     const char *getTypeInfo();
 
     void printValue(std::ostream &os, const uint32_t &level, const bool &recursive);
 
-    static TTObject *createStringLiteral(uint32_t length);
-    static TTObject *createStringLiteral(const uint8_t *str);
+    static RefPtr<TTObject> createStringLiteral(uint32_t length);
+    static RefPtr<TTObject> createStringLiteral(const uint8_t *str);
 
-    static TTObject *createIntegerLiteral();
-    static TTObject *createIntegerLiteral(const int32_t &value);
+    static RefPtr<TTObject> createIntegerLiteral();
+    static RefPtr<TTObject> createIntegerLiteral(const int32_t &value);
 
-    static TTObject *createByteArray(uint32_t size);
-    static TTObject *createByteArray(const std::vector<uint8_t> &objects);
+    static RefPtr<TTObject> createByteArray(uint32_t size);
+    static RefPtr<TTObject> createByteArray(const std::vector<uint8_t> &objects);
 
-    static TTObject *createObjectArray(uint32_t size);
-    static TTObject *createObjectArray(const std::vector<TTObject *> &objects);
+    static RefPtr<TTObject> createObjectArray(uint32_t size);
+    static RefPtr<TTObject> createObjectArray(const std::vector<RefPtr<TTObject> > &objects);
 
-    static void setLiteralParent(TTObject *obj, TTLiteral *lit);
+    static void setLiteralParent(RefPtr<TTObject> obj, RefPtr<TTLiteral> lit);
 };
 
 #endif

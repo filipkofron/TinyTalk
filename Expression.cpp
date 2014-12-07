@@ -1,15 +1,16 @@
+#include "TTLiteral.h"
 #include "common.h"
 #include "Expression.h"
 
 namespace Expression
 {
-    TTObject *createSimpleMessage(TTObject *destExpr, TTLiteral *name)
+    RefPtr<TTObject> createSimpleMessage(RefPtr<TTObject> destExpr, RefPtr<TTLiteral> name)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_SIMPLE_MESSAGE;
 
-        TTObject *msgName = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> msgName = TTObject::createObject(TT_LITERAL);
         msgName->setLiteral(name);
 
         expr->addField(TO_TT_STR("msgName"), msgName);
@@ -18,19 +19,19 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createMultipleMessage(TTObject *destExpr, TTLiteral *fullName, TTLiteral *nameArray, TTLiteral *valueArray)
+    RefPtr<TTObject> createMultipleMessage(RefPtr<TTObject> destExpr, RefPtr<TTLiteral> fullName, RefPtr<TTLiteral> nameArray, RefPtr<TTLiteral> valueArray)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_MULTIPLE_MESSAGE;
 
-        TTObject *msgFullName = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> msgFullName = TTObject::createObject(TT_LITERAL);
         msgFullName->setLiteral(fullName);
 
-        TTObject *msgNameArray = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> msgNameArray = TTObject::createObject(TT_LITERAL);
         msgNameArray->setLiteral(nameArray);
 
-        TTObject *msgValueArray = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> msgValueArray = TTObject::createObject(TT_LITERAL);
         msgValueArray->setLiteral(valueArray);
 
         expr->addField(TO_TT_STR("msgDestExpr"), destExpr);
@@ -41,13 +42,13 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createSymbolValue(TTLiteral *name)
+    RefPtr<TTObject> createSymbolValue(RefPtr<TTLiteral> name)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_SYMBOL_VALUE;
 
-        TTObject *symbolName = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> symbolName = TTObject::createObject(TT_LITERAL);
         symbolName->setLiteral(name);
 
         expr->addField(TO_TT_STR("symbolName"), symbolName);
@@ -55,13 +56,13 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createAssignment(TTLiteral *name, TTObject *rightExpr)
+    RefPtr<TTObject> createAssignment(RefPtr<TTLiteral> name, RefPtr<TTObject> rightExpr)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_ASSIGN;
 
-        TTObject *symbolName = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> symbolName = TTObject::createObject(TT_LITERAL);
         symbolName->setLiteral(name);
 
         expr->addField(TO_TT_STR("assignSymbolName"), symbolName);
@@ -70,13 +71,13 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createLiteralValue(TTLiteral *value)
+    RefPtr<TTObject> createLiteralValue(RefPtr<TTLiteral> value)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_LITERAL_VALUE;
 
-        TTObject *literalValue = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> literalValue = TTObject::createObject(TT_LITERAL);
         literalValue->setLiteral(value);
 
         expr->addField(TO_TT_STR("literalValue"), literalValue);
@@ -84,9 +85,9 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createParenthesis(TTObject *innerExpr)
+    RefPtr<TTObject> createParenthesis(RefPtr<TTObject> innerExpr)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_PARENTHESIS;
 
@@ -95,25 +96,25 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr, TTLiteral *nativeName)
+    RefPtr<TTObject> createBlock(RefPtr<TTLiteral> nameArray, RefPtr<TTLiteral> fullName, RefPtr<TTObject> expr, RefPtr<TTLiteral> nativeName)
     {
-        TTObject *res = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> res = TTObject::createObject(TT_EXPR);
 
         res->flags = EXPRESSION_BLOCK;
 
-        TTObject *blockArgNames = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> blockArgNames = TTObject::createObject(TT_LITERAL);
         blockArgNames->setLiteral(nameArray);
 
-        TTObject *blockFullName = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> blockFullName = TTObject::createObject(TT_LITERAL);
         blockFullName->setLiteral(fullName);
 
         res->addField(TO_TT_STR("blockArgNames"), blockArgNames);
         res->addField(TO_TT_STR("blockFullName"), blockFullName);
         res->addField(TO_TT_STR("blockExpr"), expr);
 
-        if(nativeName)
+        if(&nativeName)
         {
-            TTObject *blockNativeName = TTObject::createObject(TT_LITERAL);
+            RefPtr<TTObject> blockNativeName = TTObject::createObject(TT_LITERAL);
             blockNativeName->setLiteral(nativeName);
 
             res->addField(TO_TT_STR("blockNativeName"), blockNativeName);
@@ -122,14 +123,14 @@ namespace Expression
         return res;
     }
 
-    TTObject *createNaiveBlock(TTObject *expr)
+    RefPtr<TTObject> createNaiveBlock(RefPtr<TTObject> expr)
     {
-        TTObject *res = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> res = TTObject::createObject(TT_EXPR);
 
         res->flags = EXPRESSION_BLOCK;
 
-        TTObject *blockArgNames = TTLiteral::createObjectArray(0);
-        TTObject *blockFullName = TTLiteral::createStringLiteral(TO_TT_STR(""));
+        RefPtr<TTObject> blockArgNames = TTLiteral::createObjectArray(0);
+        RefPtr<TTObject> blockFullName = TTLiteral::createStringLiteral(TO_TT_STR(""));
 
         res->addField(TO_TT_STR("blockArgNames"), blockArgNames);
         res->addField(TO_TT_STR("blockFullName"), blockFullName);
@@ -138,9 +139,9 @@ namespace Expression
         return res;
     }
 
-    TTObject *createChained(TTObject *currExpr, TTObject *nextExpr)
+    RefPtr<TTObject> createChained(RefPtr<TTObject> currExpr, RefPtr<TTObject> nextExpr)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_CHAINED;
 
@@ -150,13 +151,13 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createCreateVariables(TTLiteral *varNames)
+    RefPtr<TTObject> createCreateVariables(RefPtr<TTLiteral> varNames)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_CREATE_VARIABLES;
 
-        TTObject *varNamesLit = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> varNamesLit = TTObject::createObject(TT_LITERAL);
         varNamesLit->setLiteral(varNames);
 
         expr->addField(TO_TT_STR("varNames"), varNamesLit);
@@ -164,13 +165,13 @@ namespace Expression
         return expr;
     }
 
-    TTObject *createArray(TTLiteral *expressions)
+    RefPtr<TTObject> createArray(RefPtr<TTLiteral> expressions)
     {
-        TTObject *expr = TTObject::createObject(TT_EXPR);
+        RefPtr<TTObject> expr = TTObject::createObject(TT_EXPR);
 
         expr->flags = EXPRESSION_ARRAY;
 
-        TTObject *varNamesLit = TTObject::createObject(TT_LITERAL);
+        RefPtr<TTObject> varNamesLit = TTObject::createObject(TT_LITERAL);
         varNamesLit->setLiteral(expressions);
 
         expr->addField(TO_TT_STR("expressions"), varNamesLit);
@@ -178,7 +179,7 @@ namespace Expression
         return expr;
     }
 
-    const char *getTypeInfo(TTObject *expr)
+    const char *getTypeInfo(RefPtr<TTObject> expr)
     {
         switch(expr->flags)
         {

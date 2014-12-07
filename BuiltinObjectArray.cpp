@@ -5,16 +5,16 @@
 
 #include <sstream>
 
-TTObject *BuiltinObjectArraySize::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectArraySize::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
-    TTObject *sizeObj = TTLiteral::createIntegerLiteral((int32_t) (dest->getLiteral()->length / sizeof(TTObject *)));
+    RefPtr<TTObject> sizeObj = TTLiteral::createIntegerLiteral((int32_t) (dest->getLiteral()->length / sizeof(TTObject *)));
 
     return sizeObj;
 }
 
-TTObject *BuiltinObjectArrayAt::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectArrayAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -31,16 +31,16 @@ TTObject *BuiltinObjectArrayAt::invoke(TTObject *dest, std::vector<std::string> 
         throw std::exception();
     }
 
-    TTObject *obj = ((TTObject **) dest->getLiteral()->data)[elemIndex];
+    RefPtr<TTObject> obj = ((TTObject **) dest->getLiteral()->data)[elemIndex];
 
-    if(!obj)
+    if(!&obj)
     {
         return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
     }
     return obj;
 }
 
-TTObject *BuiltinObjectArrayAtSet::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectArrayAtSet::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
 
@@ -57,13 +57,13 @@ TTObject *BuiltinObjectArrayAtSet::invoke(TTObject *dest, std::vector<std::strin
         throw std::exception();
     }
 
-    ((TTObject **) dest->getLiteral()->data)[elemIndex] = values[1];
+    ((TTObject **) dest->getLiteral()->data)[elemIndex] = &values[1];
 
     return dest;
 }
 
 
-TTObject * BuiltinObjectArrayEmpty::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject>  BuiltinObjectArrayEmpty::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -74,7 +74,7 @@ TTObject * BuiltinObjectArrayEmpty::invoke(TTObject *dest, std::vector<std::stri
     return Runtime::globalEnvironment->getField(TO_TT_STR(toFind));
 }
 
-TTObject * BuiltinObjectArrayToString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject>  BuiltinObjectArrayToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -87,10 +87,10 @@ TTObject * BuiltinObjectArrayToString::invoke(TTObject *dest, std::vector<std::s
 
     for(int32_t i = 0; i < size; i++)
     {
-        TTObject *obj = ((TTObject **) dest->getLiteral()->data)[i];
-        TTObject *toStringRes = evaluator.sendSimpleMessage(obj, toString);
+        RefPtr<TTObject> obj = ((TTObject **) dest->getLiteral()->data)[i];
+        RefPtr<TTObject> toStringRes = evaluator.sendSimpleMessage(obj, toString);
         ss << "[" << i << "]: ";
-        if(toStringRes)
+        if(&toStringRes)
         {
             ss << ((const char *) toStringRes->getLiteral()->data) << std::endl;
         }
@@ -104,7 +104,7 @@ TTObject * BuiltinObjectArrayToString::invoke(TTObject *dest, std::vector<std::s
 
     getline(ss, res, '\0');
 
-    TTObject *resStr = TTLiteral::createStringLiteral(TO_TT_STR(res.c_str()));
+    RefPtr<TTObject> resStr = TTLiteral::createStringLiteral(TO_TT_STR(res.c_str()));
 
     return resStr;
 }

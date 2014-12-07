@@ -21,6 +21,7 @@ protected:
 
     void setBasePtr(uintptr_t ptr);
 public:
+    RefPtrBase &operator = (const RefPtrBase& orig);
     friend class RefPtrMap;
 };
 
@@ -41,12 +42,10 @@ public:
     RefPtr(const RefPtr<T> &orig)
         : RefPtrBase(orig)
     {
-
     }
 
     ~RefPtr()
     {
-
     }
 
     bool isObject(TTObject *object)
@@ -82,6 +81,13 @@ public:
     T* operator ->()
     {
         return (T *) ptr;
+    }
+
+    RefPtr<T> &operator = (const RefPtr<T> &orig)
+    {
+        // cannot check this because we have the & operator .. fuu
+        ((RefPtrBase &) *this) = ((RefPtrBase &) orig);
+        return *this;
     }
 };
 

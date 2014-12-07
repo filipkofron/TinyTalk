@@ -3,15 +3,15 @@
 #include "BuiltinString.h"
 #include "common.h"
 
-TTObject *BuiltinStringCharAt::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
     BUILTIN_CHECK_LITERAL(0);
     BUILTIN_CHECK_INTEGER(0);
 
-    TTLiteral *thisStr = dest->getLiteral();
-    TTLiteral *argInt = values[0]->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> argInt = values[0]->getLiteral();
 
     int32_t index = *((int32_t *) argInt->data);
 
@@ -25,12 +25,12 @@ TTObject *BuiltinStringCharAt::invoke(TTObject *dest, std::vector<std::string> &
 
     cr[0] = (uint8_t) thisStr->data[index];
 
-    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(cr));
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(cr));
 
     return res;
 }
 
-TTObject *BuiltinStringSetCharAt::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringSetCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
 
@@ -40,9 +40,9 @@ TTObject *BuiltinStringSetCharAt::invoke(TTObject *dest, std::vector<std::string
     BUILTIN_CHECK_LITERAL(1);
     BUILTIN_CHECK_INTEGER(1);
 
-    TTLiteral *thisStr = dest->getLiteral();
-    TTLiteral *argStr = values[0]->getLiteral();
-    TTLiteral *argInt = values[1]->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> argStr = values[0]->getLiteral();
+    RefPtr<TTLiteral> argInt = values[1]->getLiteral();
 
     int32_t index = *((int32_t *) argInt->data);
 
@@ -58,37 +58,37 @@ TTObject *BuiltinStringSetCharAt::invoke(TTObject *dest, std::vector<std::string
         throw std::exception();
     }
 
-    TTObject *res = TTLiteral::createStringLiteral(thisStr->data);
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(thisStr->data);
     res->getLiteral()->data[index] = argStr->data[0];
     return res;
 }
 
-TTObject *BuiltinStringToLower::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringToLower::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
-    TTLiteral *thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
 
     std::string str = (const char *) thisStr->data;
 
     std::transform(str.begin(), str.end(),str.begin(), ::tolower);
 
-    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
     return res;
 }
 
-TTObject *BuiltinStringToUpper::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringToUpper::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
-    TTLiteral *thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
 
     std::string str = (const char *) thisStr->data;
 
     std::transform(str.begin(), str.end(),str.begin(), ::toupper);
 
-    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
     return res;
 }
@@ -107,32 +107,32 @@ static inline std::string &trim(std::string &s) {
     return ltrim(rtrim(s));
 }
 
-TTObject *BuiltinStringTrim::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringTrim::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
-    TTLiteral *thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
 
     std::string str = (const char *) thisStr->data;
 
     str = trim(str);
 
-    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(str.c_str()));
 
     return res;
 }
 
-TTObject *BuiltinStringAppend::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringAppend::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
     BUILTIN_CHECK_LITERAL(0);
     BUILTIN_CHECK_STRING(0);
 
-    TTLiteral *thisStr = dest->getLiteral();
-    TTLiteral *rightStr = values[0]->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> rightStr = values[0]->getLiteral();
 
-    TTObject *appendedObj = TTLiteral::createStringLiteral(thisStr->length + rightStr->length - 1);
+    RefPtr<TTObject> appendedObj = TTLiteral::createStringLiteral(thisStr->length + rightStr->length - 1);
 
     uint8_t *destStr = appendedObj->getLiteral()->data;
     uint8_t *left = thisStr->data;
@@ -152,18 +152,18 @@ TTObject *BuiltinStringAppend::invoke(TTObject *dest, std::vector<std::string> &
     return appendedObj;
 }
 
-TTObject *BuiltinStringLength::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringLength::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
-    TTLiteral *thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
 
-    TTObject *res = TTLiteral::createIntegerLiteral(thisStr->length - 1);
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(thisStr->length - 1);
 
     return res;
 }
 
-TTObject *BuiltinStringToString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinStringToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     return dest;
 }

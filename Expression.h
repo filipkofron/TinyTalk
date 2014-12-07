@@ -124,19 +124,19 @@
 
 namespace Expression
 {
-    TTObject *createSimpleMessage(TTObject *destExpr, TTLiteral *name);
-    TTObject *createMultipleMessage(TTObject *destExpr, TTLiteral *fullName, TTLiteral *nameArray, TTLiteral *valueArray);
-    TTObject *createSymbolValue(TTLiteral *name);
-    TTObject *createAssignment(TTLiteral *name, TTObject *rightExpr);
-    TTObject *createLiteralValue(TTLiteral *value);
-    TTObject *createParenthesis(TTObject *innerExpr);
-    TTObject *createBlock(TTLiteral *nameArray, TTLiteral *fullName, TTObject *expr, TTLiteral *nativeName);
-    TTObject *createNaiveBlock(TTObject *expr);
-    TTObject *createChained(TTObject *currExpr, TTObject *nextExpr);
-    TTObject *createCreateVariables(TTLiteral *varNames);
-    TTObject *createArray(TTLiteral *expressions);
+    RefPtr<TTObject> createSimpleMessage(RefPtr<TTObject> destExpr, RefPtr<TTLiteral> name);
+    RefPtr<TTObject> createMultipleMessage(RefPtr<TTObject> destExpr, RefPtr<TTLiteral> fullName, RefPtr<TTLiteral> nameArray, RefPtr<TTLiteral> valueArray);
+    RefPtr<TTObject> createSymbolValue(RefPtr<TTLiteral> name);
+    RefPtr<TTObject> createAssignment(RefPtr<TTLiteral> name, RefPtr<TTObject> rightExpr);
+    RefPtr<TTObject> createLiteralValue(RefPtr<TTLiteral> value);
+    RefPtr<TTObject> createParenthesis(RefPtr<TTObject> innerExpr);
+    RefPtr<TTObject> createBlock(RefPtr<TTLiteral> nameArray, RefPtr<TTLiteral> fullName, RefPtr<TTObject> expr, RefPtr<TTLiteral> nativeName);
+    RefPtr<TTObject> createNaiveBlock(RefPtr<TTObject> expr);
+    RefPtr<TTObject> createChained(RefPtr<TTObject> currExpr, RefPtr<TTObject> nextExpr);
+    RefPtr<TTObject> createCreateVariables(RefPtr<TTLiteral> varNames);
+    RefPtr<TTObject> createArray(RefPtr<TTLiteral> expressions);
 
-    const char *getTypeInfo(TTObject *expr);
+    const char *getTypeInfo(RefPtr<TTObject> expr);
 }
 
 #endif

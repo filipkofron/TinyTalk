@@ -10,21 +10,21 @@ class BytecodeGen;
 class BytecodeGen
 {
 private:
-    void putTTObj(TTObject *obj, std::vector<uint8_t> &byteCode);
+    void putTTObj(RefPtr<TTObject> obj, std::vector<uint8_t> &byteCode);
     void putInstr(void (*instr)(BytecodeInterpreter &bi), std::vector<uint8_t> &byteCode);
-    void genSymbolVal(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genSimpleMessage(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genAssign(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genMultipleMessage(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genCreateVar(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genBlock(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genChained(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genLiteralValue(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genParenthesis(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void genArray(TTObject *expr, std::vector<uint8_t> &byteCode);
-    void gen(TTObject *expr, std::vector<uint8_t> &byteCode);
+    void genSymbolVal(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genSimpleMessage(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genAssign(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genMultipleMessage(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genCreateVar(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genBlock(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genChained(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genLiteralValue(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genParenthesis(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void genArray(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
+    void gen(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
 public:
-    TTObject *generate(TTObject *expression);
+    RefPtr<TTObject> generate(RefPtr<TTObject> expression);
 };
 
 #endif

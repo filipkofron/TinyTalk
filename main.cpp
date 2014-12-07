@@ -16,9 +16,9 @@ int main()
     std::cout << ">> Written by Filip Kofron" << std::endl;
     MemAllocator::initializeDefaultAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
 
-    std::cout << std::endl;
-    std::cout << std::endl;
 
+    std::cout << std::endl;
+    std::cout << std::endl;
     Interpreter interpreter;
     interpreter.interpretCommandLine(std::cin);
     std::cout << std::endl;

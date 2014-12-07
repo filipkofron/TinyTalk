@@ -3,7 +3,7 @@
 #include "Runtime.h"
 #include <iostream>
 
-TTObject *BuiltinIntegerAdd::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerAdd::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -11,13 +11,13 @@ TTObject *BuiltinIntegerAdd::invoke(TTObject *dest, std::vector<std::string> &ar
 
     BUILTIN_CHECK_INTEGER(0);
 
-    TTObject *res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             + *((int32_t *) values[0]->getLiteral()->data));
 
     return res;
 }
 
-TTObject *BuiltinIntegerMinus::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerMinus::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -25,12 +25,12 @@ TTObject *BuiltinIntegerMinus::invoke(TTObject *dest, std::vector<std::string> &
 
     BUILTIN_CHECK_INTEGER(0);
 
-    TTObject *res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             - *((int32_t *) values[0]->getLiteral()->data));
     return res;
 }
 
-TTObject *BuiltinIntegerMul::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerMul::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -38,13 +38,13 @@ TTObject *BuiltinIntegerMul::invoke(TTObject *dest, std::vector<std::string> &ar
 
     BUILTIN_CHECK_INTEGER(0);
 
-    TTObject *res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             * *((int32_t *) values[0]->getLiteral()->data));
 
     return res;
 }
 
-TTObject *BuiltinIntegerDiv::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerDiv::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -58,13 +58,13 @@ TTObject *BuiltinIntegerDiv::invoke(TTObject *dest, std::vector<std::string> &ar
         throw std::exception();
     }
 
-    TTObject *res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             / *((int32_t *) values[0]->getLiteral()->data));
 
     return res;
 }
 
-TTObject *BuiltinIntegerMod::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerMod::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -78,24 +78,24 @@ TTObject *BuiltinIntegerMod::invoke(TTObject *dest, std::vector<std::string> &ar
         throw std::exception();
     }
 
-    TTObject *res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
             % *((int32_t *) values[0]->getLiteral()->data));
 
     return res;
 }
 
-TTObject *BuiltinIntegerToString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
     std::string val = std::to_string(*((int32_t *) dest->getLiteral()->data));
 
-    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(val.c_str()));
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(val.c_str()));
 
     return res;
 }
 
-TTObject *BuiltinIntegerLessThan::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerLessThan::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -112,7 +112,7 @@ TTObject *BuiltinIntegerLessThan::invoke(TTObject *dest, std::vector<std::string
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-TTObject *BuiltinIntegerGreaterThan::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerGreaterThan::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -129,7 +129,7 @@ TTObject *BuiltinIntegerGreaterThan::invoke(TTObject *dest, std::vector<std::str
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-TTObject *BuiltinIntegerEquals::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -146,7 +146,7 @@ TTObject *BuiltinIntegerEquals::invoke(TTObject *dest, std::vector<std::string> 
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-TTObject *BuiltinIntegerLessThanOrEqual::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerLessThanOrEqual::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -163,7 +163,7 @@ TTObject *BuiltinIntegerLessThanOrEqual::invoke(TTObject *dest, std::vector<std:
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-TTObject *BuiltinIntegerGreaterThanOrEqual::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerGreaterThanOrEqual::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -180,7 +180,7 @@ TTObject *BuiltinIntegerGreaterThanOrEqual::invoke(TTObject *dest, std::vector<s
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-TTObject *BuiltinIntegerFromString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -195,7 +195,7 @@ TTObject *BuiltinIntegerFromString::invoke(TTObject *dest, std::vector<std::stri
         throw std::exception();
     }
 
-    TTObject *res = TTLiteral::createIntegerLiteral(a);
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(a);
 
     return res;
 }

@@ -3,7 +3,7 @@
 #include "Runtime.h"
 #include "Evaluator.h"
 
-TTObject *BuiltinObjectAlloc::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectAlloc::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
 #ifdef DEBUG
     std::cout << "[Builtin]: Allocating a new object." << std::endl;
@@ -12,7 +12,7 @@ TTObject *BuiltinObjectAlloc::invoke(TTObject *dest, std::vector<std::string> &a
     return TTObject::createObject(TT_OBJECT);
 }
 
-TTObject *BuiltinObjectAddField::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectAddField::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 2 || values.size() != 2)
     {
@@ -24,7 +24,7 @@ TTObject *BuiltinObjectAddField::invoke(TTObject *dest, std::vector<std::string>
     std::cout << "[Builtin]: Adding field '" << name << "'." << std::endl;
 #endif
 
-    TTObject *object = values[0];
+    RefPtr<TTObject> object = values[0];
 #ifdef DEBUG
     std::cout << "[Builtin]: Before add: " << object << std::endl;
 #endif
@@ -38,7 +38,7 @@ TTObject *BuiltinObjectAddField::invoke(TTObject *dest, std::vector<std::string>
     return dest;
 }
 
-TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectGetter::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 2 || values.size() != 2)
     {
@@ -58,7 +58,7 @@ TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &
     std::cout << "[Builtin]: Getting field '" << name << "'." << std::endl;
 #endif
 
-    TTObject *object = values[0];
+    RefPtr<TTObject> object = values[0];
 #ifdef DEBUG
     std::cout << "[Builtin]: Checking field in dest = " << object << std::endl;
 #endif
@@ -75,7 +75,7 @@ TTObject *BuiltinObjectGetter::invoke(TTObject *dest, std::vector<std::string> &
     return object->getField(TO_TT_STR(name.c_str()));
 }
 
-TTObject *BuiltinObjectSetter::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectSetter::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 3 || values.size() != 3)
     {
@@ -101,7 +101,7 @@ TTObject *BuiltinObjectSetter::invoke(TTObject *dest, std::vector<std::string> &
     std::cout << "[Builtin]: Setting field '" << name << "'." << std::endl;
 #endif
 
-    TTObject *object = values[0];
+    RefPtr<TTObject> object = values[0];
 #ifdef DEBUG
     std::cout << "[Builtin]: Checking field in dest = " << object << std::endl;
 #endif
@@ -120,7 +120,7 @@ TTObject *BuiltinObjectSetter::invoke(TTObject *dest, std::vector<std::string> &
     return dest;
 }
 
-TTObject *BuiltinObjectDebugPrint::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectDebugPrint::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -135,7 +135,7 @@ TTObject *BuiltinObjectDebugPrint::invoke(TTObject *dest, std::vector<std::strin
     return dest;
 }
 
-TTObject *BuiltinObjectDebugPrintRec::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectDebugPrintRec::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -150,7 +150,7 @@ TTObject *BuiltinObjectDebugPrintRec::invoke(TTObject *dest, std::vector<std::st
     return dest;
 }
 
-TTObject *BuiltinObjectDebugPrintString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -172,7 +172,7 @@ TTObject *BuiltinObjectDebugPrintString::invoke(TTObject *dest, std::vector<std:
     return dest;
 }
 
-TTObject *BuiltinObjectClone::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectClone::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -180,13 +180,13 @@ TTObject *BuiltinObjectClone::invoke(TTObject *dest, std::vector<std::string> &a
         throw std::exception();
     }
 
-    TTObject *cloned = values[0];
-    TTObject *res = TTObject::clone(cloned);
+    RefPtr<TTObject> cloned = values[0];
+    RefPtr<TTObject> res = TTObject::clone(cloned);
 
     return  res;
 }
 
-TTObject *BuiltinObjectNew::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectNew::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 0)
     {
@@ -194,13 +194,13 @@ TTObject *BuiltinObjectNew::invoke(TTObject *dest, std::vector<std::string> &arg
         throw std::exception();
     }
 
-    TTObject *res = TTObject::createObject(TT_OBJECT);
+    RefPtr<TTObject> res = TTObject::createObject(TT_OBJECT);
     res->setField(TO_TT_STR("parent"), dest);
 
     return res;
 }
 
-TTObject *BuiltinObjectToString::invoke(TTObject *dest, std::vector<std::string> &argNames, std::vector<TTObject *> values)
+RefPtr<TTObject> BuiltinObjectToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 0)
     {
@@ -210,7 +210,7 @@ TTObject *BuiltinObjectToString::invoke(TTObject *dest, std::vector<std::string>
 
     const char *resStr = "Object";
 
-    if(!dest)
+    if(!&dest)
     {
         resStr = "NULL";
     }
@@ -220,7 +220,7 @@ TTObject *BuiltinObjectToString::invoke(TTObject *dest, std::vector<std::string>
        return dest->getLiteral()->onMessage(dest, argNames[0], argNames, values);
     }
 */
-    TTObject *res = TTLiteral::createStringLiteral(TO_TT_STR(resStr));
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(resStr));
 
     return res;
 }

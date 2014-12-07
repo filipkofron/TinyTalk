@@ -34,19 +34,19 @@ class BytecodeInterpreter
 private:
     Stack stack;
 
-    void setupStackFrame(TTObject *block, TTObject *parentEnv, TTObject *thiz);
+    void setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObject> parentEnv, RefPtr<TTObject> thiz);
     void bindStackFrame();
 private:
-    TTObject *env;
+    RefPtr<TTObject> env;
     uint8_t *byteCode;
-    TTObject *stackFrame;
-    TTObject *nil;
+    RefPtr<TTObject> stackFrame;
+    RefPtr<TTObject> nil;
     uint32_t pc;
     uint32_t pcMax;
 public:
     BytecodeInterpreter();
     ~BytecodeInterpreter();
-    TTObject *interpret(TTObject *block, TTObject *env, TTObject *thiz);
+    RefPtr<TTObject> interpret(RefPtr<TTObject> block, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
 };
 
 #endif

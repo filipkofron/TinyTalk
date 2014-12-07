@@ -1,21 +1,22 @@
+#include "TTLiteral.h"
 #include "Evaluator.h"
 #include "Expression.h"
 #include "common.h"
 #include "Runtime.h"
 #include <cstring>
 
-TTObject *Evaluator::executeSimpleExpression(TTObject *expression, TTObject *dest, std::string &msgName, TTObject *thiz)
+RefPtr<TTObject> Evaluator::executeSimpleExpression(RefPtr<TTObject> expression, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> thiz)
 {
 #ifdef DEBUG
     std::cout << "(executeSimpleExpression)" << std::endl;
 #endif
 
-    TTObject *env = TTObject::createObject(TT_ENV);
-    TTObject *blockExpr = expression->getField(TO_TT_STR("blockExpr"));
-    TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
-    TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
+    RefPtr<TTObject> env = TTObject::createObject(TT_ENV);
+    RefPtr<TTObject> blockExpr = expression->getField(TO_TT_STR("blockExpr"));
+    RefPtr<TTObject> blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
+    RefPtr<TTObject> blockEnv = expression->getField(TO_TT_STR("blockEnv"));
 
-    if(thiz)
+    if(&thiz)
     {
 #ifdef DEBUG
         std::cout << "(executeSimpleExpression) has this: " << thiz << std::endl;
@@ -27,7 +28,7 @@ TTObject *Evaluator::executeSimpleExpression(TTObject *expression, TTObject *des
 #endif
     env->addField(TO_TT_STR("parentEnv"), blockEnv);
 
-    if(blockNativeName)
+    if(&blockNativeName)
     {
         std::string nativeName = (char *) blockNativeName->getLiteral()->data;
 
@@ -37,15 +38,15 @@ TTObject *Evaluator::executeSimpleExpression(TTObject *expression, TTObject *des
     return evaluate(blockExpr, env);
 }
 
-TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateSimpleMessage(RefPtr<TTObject> simpleMessage, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateSimpleMessage)" << std::endl;
 #endif
 
     std::string msgName = (char *) simpleMessage->getField(TO_TT_STR("msgName"))->getLiteral()->data;
-    TTObject *destExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
-    TTObject *destValue = evaluate(destExpr, env);
+    RefPtr<TTObject> destExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
+    RefPtr<TTObject> destValue = evaluate(destExpr, env);
 
 #ifdef DEBUG
     std::cout << "(evaluateSimpleMessage) destValue:" << std::endl;
@@ -53,7 +54,7 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
     std::cout << std::endl;
 #endif
 
-    if(!destValue)
+    if(!&destValue)
     {
         std::cerr << "(evaluateSimpleMessage): destValue is NULL!" << std::endl;
         throw std::exception();
@@ -61,7 +62,7 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
 
     TTObject *thiz = NULL;
 
-    TTObject *expr = Runtime::findBlock(TO_TT_STR(msgName.c_str()), destValue, env, &thiz);
+    RefPtr<TTObject> expr = Runtime::findBlock(TO_TT_STR(msgName.c_str()), &destValue, &env, &thiz);
 
     return executeSimpleExpression(expr, destValue, msgName, thiz);
 }
@@ -74,22 +75,22 @@ TTObject *Evaluator::evaluateSimpleMessage(TTObject *simpleMessage, TTObject *en
 * in the this, which corresponds to an object the message
 * is currently being answered by.
 */
-TTObject *Evaluator::evaluateSymbolValue(TTObject *symbolValue, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateSymbolValue(RefPtr<TTObject> symbolValue, RefPtr<TTObject> env)
 {
     std::string name = (char *) symbolValue->getField(TO_TT_STR("symbolName"))->getLiteral()->data;
 #ifdef DEBUG
     std::cout << "(evaluateSymbolValue): of name '" << name << "'" << std::endl;
 #endif
 
-    TTObject *nextEnv = env;
-    TTObject *result = NULL;
+    RefPtr<TTObject> nextEnv = env;
+    RefPtr<TTObject> result = NULL;
 
     do
     {
-        result = Runtime::findSymbol(TO_TT_STR(name.c_str()), nextEnv, &nextEnv);
-    } while(!result && nextEnv);
+        result = Runtime::findSymbol(TO_TT_STR(name.c_str()), nextEnv, nextEnv);
+    } while(!&result && &nextEnv);
 
-    if(result)
+    if(&result)
     {
         return result;
     }
@@ -107,7 +108,7 @@ TTObject *Evaluator::evaluateSymbolValue(TTObject *symbolValue, TTObject *env)
     throw std::exception();
 }
 
-TTObject *Evaluator::evaluateBlock(TTObject *block, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateBlock(RefPtr<TTObject> block, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateBlock)" << std::endl;
@@ -116,7 +117,7 @@ TTObject *Evaluator::evaluateBlock(TTObject *block, TTObject *env)
     std::cout << std::endl;
 #endif
 
-    TTObject *newBlock = TTObject::clone(block);
+    RefPtr<TTObject> newBlock = TTObject::clone(block);
 
     bool success = newBlock->addField(TO_TT_STR("blockEnv"), env);
     if(!success)
@@ -139,19 +140,19 @@ TTObject *Evaluator::evaluateBlock(TTObject *block, TTObject *env)
     return block;*/
 }
 
-TTObject *Evaluator::evaluateParenthesis(TTObject *parenthesis, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateParenthesis(RefPtr<TTObject> parenthesis, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateParenthesis)" << std::endl;
 #endif
 
-    TTObject *innerExpr = parenthesis->getField(TO_TT_STR("innerExpr"));
-    TTObject *innerResult = evaluate(innerExpr, env);
+    RefPtr<TTObject> innerExpr = parenthesis->getField(TO_TT_STR("innerExpr"));
+    RefPtr<TTObject> innerResult = evaluate(innerExpr, env);
 
     return innerResult;
 }
 
-TTObject *Evaluator::evaluateAssign(TTObject *expr, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateAssign(RefPtr<TTObject> expr, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateAssign)" << std::endl;
@@ -161,7 +162,7 @@ TTObject *Evaluator::evaluateAssign(TTObject *expr, TTObject *env)
 
     if (env->hasField(TO_TT_STR(name.c_str())))
     {
-        TTObject *assignedExpr = evaluate(expr->getField(TO_TT_STR("assignExpression")), env);
+        RefPtr<TTObject> assignedExpr = evaluate(expr->getField(TO_TT_STR("assignExpression")), env);
         env->setField(TO_TT_STR(name.c_str()), assignedExpr);
         return assignedExpr;
     }
@@ -172,8 +173,8 @@ TTObject *Evaluator::evaluateAssign(TTObject *expr, TTObject *env)
 #endif
     }
 
-    TTObject *thiz = env->getField(TO_TT_STR("this"));
-    if (!thiz)
+    RefPtr<TTObject> thiz = env->getField(TO_TT_STR("this"));
+    if (!&thiz)
     {
         std::cout << "(evaluateAssign): this is NULL" << std::endl;
     }
@@ -181,7 +182,7 @@ TTObject *Evaluator::evaluateAssign(TTObject *expr, TTObject *env)
     {
         if (thiz->hasField(TO_TT_STR(name.c_str())))
         {
-            TTObject *assignedExpr = evaluate(expr->getField(TO_TT_STR("assignExpression")), env);
+            RefPtr<TTObject> assignedExpr = evaluate(expr->getField(TO_TT_STR("assignExpression")), env);
             thiz->setField(TO_TT_STR(name.c_str()), assignedExpr);
             return assignedExpr;
         }
@@ -193,8 +194,8 @@ TTObject *Evaluator::evaluateAssign(TTObject *expr, TTObject *env)
         }
     }
 
-    TTObject *parent = env->getField(TO_TT_STR("parentEnv"));
-    if (parent && parent->type == TT_ENV)
+    RefPtr<TTObject> parent = env->getField(TO_TT_STR("parentEnv"));
+    if (&parent && parent->type == TT_ENV)
     {
 #ifdef DEBUG
         std::cout << "(evaluateAssign): trying parent env" << std::endl;
@@ -206,22 +207,22 @@ TTObject *Evaluator::evaluateAssign(TTObject *expr, TTObject *env)
     throw std::exception();
 }
 
-TTObject *Evaluator::evaluateCreateVariables(TTObject *expr, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateCreateVariables(RefPtr<TTObject> expr, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateCreateVariables)" << std::endl;
 #endif
 
-    TTObject *varNames = expr->getField(TO_TT_STR("varNames"));
-    TTLiteral *varNamesLit = varNames->getLiteral();
+    RefPtr<TTObject> varNames = expr->getField(TO_TT_STR("varNames"));
+    RefPtr<TTLiteral> varNamesLit = varNames->getLiteral();
 
-    if(varNamesLit)
+    if(&varNamesLit)
     {
         uint32_t len = varNamesLit->length / sizeof(TTObject *);
 
         for(uint32_t i = 0; i < len; i++)
         {
-            TTObject *lit = ((TTObject **) varNamesLit->data)[i];
+            RefPtr<TTObject> lit = ((TTObject **) varNamesLit->data)[i];
             std::string name = (char *) lit->getLiteral()->data;
             env->addField(TO_TT_STR(name.c_str()), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
         }
@@ -234,18 +235,18 @@ TTObject *Evaluator::evaluateCreateVariables(TTObject *expr, TTObject *env)
     return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
 }
 
-TTObject *Evaluator::evaluateChained(TTObject *expr, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateChained(RefPtr<TTObject> expr, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateChained)" << std::endl;
 #endif
 
-    TTObject *currExpr = expr->getField(TO_TT_STR("currExpr"));
-    TTObject *nextExpr = expr->getField(TO_TT_STR("nextExpr"));
+    RefPtr<TTObject> currExpr = expr->getField(TO_TT_STR("currExpr"));
+    RefPtr<TTObject> nextExpr = expr->getField(TO_TT_STR("nextExpr"));
 
-    TTObject *currResult = evaluate(currExpr, env);
+    RefPtr<TTObject> currResult = evaluate(currExpr, env);
 
-    if(!nextExpr)
+    if(!&nextExpr)
     {
         return currResult;
     }
@@ -257,17 +258,17 @@ TTObject *Evaluator::evaluateChained(TTObject *expr, TTObject *env)
     return evaluate(nextExpr, env);
 }
 
-TTObject *Evaluator::evaluateLiteralValue(TTObject *expr, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateLiteralValue(RefPtr<TTObject> expr, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateLiteralValue)" << std::endl;
 #endif
 
-    TTObject *lit = expr->getField(TO_TT_STR("literalValue"));
+    RefPtr<TTObject> lit = expr->getField(TO_TT_STR("literalValue"));
     return lit;
 }
 
-TTObject *Evaluator::executeMultipleExpression(TTObject *expression, TTObject *dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<TTObject *> values, TTObject *thiz)
+RefPtr<TTObject> Evaluator::executeMultipleExpression(RefPtr<TTObject> expression, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> thiz)
 {
 #ifdef DEBUG
     std::cout << "(executeMultipleExpression)" << std::endl;
@@ -275,12 +276,12 @@ TTObject *Evaluator::executeMultipleExpression(TTObject *expression, TTObject *d
 
     // TODO: Allocation of env wastes memory
 
-    TTObject *env = TTObject::createObject(TT_ENV);
-    TTObject *blockExpr = expression->getField(TO_TT_STR("blockExpr"));
-    TTObject *blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
-    TTObject *blockEnv = expression->getField(TO_TT_STR("blockEnv"));
+    RefPtr<TTObject> env = TTObject::createObject(TT_ENV);
+    RefPtr<TTObject> blockExpr = expression->getField(TO_TT_STR("blockExpr"));
+    RefPtr<TTObject> blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
+    RefPtr<TTObject> blockEnv = expression->getField(TO_TT_STR("blockEnv"));
 
-    if(thiz)
+    if(&thiz)
     {
 #ifdef DEBUG
         std::cout << "(executeMultipleExpression) has this: " << thiz << std::endl;
@@ -292,7 +293,7 @@ TTObject *Evaluator::executeMultipleExpression(TTObject *expression, TTObject *d
 #endif
     env->addField(TO_TT_STR("parentEnv"), blockEnv);
 
-    if(blockNativeName)
+    if(&blockNativeName)
     {
         std::string nativeName = (char *) blockNativeName->getLiteral()->data;
 
@@ -307,16 +308,16 @@ TTObject *Evaluator::executeMultipleExpression(TTObject *expression, TTObject *d
     return evaluate(blockExpr, env);
 }
 
-TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateMultipleMessage(RefPtr<TTObject> simpleMessage, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateMultipleMessage)" << std::endl;
 #endif
 
-    TTObject *msgDestExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
-    TTObject *msgFullName = simpleMessage->getField(TO_TT_STR("msgFullName"));
-    TTObject *msgNameArray = simpleMessage->getField(TO_TT_STR("msgNameArray"));
-    TTObject *msgValueArray = simpleMessage->getField(TO_TT_STR("msgValueArray"));
+    RefPtr<TTObject> msgDestExpr = simpleMessage->getField(TO_TT_STR("msgDestExpr"));
+    RefPtr<TTObject> msgFullName = simpleMessage->getField(TO_TT_STR("msgFullName"));
+    RefPtr<TTObject> msgNameArray = simpleMessage->getField(TO_TT_STR("msgNameArray"));
+    RefPtr<TTObject> msgValueArray = simpleMessage->getField(TO_TT_STR("msgValueArray"));
 
 #ifdef DEBUG
     std::cout << "(evaluateMultipleMessage) fullname: " << (const char *) msgFullName->getLiteral()->data << std::endl;
@@ -324,8 +325,8 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
 
     std::string fullName = (char *) msgFullName->getLiteral()->data;
     std::vector<std::string> names;
-    std::vector<TTObject *> valuesExpressions;
-    std::vector<TTObject *> values;
+    std::vector<RefPtr<TTObject> > valuesExpressions;
+    std::vector<RefPtr<TTObject> > values;
 
     bool replace = false;
     if(fullName == "value:")
@@ -359,13 +360,13 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
 
     for(uint32_t i = 0; i < len; i++)
     {
-        TTObject *value = evaluate(valuesExpressions[i], env);
+        RefPtr<TTObject> value = evaluate(valuesExpressions[i], env);
         values.push_back(value);
     }
 
-    TTObject *msgDestValue = evaluate(msgDestExpr, env);
+    RefPtr<TTObject> msgDestValue = evaluate(msgDestExpr, env);
 
-    if(!msgDestValue)
+    if(!&msgDestValue)
     {
         std::cerr << "(evaluateMultipleMessage): msgDestValue is NULL!" << std::endl;
         throw std::exception();
@@ -377,7 +378,7 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
 
     TTObject *thiz = NULL;
 
-    TTObject *expr = Runtime::findBlock(TO_TT_STR(fullName.c_str()), msgDestValue, env, &thiz);
+    RefPtr<TTObject> expr = Runtime::findBlock(TO_TT_STR(fullName.c_str()), &msgDestValue, &env, &thiz);
 
     if(replace)
     {
@@ -387,26 +388,26 @@ TTObject *Evaluator::evaluateMultipleMessage(TTObject *simpleMessage, TTObject *
     return executeMultipleExpression(expr, msgDestValue, fullName, names, values, thiz); // call named lambda expression
 }
 
-TTObject *Evaluator::evaluateArray(TTObject *expr, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluateArray(RefPtr<TTObject> expr, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluateArray): expr: " << expr << std::endl;
 #endif
-    TTObject *expressions = expr->getField(TO_TT_STR("expressions"));
-    TTLiteral *expressionsLit = expressions->getLiteral();
+    RefPtr<TTObject> expressions = expr->getField(TO_TT_STR("expressions"));
+    RefPtr<TTLiteral> expressionsLit = expressions->getLiteral();
     uint32_t size = (uint32_t) (expressionsLit->length / sizeof(TTObject *));
 
 #ifdef DEBUG
     std::cout << "(evaluateArray): size: " << size << std::endl;
 #endif
 
-    TTObject *array = TTLiteral::createObjectArray(size);
+    RefPtr<TTObject> array = TTLiteral::createObjectArray(size);
 
     for(uint32_t i = 0; i < size; i++)
     {
-        TTObject *exprItem = ((TTObject **) expressionsLit->data)[i];
-        TTObject *val = NULL;
-        if(exprItem)
+        RefPtr<TTObject> exprItem = ((TTObject **) expressionsLit->data)[i];
+        RefPtr<TTObject> val = NULL;
+        if(&exprItem)
         {
             val = evaluate(exprItem, env);
         }
@@ -416,21 +417,21 @@ TTObject *Evaluator::evaluateArray(TTObject *expr, TTObject *env)
         }
 
 
-        ((TTObject **) array->getLiteral()->data)[i] = val;
+        ((TTObject **) array->getLiteral()->data)[i] = &val;
     }
 
     return array;
 
 }
 
-TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
+RefPtr<TTObject> Evaluator::evaluate(RefPtr<TTObject> expression, RefPtr<TTObject> env)
 {
 #ifdef DEBUG
     std::cout << "(evaluate)" << std::endl;
 #endif
-    TTObject *res = NULL;
+    RefPtr<TTObject> res = NULL;
 
-    if(!expression)
+    if(!&expression)
     {
         return res;
     }
@@ -480,14 +481,14 @@ TTObject *Evaluator::evaluate(TTObject *expression, TTObject *env)
     return res;
 }
 
-TTObject *Evaluator::sendSimpleMessage(TTObject *object, std::string &name)
+RefPtr<TTObject> Evaluator::sendSimpleMessage(RefPtr<TTObject> object, std::string &name)
 {
 #ifdef DEBUG
     std::cout << "(sendSimpleMessage)" << std::endl;
     std::cout << "(sendSimpleMessage) name: " << name << std::endl;
 #endif
 
-    TTObject *next = object;
+    TTObject *next = &object;
     TTObject *resExpr = NULL;
     do
     {
