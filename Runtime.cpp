@@ -7,6 +7,9 @@ RefPtrMap Runtime::refPtrMap;
 BytecodeGen Runtime::bytecodeGen;
 RefPtr<TTObject> Runtime::globalEnvironment = NULL;
 
+std::set<BytecodeInterpreter *> Runtime::interpretersAlive;
+
+bool Runtime::running = false;
 
 RefPtr<TTObject> Runtime::findSymbolValueInThis(RefPtr<TTObject> thiz, const uint8_t *name, RefPtr<TTObject> &nextThis)
 {
@@ -299,6 +302,12 @@ RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, 
 
 void Runtime::runCopyGC()
 {
+    if(running)
+    {
+        std::cerr << "GC ERROR: Out of memory! - cannon free more memory" << std::endl;
+        throw std::exception();
+    }
+    running = true;
     MemAllocator *newAllocator = new MemAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
 
     std::cout << "GC: Starting copying garbage collection." << std::endl;
@@ -307,17 +316,60 @@ void Runtime::runCopyGC()
      */
 
     std::cout << "GC: Referenced objects from runtime stack:" << std::endl;
-    for(Ptr &ptr : refPtrMap.collectRoots())
+
+    uint32_t ci = 0;
+
+    std::vector<Ptr> ptrs = refPtrMap.collectRoots();
+
+#ifdef DEBUG
+    for(uint32_t i = 0; i < ptrs.size(); i++)
     {
-        std::cout << "ptr: " << (unsigned long) ptr.ptr << " object: " << ptr.object << std::endl;
+
+        std::cout << "would copy root: " << ci << "/" << (ptrs.size() - 1) << std::endl;
+        std::cout << "ptrs[i].ptr: " << (unsigned long long ) ptrs[i].ptr << std::endl;
+    }
+#endif
+
+    for(uint32_t i = 0; i < ptrs.size(); i++)
+    {
+#ifdef DEBUG
+        std::cout << "Copying root: " << ci << "/" << (ptrs.size() - 1) << std::endl;
+#endif
+        if(ptrs[i].object)
+        {
+            TTObject *obj = (TTObject *) ptrs[i].ptr;
+            TTObject::_gc_COPY_copy(&obj, MemAllocator::getCurrent(), newAllocator);
+        }
+        else
+        {
+            TTLiteral *lit = (TTLiteral *) ptrs[i].ptr;
+            TTLiteral::_gc_COPY_copy(&lit, MemAllocator::getCurrent(), newAllocator);
+        }
+        ci++;
+    }
+
+    std::cout << "GC: finished stuff ========== " << std::endl;
+
+    refPtrMap.updateRoots();
+
+    for(auto inter : interpretersAlive)
+    {
+        inter->runGC(MemAllocator::getCurrent(), newAllocator);
+    }
+
+    for(auto inter : interpretersAlive)
+    {
+        inter->refreshAfterGC();
     }
 
     std::cout << "GC: Finished copying garbage collection." << std::endl;
 
-    std::cout << "GC: Debug exit." << std::endl;
+   // std::cout << "GC: Debug exit." << std::endl;
 
-    exit(0);
+   // exit(0);
 
     MemAllocator::cleanupDefaultAllocator();
     MemAllocator::setDefaultAllocator(newAllocator);
+
+    running = false;
 }

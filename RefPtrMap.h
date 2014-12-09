@@ -4,7 +4,7 @@
 class RefPtrMap;
 
 #include <cstdint>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include "Ptr.h"
 #include "RefPtr.h"
@@ -12,7 +12,7 @@ class RefPtrMap;
 class RefPtrMap
 {
 private:
-    std::map<RefPtrBase *, Ptr> refs;
+    std::unordered_map<RefPtrBase *, Ptr> refs;
 public:
     RefPtrMap();
 

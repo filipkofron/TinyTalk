@@ -18,6 +18,7 @@ struct TTObject;
 #define TT_LITERAL 0x04
 #define TT_ENV 0x08
 #define TT_STACK_FRAME 0x10
+#define TT_MOVED_OBJECT 0x20
 
 #define IS_SOME_TYPE(a, b) (!(!((a)->type == b)))
 
@@ -27,6 +28,7 @@ struct TTObject;
 #define IS_LITERAL(a) IS_SOME_TYPE(a, TT_LITERAL)
 #define IS_ENV(a) IS_SOME_TYPE(a, TT_ENV)
 #define IS_STACK_FRAME(a) IS_SOME_TYPE(a, TT_STACK_FRAME)
+#define IS_MOVED_OBJECT(a) IS_SOME_TYPE(a, TT_MOVED_OBJECT)
 
 /**
 * TTObject is any object within this VM, that can be directly interfaced from
@@ -46,6 +48,8 @@ struct TTObject
         TTObject *object;
     };
 
+    Field *fields; // BEWARE, upon GC this is used as pointer to new object
+
     uint8_t type;
 
     /**
@@ -55,14 +59,13 @@ struct TTObject
     */
     uint8_t flags;
 
-    Field *fields;
     uint32_t fieldCount;
     uint32_t fieldCapacity;
 
     /**
     * For future stuff (GC) only!
     */
-    TTObject *_gc_COPY_copy(MemAllocator *allocator);
+    static void _gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator *newMem);
 
     /**
     * Objects must only be created using these functions.
@@ -123,6 +126,6 @@ struct TTObject
 /**
 * Outputs rich object info.
 */
-std::ostream &operator << (std::ostream &os, RefPtr<TTObject> object);
+std::ostream &operator << (std::ostream &os, RefPtr<TTObject> &object);
 
 #endif

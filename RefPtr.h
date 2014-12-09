@@ -19,7 +19,8 @@ protected:
     RefPtrBase(const RefPtrBase &orig);
     ~RefPtrBase();
 
-    void setBasePtr(uintptr_t ptr);
+    //void _debug_check();
+    void setBasePtr(uintptr_t ptr, bool object);
 public:
     RefPtrBase &operator = (const RefPtrBase& orig);
     friend class RefPtrMap;
@@ -60,7 +61,7 @@ public:
 
     void setPtr(T *ptr)
     {
-        setBasePtr((uintptr_t) ptr);
+        setBasePtr((uintptr_t) ptr, isObject(ptr));
     }
 
     T *getPtr()

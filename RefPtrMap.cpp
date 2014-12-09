@@ -4,9 +4,9 @@ RefPtrMap::RefPtrMap()
 {
     std::cout << "RefPtrMap constructor" << std::endl;
 }
-
 void RefPtrMap::reg(RefPtrBase *refPtr, bool object)
 {
+//    std::cout << "Insert: " << (unsigned long) refPtr->ptr << std::endl;
     refs.insert(std::make_pair(refPtr, Ptr(refPtr->ptr, object)));
 }
 
@@ -31,6 +31,9 @@ void RefPtrMap::updateRoots()
 {
     for(auto pair : refs)
     {
-        pair.first->ptr = *(uintptr_t *) pair.first->ptr;
+        if(MemAllocator::getCurrent()->isInside(pair.first->ptr))
+        {
+            pair.first->ptr = *(uintptr_t *) pair.first->ptr;
+        }
     }
 }

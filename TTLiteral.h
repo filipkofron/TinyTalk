@@ -12,15 +12,19 @@ struct TTLiteral;
 #define LITERAL_TYPE_INTEGER 0x01
 #define LITERAL_TYPE_OBJECT_ARRAY 0x02
 #define LITERAL_TYPE_BYTE_ARRAY 0x03
+#define LITERAL_TYPE_MOVED_LITERAL 0xFF
 // TODO: #define LITERAL_TYPE_BIG_INTEGER 0x03
 // TODO: #define LITERAL_TYPE_BYTE_CODE 0x04
 // TODO: #define LITERAL_TYPE_MACHINE_CODE 0x05
 
 struct TTLiteral
 {
-    uint8_t type;
+    uint8_t *data; // BEWARE, upon GC this is used as pointer to new object
     uint32_t length;
-    uint8_t *data;
+    uint8_t type;
+    uint8_t collectiblePtrs;
+
+    static void _gc_COPY_copy(TTLiteral **ptr, MemAllocator *oldMem, MemAllocator *newMem);
 
     static RefPtr<TTLiteral> copy(MemAllocator *allocator, RefPtr<TTLiteral> lit);
 

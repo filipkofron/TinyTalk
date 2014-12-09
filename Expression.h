@@ -136,7 +136,7 @@ namespace Expression
     RefPtr<TTObject> createCreateVariables(RefPtr<TTLiteral> varNames);
     RefPtr<TTObject> createArray(RefPtr<TTLiteral> expressions);
 
-    const char *getTypeInfo(RefPtr<TTObject> expr);
+    const char *getTypeInfo(TTObject *expr);
 }
 
 #endif

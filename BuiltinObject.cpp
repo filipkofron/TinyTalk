@@ -168,7 +168,6 @@ RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, st
 
     std::cout << "DBG: " << str << std::endl;
 
-
     return dest;
 }
 

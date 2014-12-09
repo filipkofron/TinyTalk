@@ -10,9 +10,6 @@ class Interpreter;
 class Interpreter
 {
 private:
-    BuiltinPool pool;
-
-
     void initialize();
     void setupObject();
     void setupLiterals();

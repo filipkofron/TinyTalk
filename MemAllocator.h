@@ -5,6 +5,8 @@ class MemAllocator;
 
 #include <cstdint>
 #include <cstdlib>
+#include <set>
+#include "common.h"
 #include "TTObject.h"
 #include "TTLiteral.h"
 
@@ -18,14 +20,15 @@ private:
     size_t top;
     static MemAllocator *defaultAllocator;
 
+    uint8_t *allocateString(const uint8_t *str);
+
 public:
     MemAllocator(size_t poolCapacity);
     ~MemAllocator();
 
-    inline bool isInside(intptr_t ptr);
+    bool isInside(uintptr_t ptr);
 
     uint8_t *allocate(size_t bytes);
-    uint8_t *allocateString(const uint8_t *str);
     uint8_t *cloneString(const uint8_t *str);
 
     TTObject *allocateObject();
@@ -34,6 +37,11 @@ public:
     static void initializeDefaultAllocator(size_t poolCapacity);
     static void setDefaultAllocator(MemAllocator *allocator);
     static void cleanupDefaultAllocator();
+
+    #ifdef DEBUG
+        std::set<uintptr_t> objects;
+        std::set<uintptr_t> literals;
+    #endif
 };
 
 #endif

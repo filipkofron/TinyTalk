@@ -1,27 +1,114 @@
 #include "TTObject.h"
 #include "Expression.h"
 #include "common.h"
+#include "cstdint"
 #include "BuiltinUtil.h"
+#include "Runtime.h"
 #include <cstring>
 
-TTObject *TTObject::_gc_COPY_copy(MemAllocator *allocator)
+void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator *newMem)
 {
-    TTObject *newObject = allocator->allocateObject();
-    memcpy(newObject, this, sizeof(*this));
+#ifdef DEBUG
+    std::cout << ">> TTObject::_gc_COPY_copy ptr: " << ((unsigned long) (uintptr_t) *ptr) << std::endl;
+#endif
+//#ifdef DEBUG
+//    if(*ptr == NULL)
+//    {
+//        std::cout << "NULL!" << std::endl;
+//        return;
+//    }
+//    if(oldMem->objects.find((uintptr_t) *ptr) == oldMem->objects.end() && newMem->objects.find((uintptr_t) *ptr) == newMem->objects.end())
+//    {
+//        std::cerr << "Address not known!!" << std::endl;
+//        KILL;
+//    }
+//#endif
 
-    // TODO: implement by the GC algo
+    if(newMem->isInside((uintptr_t) *ptr))
+    {
+#ifdef DEBUG
+        std::cout << "is new already" << std::endl;
+#endif
+        return;
+    }
 
-    return newObject;
+    if(!oldMem->isInside((uintptr_t) *ptr))
+    {
+#ifdef DEBUG
+        std::cout << "is also not in OLD ????????" << std::endl;
+#endif
+        return;
+    }
+
+    if(IS_MOVED_OBJECT(ptr[0]))
+    {
+#ifdef DEBUG
+        std::cout << "is moved already new addr: " << ((unsigned long) (uintptr_t) *ptr) << std::endl;
+#endif
+        *ptr = (TTObject *) *(uintptr_t *) ptr[0];
+        return;
+    }
+
+#ifdef DEBUG
+    std::cout << "Making copy of:";
+    ptr[0]->print(std::cout, 1, false);
+    std::cout << std::endl;
+#endif
+
+    TTObject *newObj = newMem->allocateObject();
+    memcpy(newObj, *ptr, sizeof(**ptr));
+    Field * _temp_GCfields = (Field *) newMem->allocate(sizeof(*newObj->fields) * newObj->fieldCapacity);
+    newObj->fields = _temp_GCfields;
+    memcpy(newObj->fields, ptr[0]->fields, sizeof(*newObj->fields) * newObj->fieldCapacity);
+
+    ptr[0]->type = TT_MOVED_OBJECT;
+    *(uintptr_t *) ptr[0] = (uintptr_t) newObj;
+
+    ptr[0] = newObj;
+
+#ifdef DEBUG
+    std::cout << "Traversing rest, fieldcount = " << newObj->fieldCount << std::endl;
+#endif
+
+    for(uint32_t i = 0; i < newObj->fieldCount; i++)
+    {
+#ifdef DEBUG
+        std::cout << "Will copy '" << newObj->fields[i].name << "'" << std::endl;
+#endif
+        uint8_t *_temp_GCStr = newMem->cloneString(newObj->fields[i].name);
+        newObj->fields[i].name = _temp_GCStr;
+#ifdef DEBUG
+        std::cout << "Will copy (allocated): '" << newObj->fields[i].name << "'" << std::endl;
+        std::cout << " -->> " << std::endl;
+#endif
+        if(*newObj->fields[i].name)
+        {
+            _gc_COPY_copy(&newObj->fields[i].object, oldMem, newMem);
+        }
+        else
+        {
+            TTLiteral::_gc_COPY_copy((TTLiteral **) &newObj->fields[i].object, oldMem, newMem);
+        }
+#ifdef DEBUG
+        std::cout << " <<-- " << std::endl;
+#endif
+    }
+#ifdef DEBUG
+    std::cout << "<< TTObject::_gc_COPY_copy" << std::endl;
+#endif
 }
 
 RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
 {
-    MemAllocator *alloc = MemAllocator::getCurrent();
-    RefPtr<TTObject> newObject = alloc->allocateObject();
-    newObject->fields = (Field *) alloc->allocate(sizeof(Field) * fieldsPreallocated);
-    newObject->fieldCapacity = fieldsPreallocated;
-    newObject->fieldCount = 0;
-    newObject->type = type;
+    TTObject *tempHax = MemAllocator::getCurrent()->allocateObject();
+    tempHax->fieldCapacity = 0;
+    tempHax->fieldCount = 0;
+    tempHax->type = type;
+    tempHax->fields = NULL;
+    RefPtr<TTObject> newObject = tempHax;
+    Field *fields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(Field) * fieldsPreallocated);
+    newObject->fields = fields;
+    newObject->fieldCapacity = fieldsPreallocated; // hax for GC, it must not know, because of the above
 
     if(type != TT_ENV)
     {
@@ -41,10 +128,11 @@ RefPtr<TTObject> TTObject::createObject(uint8_t type)
 
 RefPtr<TTObject> TTObject::clone(RefPtr<TTObject> cloned)
 {
-    MemAllocator *alloc = MemAllocator::getCurrent();
-    RefPtr<TTObject> newObject = alloc->allocateObject();
+    TTObject *temp_GC_Object = MemAllocator::getCurrent()->allocateObject();
+    RefPtr<TTObject> newObject = temp_GC_Object;
     memcpy(&newObject, &cloned, sizeof(*cloned));
-    newObject->fields = (Field *) alloc->allocate(sizeof(*newObject->fields) * cloned->fieldCapacity);
+    Field *_temp_GC_Fields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(*newObject->fields) * cloned->fieldCapacity);
+    newObject->fields = _temp_GC_Fields;
 
     memcpy(newObject->fields, cloned->fields, sizeof(*cloned->fields) * cloned->fieldCapacity);
 
@@ -77,18 +165,20 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
 #endif
         return false;
     }
-    MemAllocator *alloc = MemAllocator::getCurrent();
 
-    if(fieldCount == fieldCapacity)
+    RefPtr<TTObject> thiz = this;
+
+    if(thiz->fieldCount == thiz->fieldCapacity)
     {
-        fieldCapacity *= 2;
-        Field *newFields = (Field *) alloc->allocate(sizeof(Field) * fieldCapacity);
-        memcpy(newFields, fields, sizeof(Field) * fieldCount);
-        fields = newFields;
+        thiz->fieldCapacity *= 2;
+        Field *newFields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(Field) * thiz->fieldCapacity);
+        memcpy(newFields, thiz->fields, sizeof(Field) * thiz->fieldCount);
+        thiz->fields = newFields;
     }
-    fields[fieldCount].name = alloc->cloneString(name);
-    fields[fieldCount].object = &object;
-    fieldCount++;
+    uint8_t *newStr = MemAllocator::getCurrent()->cloneString(name); // Because of GC
+    thiz->fields[thiz->fieldCount].name = newStr;
+    thiz->fields[thiz->fieldCount].object = &object;
+    thiz->fieldCount++;
 
     return true;
 }
@@ -178,15 +268,15 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
         }
     }
 
-    MemAllocator *alloc = MemAllocator::getCurrent();
     if(fieldCount == fieldCapacity)
     {
         fieldCapacity *= 2;
-        Field *newFields = (Field *) alloc->allocate(sizeof(Field) * fieldCapacity);
+        Field *newFields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(Field) * fieldCapacity);
         memcpy(newFields, fields, sizeof(Field) * fieldCount);
         fields = newFields;
     }
-    fields[fieldCount].name = alloc->cloneString(TO_TT_STR(""));
+    uint8_t *_temp_GC_Str = MemAllocator::getCurrent()->cloneString(TO_TT_STR(""));
+    fields[fieldCount].name = _temp_GC_Str;
     fields[fieldCount].object = (TTObject *) &lit;
     fieldCount++;
 
@@ -195,11 +285,11 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
 
 void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
 {
+    std::cout << "TTObject::print" << std::endl;
     if(level < 1)
     {
         level = 1;
     }
-
 
     os << "Object" << std::endl;
     prlvl(os, level - 1);
@@ -237,6 +327,9 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
         case TT_STACK_FRAME:
             type = "STACT FRAME";
             break;
+        case TT_MOVED_OBJECT:
+            type = "MOVED OBJECT";
+            break;
         default:
             break;
     }
@@ -258,7 +351,6 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             {
                 prlvl(os, level);
                 os << "ERROR: literal is NULL!" << std::endl;
-                throw std::exception();
             }
             break;
         default:
@@ -334,7 +426,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
     os << "}";
 }
 
-std::ostream &operator << (std::ostream &os, RefPtr<TTObject> object)
+std::ostream &operator << (std::ostream &os, RefPtr<TTObject> &object)
 {
     if(!&object)
     {

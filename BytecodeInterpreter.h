@@ -46,6 +46,8 @@ private:
 public:
     BytecodeInterpreter();
     ~BytecodeInterpreter();
+    void refreshAfterGC();
+    void runGC(MemAllocator *oldMem, MemAllocator *newMem);
     RefPtr<TTObject> interpret(RefPtr<TTObject> block, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
 };
 

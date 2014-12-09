@@ -179,7 +179,7 @@ namespace Expression
         return expr;
     }
 
-    const char *getTypeInfo(RefPtr<TTObject> expr)
+    const char *getTypeInfo(TTObject *expr)
     {
         switch(expr->flags)
         {

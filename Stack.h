@@ -4,6 +4,7 @@
 struct Stack;
 
 #include <cstdint>
+#include "MemAllocator.h"
 
 #define STACK_DEFAULT_SIZE 64 * 1024
 
@@ -16,9 +17,11 @@ struct Stack
     Stack();
     ~Stack();
 
-    intptr_t topPtr();
-    intptr_t popPtr();
-    void pushPtr(intptr_t ptr);
+    uintptr_t topPtr();
+    uintptr_t popPtr();
+    void pushPtr(uintptr_t ptr);
+
+    void runGC(MemAllocator *oldMem, MemAllocator *newMem);
 };
 
 #endif

@@ -13,6 +13,10 @@ std::cerr << "NOT IMPLEMENTED " << __PRETTY_FUNCTION__ << " at " << __FILE__ << 
 throw std::exception(); \
 } while(false)
 
+#define KILL \
+do { \
+    *(int *) NULL = 0; \
+} while(false)
 
 #include <cstdint>
 #include <ostream>

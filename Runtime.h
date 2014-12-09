@@ -6,11 +6,13 @@ struct Runtime;
 #include "BuiltinPool.h"
 #include "RefPtrMap.h"
 #include "BytecodeGen.h"
+#include <set>
 
 struct Runtime
 {
     static BuiltinPool builtinPool;
     static RefPtrMap refPtrMap;
+    static std::set<BytecodeInterpreter *> interpretersAlive;
     static BytecodeGen bytecodeGen;
     static RefPtr<TTObject> globalEnvironment;
 
@@ -25,6 +27,7 @@ struct Runtime
     static RefPtr<TTObject> executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> thiz);
     static RefPtr<TTObject> executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> thiz);
 
+    static bool running;
     static void runCopyGC();
 };
 
