@@ -325,7 +325,9 @@ BytecodeInterpreter::~BytecodeInterpreter()
 
 void BytecodeInterpreter::refreshAfterGC()
 {
+#ifdef DEBUG
     std::cout << "Refresh after GC" << std::endl;
+#endif
     if(&stackFrame)
     {
         RefPtr<TTObject> byteCodeObj = stackFrame->getField(TO_TT_STR("byteCode"));
@@ -335,7 +337,9 @@ void BytecodeInterpreter::refreshAfterGC()
 
 void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
 {
+#ifdef DEBUG
     std::cout << "BytecodeInterpreter::runGC ==== BEGIN ====" << std::endl;
+#endif
     if(&stackFrame)
     {
         TTObject *stackFramePtr = &stackFrame;
@@ -349,7 +353,9 @@ void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
             TTObject::_gc_COPY_copy(&(((TTObject **) byteCodeLit->data)[i]), oldMem, newMem);
         }
     }
+#ifdef DEBUG
     std::cout << "BytecodeInterpreter::runGC ==== END ====" << std::endl;
+#endif
     stack.runGC(oldMem, newMem);
 }
 

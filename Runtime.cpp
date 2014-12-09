@@ -310,12 +310,16 @@ void Runtime::runCopyGC()
     running = true;
     MemAllocator *newAllocator = new MemAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
 
+#ifdef DEBUG
     std::cout << "GC: Starting copying garbage collection." << std::endl;
+#endif
     /*
     Traverse and copy all things
      */
 
+#ifdef DEBUG
     std::cout << "GC: Referenced objects from runtime stack:" << std::endl;
+#endif
 
     uint32_t ci = 0;
 
@@ -347,8 +351,9 @@ void Runtime::runCopyGC()
         }
         ci++;
     }
-
-    std::cout << "GC: finished stuff ========== " << std::endl;
+#ifdef DEBUG
+    std::cout << "GC: finished phase ========== " << std::endl;
+#endif
 
     refPtrMap.updateRoots();
 
@@ -362,7 +367,10 @@ void Runtime::runCopyGC()
         inter->refreshAfterGC();
     }
 
-    std::cout << "GC: Finished copying garbage collection." << std::endl;
+    long int prevSz = MemAllocator::getCurrent()->getCapacity() - MemAllocator::getCurrent()->getFreeMemory();
+    long int currSz = newAllocator->getCapacity() - newAllocator->getFreeMemory();
+    long int diff = prevSz - currSz;
+    std::cout << "GC: collected: " << (diff < 0 ? 0 : diff) << " bytes, free: " << currSz << std::endl;
 
    // std::cout << "GC: Debug exit." << std::endl;
 

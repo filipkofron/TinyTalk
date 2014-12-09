@@ -57,7 +57,9 @@ void Stack::pushPtr(uintptr_t ptr)
 
 void Stack::runGC(MemAllocator *oldMem, MemAllocator *newMem)
 {
+#ifdef DEBUG
     std::cout << "Stack::runGC ==== BEGIN ====" << std::endl;
+#endif
     for(uint32_t mySp = sp; mySp < len; mySp += sizeof(uintptr_t))
     {
 #ifdef DEBUG
@@ -65,5 +67,7 @@ void Stack::runGC(MemAllocator *oldMem, MemAllocator *newMem)
 #endif
         TTObject::_gc_COPY_copy((TTObject **) &data[mySp], oldMem, newMem);
     }
+#ifdef DEBUG
     std::cout << "Stack::runGC ==== END ====" << std::endl;
+#endif
 }

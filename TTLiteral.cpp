@@ -56,17 +56,21 @@ void TTLiteral::_gc_COPY_copy(TTLiteral **ptr, MemAllocator *oldMem, MemAllocato
 
     newLit->type = ptr[0]->type;
     newLit->length = ptr[0]->length;
+    newLit->data = NULL;
     uint8_t *_gc_tempData = newMem->allocate(ptr[0]->length); // Because of GC
     newLit->data = _gc_tempData;
     newLit->collectiblePtrs = ptr[0]->collectiblePtrs;
-    memcpy(newLit->data, ptr[0]->data, newLit->length);
+    if(ptr[0]->data)
+    {
+        memcpy(newLit->data, ptr[0]->data, newLit->length);
+    }
 
     ptr[0]->type = LITERAL_TYPE_MOVED_LITERAL;
     *(uintptr_t *) ptr[0] = (uintptr_t) newLit;
 
     ptr[0] = newLit;
 
-    if(newLit->collectiblePtrs == 1)
+    if(newLit->data && newLit->collectiblePtrs == 1)
     {
         for(uint32_t i = 0; i < newLit->length / sizeof(TTObject *); i ++)
         {
@@ -92,7 +96,9 @@ RefPtr<TTLiteral> TTLiteral::copy(MemAllocator *allocator, RefPtr<TTLiteral> lit
 
     newLit->type = lit->type;
     newLit->length = lit->length;
+    newLit->data = NULL;
     uint8_t *_gc_tempLit2 = MemAllocator::getCurrent()->allocate(lit->length);
+
     newLit->data = _gc_tempLit2;
     memcpy(newLit->data, lit->data, lit->length);
 
@@ -207,6 +213,7 @@ RefPtr<TTObject> TTLiteral::createStringLiteral(uint32_t length)
     RefPtr<TTLiteral> lit = laterLit;
 
     lit->length = length + 1;
+
     uint8_t *_gc_tempLit = MemAllocator::getCurrent()->allocate(lit->length);
     lit->data = _gc_tempLit;
     lit->data[length] = '\0';
@@ -250,6 +257,7 @@ RefPtr<TTObject> TTLiteral::createObjectArray(uint32_t size)
 
     lit->type = LITERAL_TYPE_OBJECT_ARRAY;
     lit->length = (uint32_t) sizeof(TTObject *) * size;
+    lit->data = NULL;
     uint8_t *_gc_tempLit2 = MemAllocator::getCurrent()->allocate(lit->length);
     lit->data = _gc_tempLit2;
     lit->collectiblePtrs = 1;
@@ -265,11 +273,12 @@ RefPtr<TTObject> TTLiteral::createObjectArray(uint32_t size)
 
 RefPtr<TTObject> TTLiteral::createByteArray(uint32_t size)
 {
-    TTLiteral *_gc_tempLit =  MemAllocator::getCurrent()->allocateLiteral();
+    TTLiteral *_gc_tempLit = MemAllocator::getCurrent()->allocateLiteral();
     RefPtr<TTLiteral> lit = _gc_tempLit;
 
     lit->type = LITERAL_TYPE_BYTE_ARRAY;
     lit->length = size;
+    lit->data = NULL;
     uint8_t *_gc_tempLit2 = MemAllocator::getCurrent()->allocate(lit->length);
     lit->data = _gc_tempLit2;
     lit->collectiblePtrs = 0;

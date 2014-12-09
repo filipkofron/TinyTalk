@@ -38,6 +38,9 @@ public:
     static void setDefaultAllocator(MemAllocator *allocator);
     static void cleanupDefaultAllocator();
 
+    size_t getFreeMemory();
+    size_t getCapacity();
+
     #ifdef DEBUG
         std::set<uintptr_t> objects;
         std::set<uintptr_t> literals;

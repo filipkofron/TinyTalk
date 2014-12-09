@@ -48,7 +48,9 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         return nextAddr;
     }
 
+#ifdef DEBUG
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
+#endif
 
     Runtime::runCopyGC();
 
@@ -112,4 +114,14 @@ void MemAllocator::cleanupDefaultAllocator()
 {
     delete defaultAllocator;
     defaultAllocator = NULL;
+}
+
+size_t MemAllocator::getFreeMemory()
+{
+    return capacity - top;
+}
+
+size_t MemAllocator::getCapacity()
+{
+    return capacity;
 }
