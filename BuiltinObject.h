@@ -47,6 +47,12 @@ public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
 
+class BuiltinObjectDebugGC : public Builtin
+{
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
+};
+
 class BuiltinObjectClone : public Builtin
 {
 public:
@@ -64,5 +70,6 @@ class BuiltinObjectToString : public Builtin
 public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
+
 
 #endif

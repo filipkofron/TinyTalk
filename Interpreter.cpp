@@ -51,6 +51,7 @@ void Interpreter::setupObject()
     BuiltinUtil::addMultipleMethod(debug, "print:", {"print"}, "object_debugprint");
     BuiltinUtil::addMultipleMethod(debug, "printrec:", {"printrec"}, "object_debugprintrec");
     BuiltinUtil::addMultipleMethod(debug, "printString:", {"printString"}, "object_debugprintstring");
+    BuiltinUtil::addSimpleMethod(debug, "gc", "object_debuggc");
 
 
     object->addField(TO_TT_STR("nil"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));

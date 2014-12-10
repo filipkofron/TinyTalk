@@ -370,7 +370,7 @@ void Runtime::runCopyGC()
     long int prevSz = MemAllocator::getCurrent()->getCapacity() - MemAllocator::getCurrent()->getFreeMemory();
     long int currSz = newAllocator->getCapacity() - newAllocator->getFreeMemory();
     long int diff = prevSz - currSz;
-    std::cout << "GC: collected: " << (diff < 0 ? 0 : diff) << " bytes, free: " << currSz << std::endl;
+    std::cout << "GC: collected: " << (diff < 0 ? 0 : diff) << " bytes, free: " << newAllocator->getFreeMemory() << std::endl;
 
    // std::cout << "GC: Debug exit." << std::endl;
 

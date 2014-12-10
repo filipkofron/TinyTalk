@@ -171,6 +171,15 @@ RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, st
     return dest;
 }
 
+RefPtr<TTObject> BuiltinObjectDebugGC::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 0);
+
+    Runtime::runCopyGC();
+
+    return dest;
+}
+
 RefPtr<TTObject> BuiltinObjectClone::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     if (argNames.size() != 1 || values.size() != 1)
