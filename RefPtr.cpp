@@ -4,6 +4,10 @@
 RefPtrBase::RefPtrBase(uintptr_t ptr, bool object)
     : ptr(ptr), object(object)
 {
+#ifdef DEBUG
+    std::cout << "RefPtr CREATE obj: " << object << " ptr: " << (unsigned long) ptr << std::endl;
+    _debug_check();
+#endif
     if(ptr)
     {
         Runtime::refPtrMap.reg(this, object);
@@ -14,6 +18,10 @@ RefPtrBase::RefPtrBase(uintptr_t ptr, bool object)
 RefPtrBase::RefPtrBase(const RefPtrBase &orig)
     : ptr(orig.ptr), object(orig.object)
 {
+#ifdef DEBUG
+    std::cout << "RefPtr CREATE COPY obj: " << object << " ptr: " << (unsigned long) ptr << std::endl;
+    _debug_check();
+#endif
     if(ptr)
     {
         Runtime::refPtrMap.reg(this, object);
@@ -31,6 +39,9 @@ RefPtrBase::~RefPtrBase()
 
 RefPtrBase &RefPtrBase::operator =(const RefPtrBase& orig)
 {
+#ifdef DEBUG
+    std::cout << "RefPtr ASSIGN obj: " << object << " ptr: " << (unsigned long) ptr << std::endl;
+#endif
     if(&orig != this)
     {
         if (ptr)
@@ -39,6 +50,10 @@ RefPtrBase &RefPtrBase::operator =(const RefPtrBase& orig)
         }
         ptr = orig.ptr;
         object = orig.object;
+
+#ifdef DEBUG
+        _debug_check();
+#endif
         if (ptr)
         {
             Runtime::refPtrMap.reg(this, object);
@@ -47,7 +62,8 @@ RefPtrBase &RefPtrBase::operator =(const RefPtrBase& orig)
 
     return *this;
 }
-/*
+
+#ifdef DEBUG
 void RefPtrBase::_debug_check()
 {
     if (ptr)
@@ -75,10 +91,14 @@ void RefPtrBase::_debug_check()
             //obj->printValue(std::cout, 2, false);
         }
     }
-}*/
+}
+#endif
 
 void RefPtrBase::setBasePtr(uintptr_t ptr, bool object)
 {
+#ifdef DEBUG
+    std::cout << "RefPtr SET obj: " << object << " ptr: " << (unsigned long) ptr << std::endl;
+#endif
     if(this->ptr)
     {
         Runtime::refPtrMap.unreg(this);
@@ -86,6 +106,10 @@ void RefPtrBase::setBasePtr(uintptr_t ptr, bool object)
 
     this->ptr = ptr;
     this->object = object;
+
+#ifdef DEBUG
+    _debug_check();
+#endif
 
     if(this->ptr)
     {

@@ -5,6 +5,7 @@
 #include <iostream>
 
 MemAllocator *MemAllocator::defaultAllocator = NULL;
+MemAllocator *MemAllocator::nextAllocator = NULL;
 
 MemAllocator::MemAllocator(size_t poolCapacity)
         : capacity(poolCapacity), top(0)
@@ -27,7 +28,10 @@ MemAllocator::~MemAllocator()
 
 bool MemAllocator::isInside(uintptr_t ptr)
 {
-    return ptr >= (uintptr_t ) pool && ptr < (uintptr_t) &pool[capacity];
+#ifdef DEBUG
+    std::cout << "pool[" << (unsigned long) (uintptr_t ) pool << "] <= ptr[" << (unsigned long) ptr << "] < " << (unsigned long) (uintptr_t) &pool[capacity] << std::endl;
+#endif
+    return (uintptr_t ) pool <= ptr && ptr < (uintptr_t) &pool[capacity];
 }
 
 uint8_t *MemAllocator::allocate(size_t bytes)
@@ -54,6 +58,12 @@ uint8_t *MemAllocator::allocate(size_t bytes)
 
     Runtime::runCopyGC();
 
+    if(getCurrent()->getFreeMemory() < bytes)
+    {
+        std::cerr << "Runtime error: Could not free more memory." << std::endl;
+        throw std::exception();
+    }
+
     return getCurrent()->allocate(bytes);
 }
 
@@ -77,7 +87,7 @@ TTObject* MemAllocator::allocateObject()
 {
 #ifdef DEBUG
     TTObject *obj = (TTObject *) allocate(sizeof(TTObject));
-    objects.insert((uintptr_t) obj);
+    nextAllocator->objects.insert((uintptr_t) obj);
     return obj;
 #else
     return (TTObject *) allocate(sizeof(TTObject));
@@ -87,8 +97,9 @@ TTObject* MemAllocator::allocateObject()
 TTLiteral* MemAllocator::allocateLiteral()
 {
 #ifdef DEBUG
+
     TTLiteral *lit = (TTLiteral *) allocate(sizeof(TTLiteral));
-    literals.insert((uintptr_t) lit);
+    nextAllocator->literals.insert((uintptr_t) lit);
     return lit;
 #else
     return (TTLiteral *) allocate(sizeof(TTLiteral));
@@ -103,11 +114,17 @@ MemAllocator *MemAllocator::getCurrent()
 void MemAllocator::initializeDefaultAllocator(size_t poolCapacity)
 {
     defaultAllocator = new MemAllocator(poolCapacity);
+    nextAllocator = defaultAllocator;
 }
 
 void MemAllocator::setDefaultAllocator(MemAllocator *allocator)
 {
     defaultAllocator = allocator;
+}
+
+void MemAllocator::setNextAllocator(MemAllocator *allocator)
+{
+    nextAllocator = allocator;
 }
 
 void MemAllocator::cleanupDefaultAllocator()

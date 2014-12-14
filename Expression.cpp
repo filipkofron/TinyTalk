@@ -98,6 +98,9 @@ namespace Expression
 
     RefPtr<TTObject> createBlock(RefPtr<TTLiteral> nameArray, RefPtr<TTLiteral> fullName, RefPtr<TTObject> expr, RefPtr<TTLiteral> nativeName)
     {
+#ifdef DEBUG
+        std::cout << "Create BLOCK PTR, nameArray type: " << nameArray->type << std::endl;
+#endif
         RefPtr<TTObject> res = TTObject::createObject(TT_EXPR);
 
         res->flags = EXPRESSION_BLOCK;
@@ -106,7 +109,8 @@ namespace Expression
         blockArgNames->setLiteral(nameArray);
 
         RefPtr<TTObject> blockFullName = TTObject::createObject(TT_LITERAL);
-        blockFullName->setLiteral(fullName);
+        RefPtr<TTLiteral> test = fullName;
+        blockFullName->setLiteral(test);
 
         res->addField(TO_TT_STR("blockArgNames"), blockArgNames);
         res->addField(TO_TT_STR("blockFullName"), blockFullName);

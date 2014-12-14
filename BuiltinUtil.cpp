@@ -9,7 +9,13 @@ RefPtr<TTObject> BuiltinUtil::createSimpleMethod(const std::string &msgName, con
     RefPtr<TTObject> objectLit = TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str()));
     names.push_back(objectLit);
     RefPtr<TTLiteral> objArray = TTLiteral::createObjectArray(names)->getLiteral();
-    return Expression::createBlock(objArray, TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str()))->getLiteral(), NULL, TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str()))->getLiteral());
+    RefPtr<TTLiteral> msgNameLit = TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str()))->getLiteral();
+    RefPtr<TTLiteral> builtinNameLit = TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str()))->getLiteral();
+#ifdef DEBUG
+    std::cout << "createSimpleMethod" << std::endl;
+#endif
+    RefPtr<TTObject> res = Expression::createBlock(objArray, msgNameLit, NULL, builtinNameLit);
+    return res;
 }
 
 RefPtr<TTObject> BuiltinUtil::createMultipleMethod(const std::string &msgName, const std::vector <std::string> &msgArgs, const std::string &buitlinName)
@@ -21,7 +27,10 @@ RefPtr<TTObject> BuiltinUtil::createMultipleMethod(const std::string &msgName, c
         names.push_back(objectLit);
     }
     RefPtr<TTLiteral> objArray = TTLiteral::createObjectArray(names)->getLiteral();
-    return Expression::createBlock(objArray, TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str()))->getLiteral(), NULL, TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str()))->getLiteral());
+    RefPtr<TTLiteral> msgNameLit = TTLiteral::createStringLiteral(TO_TT_STR(msgName.c_str()))->getLiteral();
+    RefPtr<TTLiteral> builtinNameLit = TTLiteral::createStringLiteral(TO_TT_STR(buitlinName.c_str()))->getLiteral();
+    RefPtr<TTObject> res = Expression::createBlock(objArray, msgNameLit, NULL, builtinNameLit);
+    return res;
 }
 
 void BuiltinUtil::addSimpleMethod(RefPtr<TTObject> dest, const std::string &msgName, const std::string &buitlinName)

@@ -31,6 +31,14 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 #endif
         return;
     }
+    else
+    {
+        {
+#ifdef DEBUG
+            std::cout << "not new" << std::endl;
+#endif
+        }
+    }
 
     if(!oldMem->isInside((uintptr_t) *ptr))
     {
@@ -38,6 +46,13 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
         std::cout << "is also not in OLD ????????" << std::endl;
 #endif
         return;
+    }else
+    {
+        {
+#ifdef DEBUG
+            std::cout << "is old" << std::endl;
+#endif
+        }
     }
 
     if(IS_MOVED_OBJECT(ptr[0]))
@@ -57,16 +72,39 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 
     TTObject *newObj = newMem->allocateObject();
     memcpy(newObj, *ptr, sizeof(**ptr));
-    Field * _temp_GCfields = (Field *) newMem->allocate(sizeof(*newObj->fields) * newObj->fieldCapacity);
-    newObj->fields = _temp_GCfields;
-    memcpy(newObj->fields, ptr[0]->fields, sizeof(*newObj->fields) * newObj->fieldCapacity);
-
-    ptr[0]->type = TT_MOVED_OBJECT;
-    *(uintptr_t *) ptr[0] = (uintptr_t) newObj;
-
-    ptr[0] = newObj;
-
 #ifdef DEBUG
+    std::cout << "Allocating capacity: newObj->fieldCapacity: " << newObj->fieldCapacity << " newObj->fieldCount: " << newObj->fieldCount << std::endl;
+#endif
+    Field * _temp_GCfields = (Field *) newMem->allocate(sizeof(Field) * newObj->fieldCapacity);
+    newObj->fields = _temp_GCfields;
+    memcpy(newObj->fields, ptr[0]->fields, sizeof(Field) * newObj->fieldCapacity);
+#ifdef DEBUG
+    std::cout << "old obj bytes before: " << std::endl;
+    print_bytes(sizeof(TTObject), ptr[0]);
+
+    std::cout << "new obj bytes before: " << std::endl;
+    print_bytes(sizeof(TTObject), newObj);
+#endif
+    ptr[0]->type = TT_MOVED_OBJECT;
+
+    *((uintptr_t *) *ptr) = (uintptr_t) newObj;
+#ifdef DEBUG
+    std::cout << "old obj bytes after: " << std::endl;
+    print_bytes(sizeof(TTObject), ptr[0]);
+
+    std::cout << "new obj bytes after: " << std::endl;
+    print_bytes(sizeof(TTObject), newObj);
+
+    std::cout << "old addr: " << (unsigned long) ptr[0] << std::endl;
+#endif
+    ptr[0] = newObj;
+#ifdef DEBUG
+    std::cout << "new addr: " << (unsigned long) ptr[0] << std::endl;
+
+    std::cout << "DEST obj bytes after: " << std::endl;
+    print_bytes(sizeof(TTObject), ptr[0]);
+
+
     std::cout << "Traversing rest, fieldcount = " << newObj->fieldCount << std::endl;
 #endif
 
@@ -150,7 +188,7 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
     {
         return false;
     }
-    if(TTObject::hasField(name))
+    if(hasField(name))
     {
 #ifdef DEBUG
         std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
@@ -176,9 +214,16 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
         thiz->fields = newFields;
     }
     uint8_t *newStr = MemAllocator::getCurrent()->cloneString(name); // Because of GC
+#ifdef DEBUG
+    std::cout << "cloned str: '" << (const char *) name << "' to '" << (const char *) newStr << "'" << std::endl;
+#endif
     thiz->fields[thiz->fieldCount].name = newStr;
     thiz->fields[thiz->fieldCount].object = &object;
     thiz->fieldCount++;
+
+#ifdef DEBUG
+    std::cout << "======================= Added field of name: " << ((const char *) name) << std::endl;
+#endif
 
     return true;
 }
@@ -201,12 +246,25 @@ bool TTObject::hasField(const uint8_t *name)
 
 TTObject *TTObject::getField(const uint8_t *name)
 {
+#ifdef DEBUG
+    std::cout << "TTObject::getField: " << (unsigned long) name << ": '" << (const char *) name << "'"<< std::endl;
+    std::cout << "TTObject::getField: THIS: " << (unsigned long) this << std::endl;
+#endif
     if(!*name)
     {
         return NULL;
     }
+
+#ifdef DEBUG
+    std::cout << "Object contents: " << std::endl;
+    print_bytes(sizeof(TTObject), this);
+#endif
+
     for(uint32_t i = 0; i < fieldCount; i++)
     {
+#ifdef DEBUG
+        std::cout << "TTObject::getField: [" << i << "] " << (unsigned long) fields[i].name << std::endl;
+#endif
         if(COMPARE_NAME(name, fields[i].name) == 0)
         {
             return fields[i].object;
@@ -232,7 +290,7 @@ bool TTObject::setField(const uint8_t *name, RefPtr<TTObject> object)
     return addField(name, object);
 }
 
-RefPtr<TTLiteral> TTObject::getLiteral()
+TTLiteral *TTObject::getLiteral()
 {
     if(type != TT_LITERAL)
     {
@@ -257,7 +315,7 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
         throw  std::exception();
     }
 
-    TTLiteral::setLiteralParent(this, &lit);
+    TTLiteral::setLiteralParent(this, lit);
 
     for(uint32_t i = 0; i < fieldCount; i++)
     {
@@ -342,7 +400,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             os << "Expression type: " << Expression::getTypeInfo(this) << std::endl;
             break;
         case TT_LITERAL:
-            if(&this->getLiteral())
+            if(this->getLiteral())
             {
                 prlvl(os, level);
                 os << "Literal type: " << this->getLiteral()->getTypeInfo() << std::endl;
@@ -404,7 +462,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
         {
             prlvl(os, level);
             os << "[" << this->fields[i].name << "]" << " -> " << "LITERAL <";
-            if(&this->getLiteral())
+            if(this->getLiteral())
             {
                 if(recursive)
                 {

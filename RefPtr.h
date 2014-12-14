@@ -19,11 +19,14 @@ protected:
     RefPtrBase(const RefPtrBase &orig);
     ~RefPtrBase();
 
-    //void _debug_check();
+#ifdef DEBUG
+    void _debug_check();
+#endif
     void setBasePtr(uintptr_t ptr, bool object);
 public:
     RefPtrBase &operator = (const RefPtrBase& orig);
     friend class RefPtrMap;
+    friend class Runtime;
 };
 
 template <class T>

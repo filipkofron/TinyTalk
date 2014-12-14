@@ -17,7 +17,7 @@ void Interpreter::initialize()
 {
     std::cout << "%% Interpreter::initializing." << std::endl;
 
-    Runtime::globalEnvironment = TTObject::createObject(TT_ENV);
+    Runtime::globalEnvironment = &TTObject::createObject(TT_ENV);
     Runtime::globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
     Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
 
@@ -35,6 +35,9 @@ void Interpreter::initialize()
 
 void Interpreter::setupObject()
 {
+#ifdef DEBUG
+    std::cout << "//setupObject" << std::endl;
+#endif
     RefPtr<TTObject> object = TTObject::createObject(TT_OBJECT);
 
     BuiltinUtil::addSimpleMethod(object, "alloc", "object_alloc");
@@ -160,10 +163,10 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             if(&expression != NULL)
             {
-                //RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);
+                RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
-                RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
-                RefPtr<TTObject> result = bytecodeInterpreter.interpret(expr, &Runtime::globalEnvironment, NULL);
+                /*RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
+                RefPtr<TTObject> result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);*/
 
                 if(!silent)
                 {

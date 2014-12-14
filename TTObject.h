@@ -44,12 +44,13 @@ struct TTObject
 {
     struct Field
     {
-        uint8_t *name;
         TTObject *object;
+        uint8_t *name;
     };
 
     Field *fields; // BEWARE, upon GC this is used as pointer to new object
-
+    uint32_t fieldCount;
+    uint32_t fieldCapacity;
     uint8_t type;
 
     /**
@@ -59,8 +60,6 @@ struct TTObject
     */
     uint8_t flags;
 
-    uint32_t fieldCount;
-    uint32_t fieldCapacity;
 
     /**
     * For future stuff (GC) only!
@@ -109,7 +108,7 @@ struct TTObject
     /**
     * Returns an object from field by given name or NULL if not found.
     */
-    RefPtr<TTLiteral> getLiteral();
+    TTLiteral *getLiteral();
 
     /**
     * Sets an object overwriting the old one, returns false and does nothing if

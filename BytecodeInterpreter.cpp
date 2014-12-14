@@ -116,10 +116,12 @@ void sendSimple(BytecodeInterpreter &bi)
     RefPtr<TTObject> dest = (TTObject *) bi.stack.popPtr();
     RefPtr<TTObject> name = (TTObject *) bi.stack.popPtr();
 
-    TTObject *thiz = NULL;
+    TTObject *thizPtr = NULL;
     std::string safeName = (const char *) name->getLiteral()->data;
 
-    RefPtr<TTObject> expression = Runtime::findBlock(TO_TT_STR(safeName.c_str()), &dest, &bi.env, &thiz);
+    RefPtr<TTObject> expression = Runtime::findBlock(TO_TT_STR(safeName.c_str()), &dest, &bi.env, &thizPtr);
+
+    RefPtr<TTObject> thiz = thizPtr;
 
     RefPtr<TTObject> blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
     if(&blockNativeName)
@@ -293,6 +295,15 @@ void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObjec
         block->addField(TO_TT_STR("blockByteCode"), byteCodeObj);
     }
 
+#ifdef DEBUG
+    std::cout << "print bytecode:" << std::endl;
+    byteCodeObj->print(std::cout, 1, false);
+    std::cout << "print literal:" << std::endl;
+    byteCodeObj->getLiteral()->printValue(std::cout, 1, false);
+    std::cout << "print bytecode bytes:" << std::endl;
+    print_bytes(byteCodeObj->getLiteral()->length, byteCodeObj->getLiteral()->data);
+#endif
+
     stackFrame->addField(TO_TT_STR("byteCode"), byteCodeObj);
 
     RefPtr<TTObject> newEnv = TTObject::createObject(TT_ENV);
@@ -326,12 +337,16 @@ BytecodeInterpreter::~BytecodeInterpreter()
 void BytecodeInterpreter::refreshAfterGC()
 {
 #ifdef DEBUG
-    std::cout << "Refresh after GC" << std::endl;
+    std::cout << "Refresh after GC, stackframe: " << (unsigned long) &stackFrame << std::endl;
 #endif
-    if(&stackFrame)
+    TTObject *stackFramePtr = &stackFrame;
+    if(stackFramePtr)
     {
-        RefPtr<TTObject> byteCodeObj = stackFrame->getField(TO_TT_STR("byteCode"));
-        byteCode = byteCodeObj->getLiteral()->data;
+        TTObject *tempGCHack = stackFramePtr->getField(TO_TT_STR("byteCode"));
+        if(tempGCHack)
+        {
+            byteCode = tempGCHack->getLiteral()->data;
+        }
     }
 }
 
@@ -340,23 +355,73 @@ void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
 #ifdef DEBUG
     std::cout << "BytecodeInterpreter::runGC ==== BEGIN ====" << std::endl;
 #endif
-    if(&stackFrame)
+    TTObject *stackFramePtr = &stackFrame;
+    TTObject::_gc_COPY_copy(&stackFramePtr, oldMem, newMem);
+    if(stackFramePtr)
     {
-        TTObject *stackFramePtr = &stackFrame;
-        TTObject::_gc_COPY_copy(&stackFramePtr, oldMem, newMem);
-        TTLiteral *byteCodeLit = &stackFramePtr->getField(TO_TT_STR("byteCode"))->getLiteral();
-        for (uint32_t i = 0; i < pcMax / sizeof(TTObject *); i ++)
-        {
 #ifdef DEBUG
-            std::cout << "GC: BC: i/pcMax: " << i << "/" << pcMax << std::endl;
+        std::cout << "stackframe: " << (unsigned long) stackFramePtr << std::endl;
+        std::cout << "stackframe cnt: " << stackFramePtr->fieldCount << std::endl;
+        stackFramePtr->print(std::cout, 0, false);
 #endif
-            TTObject::_gc_COPY_copy(&(((TTObject **) byteCodeLit->data)[i]), oldMem, newMem);
+        TTObject *obj = stackFramePtr->getField(TO_TT_STR("byteCode"));
+#ifdef DEBUG
+        std::cout << "byteCodeObj: " << (unsigned long) obj << std::endl;
+#endif
+        if(obj)
+        {
+            TTLiteral *byteCodeLit = obj->getLiteral();
+            for (uint32_t i = 0; i < pcMax / sizeof(TTObject *); i++)
+            {
+#ifdef DEBUG
+                std::cout << "GC: BC: i/pcMax: " << i << "/" << pcMax << std::endl;
+#endif
+                TTObject::_gc_COPY_copy(&(((TTObject **) byteCodeLit->data)[i]), oldMem, newMem);
+
+                test(oldMem, newMem);
+            }
         }
     }
 #ifdef DEBUG
     std::cout << "BytecodeInterpreter::runGC ==== END ====" << std::endl;
 #endif
     stack.runGC(oldMem, newMem);
+}
+
+void BytecodeInterpreter::test(MemAllocator *oldMem, MemAllocator *newMem)
+{
+#ifdef DEBUG
+    std::cout << " --> Test fail" << std::endl;
+    TTObject *stackFramePtr = &stackFrame;
+   // TTObject::_gc_COPY_copy(&stackFramePtr, oldMem, newMem);
+    std::cout << " --> Test fail2" << std::endl;
+   // TTObject::_gc_COPY_copy(&stackFramePtr, oldMem, newMem);
+    if(stackFramePtr)
+    {
+        TTObject *byteCodeObj = stackFramePtr->getField(TO_TT_STR("byteCode"));
+
+        std::cout << "byteCodeObj: " << (unsigned long ) byteCodeObj << std::endl;
+        if(byteCodeObj)
+        {
+            TTLiteral *byteCodeLit = byteCodeObj->getLiteral();
+            std::cout << "byte code LIT SUCCESS: " << (int) byteCodeLit->type << std::endl;
+        }
+    }
+    std::cout << "#$$$$# before addr: " << (unsigned long ) stackFramePtr << std::endl;
+   // TTObject::_gc_COPY_copy(&stackFramePtr, oldMem, newMem);
+    std::cout << "#$$$$# after addr: " << (unsigned long ) stackFramePtr << std::endl;
+    if(stackFramePtr)
+    {
+        TTObject *byteCodeObj = stackFramePtr->getField(TO_TT_STR("byteCode"));
+
+        std::cout << "byteCodeObj: " << (unsigned long ) byteCodeObj << std::endl;
+        if(byteCodeObj)
+        {
+            TTLiteral *byteCodeLit = byteCodeObj->getLiteral();
+            std::cout << "byte code LIT SUCCESS: " << (int) byteCodeLit->type << std::endl;
+        }
+    }
+#endif
 }
 
 RefPtr<TTObject> BytecodeInterpreter::interpret(RefPtr<TTObject> block, RefPtr<TTObject> env, RefPtr<TTObject> thiz)

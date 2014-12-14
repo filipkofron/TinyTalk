@@ -97,6 +97,7 @@ RefPtr<TTLiteral> TTLiteral::copy(MemAllocator *allocator, RefPtr<TTLiteral> lit
     newLit->type = lit->type;
     newLit->length = lit->length;
     newLit->data = NULL;
+    newLit->collectiblePtrs = lit->collectiblePtrs;
     uint8_t *_gc_tempLit2 = MemAllocator::getCurrent()->allocate(lit->length);
 
     newLit->data = _gc_tempLit2;
@@ -338,22 +339,33 @@ RefPtr<TTObject> TTLiteral::createByteArray(const std::vector<uint8_t> &bytes)
 
 void TTLiteral::setLiteralParent(RefPtr<TTObject> obj, RefPtr<TTLiteral> lit)
 {
-    switch(lit->type)
+    RefPtr<TTObject> ptr;
+    if(lit->type == LITERAL_TYPE_STRING)
     {
-        case LITERAL_TYPE_STRING:
-            obj->setField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("String")));
-            break;
-        case LITERAL_TYPE_INTEGER:
-            obj->setField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Integer")));
-            break;
-        case LITERAL_TYPE_OBJECT_ARRAY:
-            obj->setField(TO_TT_STR("parent"), Runtime::globalEnvironment->getField(TO_TT_STR("Array")));
-            break;
-        case LITERAL_TYPE_BYTE_ARRAY:
-            // TODO: add parent
-            break;
-        default:
-            std::cerr << "Unsupported literal type!" << std::endl;
-            throw std::exception();
+        ptr = Runtime::globalEnvironment->getField(TO_TT_STR("String"));
+        obj->setField(TO_TT_STR("parent"), ptr);
+        return;
     }
+    if(lit->type == LITERAL_TYPE_INTEGER)
+    {
+        ptr = Runtime::globalEnvironment->getField(TO_TT_STR("Integer"));
+        obj->setField(TO_TT_STR("parent"), ptr);
+        return;
+    }
+    if(lit->type == LITERAL_TYPE_OBJECT_ARRAY)
+    {
+        ptr = Runtime::globalEnvironment->getField(TO_TT_STR("Array"));
+        obj->setField(TO_TT_STR("parent"), ptr);
+        return;
+    }
+    if(lit->type == LITERAL_TYPE_BYTE_ARRAY)
+    {
+        // TODO: add ByteArray
+        /*
+        ptr = Runtime::globalEnvironment->getField(TO_TT_STR("Array"));
+        obj->setField(TO_TT_STR("parent"), ptr);*/
+        return;
+    }
+    std::cerr << "Unsupported literal type: " << lit->getTypeInfo() << std::endl;
+    throw std::exception();
 }

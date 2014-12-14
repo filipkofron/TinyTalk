@@ -5,7 +5,7 @@
 BuiltinPool Runtime::builtinPool;
 RefPtrMap Runtime::refPtrMap;
 BytecodeGen Runtime::bytecodeGen;
-RefPtr<TTObject> Runtime::globalEnvironment = NULL;
+TTObject *Runtime::globalEnvironment = NULL;
 
 std::set<BytecodeInterpreter *> Runtime::interpretersAlive;
 
@@ -300,15 +300,22 @@ RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, 
     return NULL;
 }
 
+//int numrunHAX = 0; // TODO: Remove this debug hax
+
 void Runtime::runCopyGC()
 {
+    /*if(numrunHAX++ == 2)
+    {
+        *(int *) NULL = 0;
+    }*/
     if(running)
     {
-        std::cerr << "GC ERROR: Out of memory! - cannon free more memory" << std::endl;
+        std::cerr << "GC ERROR: Out of memory! - cannot free more memory" << std::endl;
         throw std::exception();
     }
     running = true;
     MemAllocator *newAllocator = new MemAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
+    MemAllocator::setNextAllocator(newAllocator);
 
 #ifdef DEBUG
     std::cout << "GC: Starting copying garbage collection." << std::endl;
@@ -323,14 +330,27 @@ void Runtime::runCopyGC()
 
     uint32_t ci = 0;
 
-    std::vector<Ptr> ptrs = refPtrMap.collectRoots();
+    std::vector<RefPtrBase *> ptrs = refPtrMap.collectRoots();
+
+    for(auto inter : interpretersAlive)
+    {
+        inter->test(MemAllocator::getCurrent(), newAllocator);
+    }
+
+#ifdef DEBUG
+    std::cout << "GC: Gopy global ENV BEGIN:" << std::endl;
+#endif
+    TTObject::_gc_COPY_copy(&Runtime::globalEnvironment, MemAllocator::getCurrent(), newAllocator);
+#ifdef DEBUG
+    std::cout << "GC: Gopy global ENV END" << std::endl;
+#endif
 
 #ifdef DEBUG
     for(uint32_t i = 0; i < ptrs.size(); i++)
     {
 
-        std::cout << "would copy root: " << ci << "/" << (ptrs.size() - 1) << std::endl;
-        std::cout << "ptrs[i].ptr: " << (unsigned long long ) ptrs[i].ptr << std::endl;
+        std::cout << "would copy root: " << (i) << "/" << (ptrs.size() - 1) << std::endl;
+        std::cout << "ptrs[i].ptr: " << (unsigned long long ) ptrs[i]->ptr << std::endl;
     }
 #endif
 
@@ -339,15 +359,13 @@ void Runtime::runCopyGC()
 #ifdef DEBUG
         std::cout << "Copying root: " << ci << "/" << (ptrs.size() - 1) << std::endl;
 #endif
-        if(ptrs[i].object)
+        if(ptrs[i]->object)
         {
-            TTObject *obj = (TTObject *) ptrs[i].ptr;
-            TTObject::_gc_COPY_copy(&obj, MemAllocator::getCurrent(), newAllocator);
+            TTObject::_gc_COPY_copy((TTObject **) &ptrs[i]->ptr, MemAllocator::getCurrent(), newAllocator);
         }
         else
         {
-            TTLiteral *lit = (TTLiteral *) ptrs[i].ptr;
-            TTLiteral::_gc_COPY_copy(&lit, MemAllocator::getCurrent(), newAllocator);
+            TTLiteral::_gc_COPY_copy((TTLiteral **) &ptrs[i]->ptr, MemAllocator::getCurrent(), newAllocator);
         }
         ci++;
     }
@@ -355,12 +373,11 @@ void Runtime::runCopyGC()
     std::cout << "GC: finished phase ========== " << std::endl;
 #endif
 
-    refPtrMap.updateRoots();
-
     for(auto inter : interpretersAlive)
     {
         inter->runGC(MemAllocator::getCurrent(), newAllocator);
     }
+
 
     for(auto inter : interpretersAlive)
     {

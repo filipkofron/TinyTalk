@@ -1,7 +1,7 @@
 // #define DEBUG
 #define VERBOSE
 
-#define MEMORY_ALLCOATOR_SIZE_DEFAULT (1024 * 1024)
+#define MEMORY_ALLCOATOR_SIZE_DEFAULT (1024 * 512)
 
 #define TO_TT_STR(a) ((const uint8_t *) (a))
 
@@ -26,3 +26,10 @@ do { \
 * Print exact amount of levels spaces.
 */
 void prlvl(std::ostream &os, uint32_t level);
+
+/*
+
+Print bytes
+
+ */
+void print_bytes(size_t bytes, void *ptr);

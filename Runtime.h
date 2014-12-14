@@ -14,7 +14,7 @@ struct Runtime
     static RefPtrMap refPtrMap;
     static std::set<BytecodeInterpreter *> interpretersAlive;
     static BytecodeGen bytecodeGen;
-    static RefPtr<TTObject> globalEnvironment;
+    static TTObject *globalEnvironment;
 
     static RefPtr<TTObject> findSymbolValueInThis(RefPtr<TTObject> thiz, const uint8_t *name, RefPtr<TTObject> &nextThis);
     static RefPtr<TTObject> findSymbol(const uint8_t *name, RefPtr<TTObject> env, RefPtr<TTObject> &nextEnv);

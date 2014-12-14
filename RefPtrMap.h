@@ -4,22 +4,35 @@
 class RefPtrMap;
 
 #include <cstdint>
-#include <unordered_map>
 #include <vector>
 #include "Ptr.h"
 #include "RefPtr.h"
+#include <cstdio>
+
+#define HASHMAP_FAST
+
+#ifndef HASHMAP_FAST
+#include <set>
+#endif
 
 class RefPtrMap
 {
 private:
-    std::unordered_map<RefPtrBase *, Ptr> refs;
+#ifndef HASHMAP_FAST
+    std::set<RefPtrBase *> refs;
+#endif
+
+#ifdef HASHMAP_FAST
+    RefPtrBase **vals;
+#endif
 public:
     RefPtrMap();
+    ~RefPtrMap();
 
     void reg(RefPtrBase *refPtr, bool object);
     void unreg(RefPtrBase *refPtr);
 
-    std::vector<Ptr> collectRoots();
+    std::vector<RefPtrBase *> collectRoots();
     void updateRoots();
 };
 
