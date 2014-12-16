@@ -1,7 +1,7 @@
 #include <string.h>
 #include <algorithm>
 #include "BuiltinString.h"
-#include "common.h"
+#include "Common.h"
 
 RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {

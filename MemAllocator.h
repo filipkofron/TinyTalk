@@ -6,7 +6,7 @@ class MemAllocator;
 #include <cstdint>
 #include <cstdlib>
 #include <set>
-#include "common.h"
+#include "Common.h"
 #include "TTObject.h"
 #include "TTLiteral.h"
 

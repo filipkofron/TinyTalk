@@ -1,4 +1,4 @@
-#include "common.h"
+#include "Common.h"
 #include "MemAllocator.h"
 #include "Runtime.h"
 #include <cstring>
@@ -20,7 +20,7 @@ MemAllocator::MemAllocator(size_t poolCapacity)
 
 MemAllocator::~MemAllocator()
 {
-#ifdef VERBOSE
+#ifdef DEBUG
     std::cout << "~MemAllocator(): " << std::dec << top << " bytes allocated" << std::endl;
 #endif
     free(pool);

@@ -1,5 +1,5 @@
 #include "Runtime.h"
-#include "common.h"
+#include "Common.h"
 #include "Expression.h"
 
 BuiltinPool Runtime::builtinPool;
@@ -378,6 +378,7 @@ void Runtime::runCopyGC()
         inter->runGC(MemAllocator::getCurrent(), newAllocator);
     }
 
+    bytecodeGen.runGC(MemAllocator::getCurrent(), newAllocator);
 
     for(auto inter : interpretersAlive)
     {

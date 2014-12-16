@@ -2,7 +2,7 @@
 #include <sstream>
 #include <memory>
 
-#include "common.h"
+#include "Common.h"
 #include "Reader.h"
 #include "TokenizerException.h"
 #include "MemAllocator.h"

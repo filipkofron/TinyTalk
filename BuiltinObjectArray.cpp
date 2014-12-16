@@ -1,6 +1,6 @@
 #include "BuiltinObjectArray.h"
 #include "Runtime.h"
-#include "common.h"
+#include "Common.h"
 #include "Evaluator.h"
 
 #include <sstream>

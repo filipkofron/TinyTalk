@@ -1,7 +1,7 @@
 #include "TTLiteral.h"
 #include "BuiltinUtil.h"
 #include "Expression.h"
-#include "common.h"
+#include "Common.h"
 
 RefPtr<TTObject> BuiltinUtil::createSimpleMethod(const std::string &msgName, const std::string &buitlinName)
 {

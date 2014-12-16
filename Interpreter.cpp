@@ -1,4 +1,4 @@
-#include "common.h"
+#include "Common.h"
 #include "Interpreter.h"
 #include "TokenizerException.h"
 #include "Parser.h"
@@ -23,6 +23,7 @@ void Interpreter::initialize()
 
     setupObject();
     setupLiterals();
+    setupFile();
 
     std::cout << "%% Loading TTLib." << std::endl;
     loadTTLib();
@@ -116,12 +117,28 @@ void Interpreter::setupLiterals()
     Runtime::globalEnvironment->addField(TO_TT_STR("Array"), array);
 }
 
+
+void Interpreter::setupFile()
+{
+    RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
+    RefPtr<TTObject> file = TTObject::createObject(TT_OBJECT);
+    file->setField(TO_TT_STR("parent"), object);
+    BuiltinUtil::addMultipleMethod(object, "openPath:", {"openPath"}, "file_openPath:");
+    BuiltinUtil::addSimpleMethod(file, "close", "file_close");
+    BuiltinUtil::addSimpleMethod(file, "isEOF", "file_isEOF");
+    BuiltinUtil::addSimpleMethod(file, "readChar", "file_readChar");
+    BuiltinUtil::addMultipleMethod(object, "writeChar:", {"writeChar"}, "file_writeChar:");
+    BuiltinUtil::addSimpleMethod(file, "length", "array_size");
+
+    Runtime::globalEnvironment->addField(TO_TT_STR("File"), file);
+}
+
 void Interpreter::loadTTLib()
 {
-    std::ifstream init("../TinyTalk/ttlib/init.tt", std::ifstream::in);
-    std::ifstream control("../TinyTalk/ttlib/control.tt", std::ifstream::in);
-    std::ifstream clazz("../TinyTalk/ttlib/class.tt", std::ifstream::in);
-    std::ifstream number("../TinyTalk/ttlib/number.tt", std::ifstream::in);
+    std::ifstream init("../../tinytalk/ttlib/init.tt", std::ifstream::in);
+    std::ifstream control("../../tinytalk/ttlib/control.tt", std::ifstream::in);
+    std::ifstream clazz("../../tinytalk/ttlib/class.tt", std::ifstream::in);
+    std::ifstream number("../../tinytalk/ttlib/number.tt", std::ifstream::in);
 
     if(init.fail() || control.fail() || clazz.fail())
     {
@@ -163,10 +180,10 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             if(&expression != NULL)
             {
-                RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);
+                //RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
-                /*RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
-                RefPtr<TTObject> result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);*/
+                RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
+                RefPtr<TTObject> result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
 
                 if(!silent)
                 {

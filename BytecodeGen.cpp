@@ -1,6 +1,6 @@
 #include "TTLiteral.h"
 #include "BytecodeGen.h"
-#include "common.h"
+#include "Common.h"
 #include "BytecodeInterpreter.h"
 #include "Runtime.h"
 
@@ -265,7 +265,7 @@ RefPtr<TTObject> BytecodeGen::generate(RefPtr<TTObject> expression)
 #ifdef DEBUG
     std::cout << "(generate)" << std::endl;
 #endif
-    std::vector<uint8_t> byteCode;
+    byteCode.clear();
 
     gen(expression, byteCode);
 
@@ -277,4 +277,17 @@ RefPtr<TTObject> BytecodeGen::generate(RefPtr<TTObject> expression)
     res->getLiteral()->collectiblePtrs = 1;
 
     return res;
+}
+
+void BytecodeGen::runGC(MemAllocator *oldMem, MemAllocator *newMem)
+{
+    uint32_t lenMax = (uint32_t) byteCode.size();
+    for (uint32_t i = 0; i < lenMax / sizeof(TTObject *); i++)
+    {
+#ifdef DEBUG
+                std::cout << "GC: BC_gen: i/pcMax: " << i << "/" << pcMax << std::endl;
+#endif
+        //&(((TTObject **) byteCode.data())[i])
+        TTObject::_gc_COPY_copy(&(((TTObject **) byteCode.data())[i]), oldMem, newMem);
+    }
 }

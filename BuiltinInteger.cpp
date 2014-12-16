@@ -1,5 +1,5 @@
 #include "BuiltinInteger.h"
-#include "common.h"
+#include "Common.h"
 #include "Runtime.h"
 #include <iostream>
 

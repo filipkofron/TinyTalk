@@ -13,6 +13,7 @@ private:
     void initialize();
     void setupObject();
     void setupLiterals();
+    void setupFile();
     void loadTTLib();
 public:
     Interpreter();

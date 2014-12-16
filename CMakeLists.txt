@@ -3,7 +3,10 @@ project(TinyTalk)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -g -Wall -O0 -fbuiltin")
 
-set(SOURCE_FILES    BuiltinInteger.cpp
+set(SOURCE_FILES    Builtin.h
+                    BuiltinFile.h
+                    BuiltinFile.cpp
+                    BuiltinInteger.cpp
                     BuiltinObject.cpp
                     BuiltinObjectArray.cpp
                     BuiltinPool.cpp
@@ -14,6 +17,7 @@ set(SOURCE_FILES    BuiltinInteger.cpp
                     BytecodeGen.cpp
                     BytecodeInterpreter.h
                     BytecodeInterpreter.cpp
+                    Common.h
                     Common.cpp
                     Evaluator.cpp
                     Expression.cpp

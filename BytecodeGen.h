@@ -10,6 +10,8 @@ class BytecodeGen;
 class BytecodeGen
 {
 private:
+    std::vector<uint8_t> byteCode;
+
     void putTTObj(RefPtr<TTObject> obj, std::vector<uint8_t> &byteCode);
     void putInstr(void (*instr)(BytecodeInterpreter &bi), std::vector<uint8_t> &byteCode);
     void genSymbolVal(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
@@ -25,6 +27,7 @@ private:
     void gen(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode);
 public:
     RefPtr<TTObject> generate(RefPtr<TTObject> expression);
+    void runGC(MemAllocator *oldMem, MemAllocator *newMem);
 };
 
 #endif

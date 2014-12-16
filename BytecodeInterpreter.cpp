@@ -1,7 +1,7 @@
 #include <cstdint>
 #include "TTLiteral.h"
 #include "BytecodeInterpreter.h"
-#include "common.h"
+#include "Common.h"
 #include "Runtime.h"
 
 void createVar(BytecodeInterpreter &bi)
@@ -378,7 +378,9 @@ void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
 #endif
                 TTObject::_gc_COPY_copy(&(((TTObject **) byteCodeLit->data)[i]), oldMem, newMem);
 
+#ifdef DEBUG
                 test(oldMem, newMem);
+#endif
             }
         }
     }
