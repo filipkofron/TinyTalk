@@ -7,6 +7,7 @@
 #include "TokenizerException.h"
 #include "MemAllocator.h"
 #include "Interpreter.h"
+#include "Runtime.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ int main()
 {
     std::cout << ">> Tinytalk Interpreter" << std::endl;
     std::cout << ">> Written by Filip Kofron" << std::endl;
-    MemAllocator::initializeDefaultAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
+    MemAllocator::initializeDefaultAllocator(Runtime::allocSize);
 
 
     std::cout << std::endl;

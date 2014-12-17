@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "Expression.h"
 
+size_t Runtime::allocSize = MEMORY_ALLCOATOR_SIZE_DEFAULT;
 BuiltinPool Runtime::builtinPool;
 RefPtrMap Runtime::refPtrMap;
 BytecodeGen Runtime::bytecodeGen;
@@ -314,7 +315,7 @@ void Runtime::runCopyGC()
         throw std::exception();
     }
     running = true;
-    MemAllocator *newAllocator = new MemAllocator(MEMORY_ALLCOATOR_SIZE_DEFAULT);
+    MemAllocator *newAllocator = new MemAllocator((size_t) (Runtime::allocSize));
     MemAllocator::setNextAllocator(newAllocator);
 
 #ifdef DEBUG

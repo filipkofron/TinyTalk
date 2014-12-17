@@ -10,6 +10,7 @@ struct Runtime;
 
 struct Runtime
 {
+    static size_t allocSize;
     static BuiltinPool builtinPool;
     static RefPtrMap refPtrMap;
     static std::set<BytecodeInterpreter *> interpretersAlive;
