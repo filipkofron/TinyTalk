@@ -81,6 +81,43 @@ uint8_t *MemAllocator::allocate(size_t bytes)
     return getCurrent()->allocate(bytes);
 }
 
+void MemAllocator::ensure(size_t bytes)
+{
+/*uint8_t *hack = (uint8_t *)  malloc(bytes);
+    memset(hack, 0, bytes);
+    return hack;*/
+
+#ifdef DEBUG
+    std::cout << "MemAllocator::allocate(): called to allocate " << bytes << " bytes, remaining: " << (capacity - (top + bytes)) << std::endl;
+#endif
+
+    if ((top + bytes) < (capacity - 1024))
+    {
+        return;
+    }
+
+#ifdef DEBUG
+    std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
+#endif
+
+    Runtime::runCopyGC();
+
+    size_t curr = getCurrent()->getFreeMemory();
+    if(curr < (Runtime::allocSize / 8))
+    {
+        Runtime::allocSize = (size_t) (Runtime::allocSize * 1.5);
+        Runtime::runCopyGC();
+    }
+
+    if(getCurrent()->getFreeMemory() < bytes)
+    {
+        /*std::cerr << "Runtime error: Could not free more memory." << std::endl;
+        throw std::exception();*/
+        Runtime::allocSize = (size_t) (Runtime::allocSize * 1.5);
+        Runtime::runCopyGC();
+    }
+}
+
 uint8_t *MemAllocator::allocateString(const uint8_t *str)
 {
     size_t size = strlen((const char *) str);

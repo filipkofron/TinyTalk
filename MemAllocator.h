@@ -35,10 +35,12 @@ public:
     bool isInside(uintptr_t ptr);
 
     uint8_t *allocate(size_t bytes);
+    void ensure(size_t bytes);
     uint8_t *cloneString(const uint8_t *str);
 
     TTObject *allocateObject();
     TTLiteral *allocateLiteral();
+
     static MemAllocator *getCurrent();
     static void initializeDefaultAllocator(size_t poolCapacity);
     static void setDefaultAllocator(MemAllocator *allocator);

@@ -10,7 +10,7 @@ struct TTObject;
 #include "TTLiteral.h"
 #include "RefPtr.h"
 
-#define DEFAULT_FIELD_COUNT 8
+#define DEFAULT_FIELD_COUNT 4
 
 #define TT_NIL 0x00
 #define TT_OBJECT 0x01
@@ -42,15 +42,11 @@ struct TTObject;
 */
 struct TTObject
 {
-    struct Field
-    {
-        TTObject *object;
-        uint8_t *name;
-    };
+    TTObject **objects;  // BEWARE, upon GC this is used as pointer to new object
+    uint8_t **names;
 
-    Field *fields; // BEWARE, upon GC this is used as pointer to new object
-    uint32_t fieldCount;
-    uint32_t fieldCapacity;
+    uint32_t count;
+    uint32_t size;
     uint8_t type;
 
     /**

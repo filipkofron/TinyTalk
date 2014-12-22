@@ -361,7 +361,7 @@ void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
     {
 #ifdef DEBUG
         std::cout << "stackframe: " << (unsigned long) stackFramePtr << std::endl;
-        std::cout << "stackframe cnt: " << stackFramePtr->fieldCount << std::endl;
+        std::cout << "stackframe cnt: " << stackFramePtr->count << std::endl;
         stackFramePtr->print(std::cout, 0, false);
 #endif
         TTObject *obj = stackFramePtr->getField(TO_TT_STR("byteCode"));

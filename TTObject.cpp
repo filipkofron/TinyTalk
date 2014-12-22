@@ -75,9 +75,13 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 #ifdef DEBUG
     std::cout << "Allocating capacity: newObj->fieldCapacity: " << newObj->fieldCapacity << " newObj->fieldCount: " << newObj->fieldCount << std::endl;
 #endif
-    Field * _temp_GCfields = (Field *) newMem->allocate(sizeof(Field) * newObj->fieldCapacity);
-    newObj->fields = _temp_GCfields;
-    memcpy(newObj->fields, ptr[0]->fields, sizeof(Field) * newObj->fieldCapacity);
+    newMem->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * newObj->size);
+    uint8_t **_temp_GCnames = (uint8_t **) newMem->allocate(sizeof(uint8_t *) * newObj->size);
+    TTObject **_temp_GCobjects = (TTObject **) newMem->allocate(sizeof(TTObject *) * newObj->size);
+    newObj->names = _temp_GCnames;
+    newObj->objects = _temp_GCobjects;
+    memcpy(newObj->names, ptr[0]->names, sizeof(uint8_t *) * newObj->size);
+    memcpy(newObj->objects, ptr[0]->objects, sizeof(TTObject *) * newObj->size);
 #ifdef DEBUG
     std::cout << "old obj bytes before: " << std::endl;
     print_bytes(sizeof(TTObject), ptr[0]);
@@ -108,46 +112,56 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
     std::cout << "Traversing rest, fieldcount = " << newObj->fieldCount << std::endl;
 #endif
 
-    for(uint32_t i = 0; i < newObj->fieldCount; i++)
+    for(uint32_t i = 0; i < newObj->size; i++)
     {
+        if (newObj->names[i])
+        {
 #ifdef DEBUG
         std::cout << "Will copy '" << newObj->fields[i].name << "'" << std::endl;
 #endif
-        uint8_t *_temp_GCStr = newMem->cloneString(newObj->fields[i].name);
-        newObj->fields[i].name = _temp_GCStr;
+            uint8_t *_temp_GCStr = newMem->cloneString(newObj->names[i]);
+            newObj->names[i] = _temp_GCStr;
 #ifdef DEBUG
         std::cout << "Will copy (allocated): '" << newObj->fields[i].name << "'" << std::endl;
         std::cout << " -->> " << std::endl;
 #endif
-        if(*newObj->fields[i].name)
-        {
-            _gc_COPY_copy(&newObj->fields[i].object, oldMem, newMem);
-        }
-        else
-        {
-            TTLiteral::_gc_COPY_copy((TTLiteral **) &newObj->fields[i].object, oldMem, newMem);
-        }
+            if (*newObj->names[i])
+            {
+                _gc_COPY_copy(&newObj->objects[i], oldMem, newMem);
+            }
+            else
+            {
+                TTLiteral::_gc_COPY_copy((TTLiteral **) &newObj->objects[i], oldMem, newMem);
+            }
 #ifdef DEBUG
         std::cout << " <<-- " << std::endl;
 #endif
-    }
+        }
 #ifdef DEBUG
     std::cout << "<< TTObject::_gc_COPY_copy" << std::endl;
 #endif
+    }
 }
 
 RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
 {
     TTObject *tempHax = MemAllocator::getCurrent()->allocateObject();
-    tempHax->fieldCapacity = 0;
-    tempHax->fieldCount = 0;
+    tempHax->size = 0;
+    tempHax->count = 0;
     tempHax->type = type;
-    tempHax->fields = NULL;
+    tempHax->names = NULL;
+    tempHax->objects = NULL;
     RefPtr<TTObject> newObject = tempHax;
-    Field *fields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(Field) * fieldsPreallocated);
-    newObject->fields = fields;
-    newObject->fieldCapacity = fieldsPreallocated; // hax for GC, it must not know, because of the above
 
+    // ensure we don't get the GC call here!
+    MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * fieldsPreallocated);
+    uint8_t **allocedNames = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * fieldsPreallocated);
+    TTObject **allocedObjects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * fieldsPreallocated);
+    newObject->names = allocedNames;
+    newObject->objects = allocedObjects;
+    newObject->size = fieldsPreallocated; // hax for GC, it must not know, because of the above
+
+    // the gc can occure now
     if(type != TT_ENV)
     {
         for (auto pairVal : laterFields)
@@ -169,10 +183,16 @@ RefPtr<TTObject> TTObject::clone(RefPtr<TTObject> cloned)
     TTObject *temp_GC_Object = MemAllocator::getCurrent()->allocateObject();
     RefPtr<TTObject> newObject = temp_GC_Object;
     memcpy(&newObject, &cloned, sizeof(*cloned));
-    Field *_temp_GC_Fields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(*newObject->fields) * cloned->fieldCapacity);
-    newObject->fields = _temp_GC_Fields;
 
-    memcpy(newObject->fields, cloned->fields, sizeof(*cloned->fields) * cloned->fieldCapacity);
+    // ensure we don't get the GC call here!
+    MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * cloned->size);
+    uint8_t **_temp_GC_Names = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * cloned->size);
+    TTObject **_temp_GC_Objects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * cloned->size);
+    newObject->names = _temp_GC_Names;
+    newObject->objects = _temp_GC_Objects;
+
+    memcpy(newObject->names, cloned->names, sizeof(uint8_t *) * cloned->size);
+    memcpy(newObject->objects, cloned->objects, sizeof(TTObject *) * cloned->size);
 
     return newObject;
 }
@@ -184,159 +204,225 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
 #ifdef DEBUG
     std::cout << "======================= Adding field of name: " << ((const char *) name) << std::endl;
 #endif
-    if(!*name)
-    {
-        return false;
-    }
-    if(hasField(name))
-    {
-#ifdef DEBUG
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
-        std::cerr << __FUNCTION__ << ": ERROR: THE FIELD: '" << (const char *) name << "' already exists!!!!!" << std::endl;
 
-#endif
+    uint32_t hash;
+
+    if(hasField(name))
         return false;
-    }
 
     RefPtr<TTObject> thiz = this;
 
-    if(thiz->fieldCount == thiz->fieldCapacity)
+    if(thiz->count == thiz->size)
     {
-        thiz->fieldCapacity *= 2;
-        Field *newFields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(Field) * thiz->fieldCapacity);
-        memcpy(newFields, thiz->fields, sizeof(Field) * thiz->fieldCount);
-        thiz->fields = newFields;
-    }
-    uint8_t *newStr = MemAllocator::getCurrent()->cloneString(name); // Because of GC
-#ifdef DEBUG
-    std::cout << "cloned str: '" << (const char *) name << "' to '" << (const char *) newStr << "'" << std::endl;
-#endif
-    thiz->fields[thiz->fieldCount].name = newStr;
-    thiz->fields[thiz->fieldCount].object = &object;
-    thiz->fieldCount++;
+        MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * ((uint32_t) ((thiz->size + 1) * 2)));
+        uint8_t **oldNames = thiz->names;
+        TTObject **oldObjects = thiz->objects;
 
-#ifdef DEBUG
-    std::cout << "======================= Added field of name: " << ((const char *) name) << std::endl;
-#endif
+        uint32_t oldSize = thiz->size;
+
+        thiz->size = (uint32_t) ((thiz->size + 1) * 2);
+
+        thiz->names = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * thiz->size);
+        thiz->objects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * thiz->size);
+
+        thiz->count = 0;
+
+        for(uint32_t i = 0; i < oldSize; i++)
+        {
+            if(oldNames[i])
+            {
+                thiz->addField(oldNames[i], oldObjects[i]);
+            }
+        }
+    }
+
+    hash = strHash32(name) % thiz->size;
+
+    uint32_t i = hash;
+    while(thiz->names[i]) // we have space for sure, find first empty slot
+    {
+        i++;
+        if(i == thiz->size)
+        {
+            i = 0;
+        }
+    }
+    uint8_t *_gcTEMP_allocedName = MemAllocator::getCurrent()->cloneString(name);
+    thiz->names[i] = _gcTEMP_allocedName;
+    thiz->objects[i] = &object;
+
+    thiz->count++;
 
     return true;
 }
 
 bool TTObject::hasField(const uint8_t *name)
 {
-    if(!*name)
+#ifdef DEBUG
+    std::cout << "======================= hasField: " << ((const char *) name) << std::endl;
+#endif
+    uint32_t hash = strHash32(name) % size;
+    uint32_t i = hash;
+    bool cycle = false;
+    while(names[i])
     {
-        return false;
-    }
-    for(uint32_t i = 0; i < fieldCount; i++)
-    {
-        if(COMPARE_NAME(name, fields[i].name) == 0)
-        {
+#ifdef DEBUG
+        std::cout << "======================= hasField: i: " << i << " hash: " << hash << std::endl;
+#endif
+        if(COMPARE_NAME(name, names[i]) == 0)
             return true;
+        if(cycle && i == hash)
+            return false;
+        i++;
+        if(i == size)
+        {
+            i = 0;
+            cycle = true;
         }
     }
+
     return false;
 }
 
 TTObject *TTObject::getField(const uint8_t *name)
 {
 #ifdef DEBUG
-    std::cout << "TTObject::getField: " << (unsigned long) name << ": '" << (const char *) name << "'"<< std::endl;
-    std::cout << "TTObject::getField: THIS: " << (unsigned long) this << std::endl;
+    std::cout << "======================= getField: " << ((const char *) name) << std::endl;
 #endif
-    if(!*name)
+    uint32_t hash = strHash32(name) % size;
+    uint32_t i = hash;
+    bool cycle = false;
+    while(names[i])
     {
-        return NULL;
-    }
-
-#ifdef DEBUG
-    std::cout << "Object contents: " << std::endl;
-    print_bytes(sizeof(TTObject), this);
-#endif
-
-    for(uint32_t i = 0; i < fieldCount; i++)
-    {
-#ifdef DEBUG
-        std::cout << "TTObject::getField: [" << i << "] " << (unsigned long) fields[i].name << std::endl;
-#endif
-        if(COMPARE_NAME(name, fields[i].name) == 0)
+        if(COMPARE_NAME(name, names[i]) == 0)
+            return objects[i];
+        if(cycle && i == hash)
+            return NULL;
+        i++;
+        if(i == size)
         {
-            return fields[i].object;
+            i = 0;
+            cycle = true;
         }
     }
+
     return NULL;
 }
 
 bool TTObject::setField(const uint8_t *name, RefPtr<TTObject> object)
 {
-    if(!*name)
+#ifdef DEBUG
+    std::cout << "======================= setField: " << ((const char *) name) << std::endl;
+#endif
+    uint32_t hash = strHash32(name) % size;
+    uint32_t i = hash;
+    bool cycle = false;
+    while(names[i])
     {
-        return false;
-    }
-    for(uint32_t i = 0; i < fieldCount; i++)
-    {
-        if(COMPARE_NAME(name, fields[i].name) == 0)
+        if(COMPARE_NAME(name, names[i]) == 0)
         {
-            fields[i].object = &object;
+            objects[i] = &object;
             return true;
         }
+        if(cycle && i == hash)
+            return false;
+        i++;
+        if(i == size)
+        {
+            i = 0;
+            cycle = true;
+        }
     }
-    return addField(name, object);
+
+    return false;
 }
+
 
 TTLiteral *TTObject::getLiteral()
 {
+#ifdef DEBUG
+    std::cout << "======================= getLiteral " << std::endl;
+#endif
     if(type != TT_LITERAL)
     {
         std::cerr << "Object is not literal: Cannot get literal value!" << std::endl;
-        throw  std::exception();
+        throw std::exception();
     }
-    for(uint32_t i = 0; i < fieldCount; i++)
+
+    uint32_t hash = strHash32(TO_TT_STR("")) % size;
+    uint32_t i = hash;
+    bool cycle = false;
+    while(names[i])
     {
-        if(!*fields[i].name)
+        if(!*names[i])
+            return (TTLiteral *) objects[i];
+        if(cycle && i == hash)
+            return NULL;
+        i++;
+        if(i == size)
         {
-            return (TTLiteral *) fields[i].object;
+            i = 0;
+            cycle = true;
         }
     }
+
     return NULL;
 }
 
 bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
 {
+#ifdef DEBUG
+    std::cout << "======================= setLiteral " << std::endl;
+#endif
     if(type != TT_LITERAL)
     {
         std::cerr << "Object is not literal: Cannot set literal value!" << std::endl;
         throw  std::exception();
     }
+    RefPtr<TTObject> thiz = this;
 
-    TTLiteral::setLiteralParent(this, lit);
+    TTLiteral::setLiteralParent(&thiz, lit);
 
-    for(uint32_t i = 0; i < fieldCount; i++)
+    if(thiz->count == thiz->size)
     {
-        if(!*fields[i].name)
+        MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * ((uint32_t) ((thiz->size + 1) * 2)));
+        uint8_t **oldNames = thiz->names;
+        TTObject **oldObjects = thiz->objects;
+
+        uint32_t oldSize = thiz->size;
+
+        thiz->size = (uint32_t) ((thiz->size + 1) * 2);
+
+        thiz->names = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * thiz->size);
+        thiz->objects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * thiz->size);
+
+        thiz->count = 0;
+
+        for(uint32_t i = 0; i < oldSize; i++)
         {
-            fields[i].object = (TTObject *) &lit;
-            return true;
+            if(oldNames[i])
+            {
+                thiz->addField(oldNames[i], oldObjects[i]);
+            }
         }
     }
 
-    if(fieldCount == fieldCapacity)
+    uint32_t hash = strHash32(TO_TT_STR("")) % thiz->size;
+
+    uint32_t i = hash;
+    while(thiz->names[i]) // we have space for sure, find first empty slot
     {
-        fieldCapacity *= 2;
-        Field *newFields = (Field *) MemAllocator::getCurrent()->allocate(sizeof(Field) * fieldCapacity);
-        memcpy(newFields, fields, sizeof(Field) * fieldCount);
-        fields = newFields;
+        i++;
+        if(i == thiz->size)
+        {
+            i = 0;
+        }
     }
-    uint8_t *_temp_GC_Str = MemAllocator::getCurrent()->cloneString(TO_TT_STR(""));
-    fields[fieldCount].name = _temp_GC_Str;
-    fields[fieldCount].object = (TTObject *) &lit;
-    fieldCount++;
+    uint8_t *_gcTEMP_allocedName = MemAllocator::getCurrent()->cloneString(TO_TT_STR(""));
+    thiz->names[i] = _gcTEMP_allocedName;
+    thiz->objects[i] = (TTObject *) &lit;
+
+    thiz->count++;
 
     return true;
 }
@@ -415,27 +501,31 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
             break;
     }
     prlvl(os, level);
-    os << "Field count/capacity: " << this->fieldCount << "/" << this->fieldCapacity
+    os << "Field count/capacity: " << this->count << "/" << this->size
             << std::endl;
     prlvl(os, level);
     os << "Fields:";
-    for(uint32_t i = 0; i < this->fieldCount; i++)
+    for(uint32_t i = 0; i < this->size; i++)
     {
-        os << " '" << this->fields[i].name << "'";
+        if(this->names[i])
+        {
+            os << " '" << this->names[i] << "'";
+        }
     }
     os << std::endl;
 
-    for(uint32_t i = 0; i < this->fieldCount; i++)
+    for(uint32_t i = 0; i < this->size; i++)
     {
-        if(*this->fields[i].name)
+        if(!this->names[i]) continue;
+        if(*this->names[i])
         {
-            if(&this->fields[i].object)
+            if(&this->objects[i])
             {
                 prlvl(os, level);
-                os << "[" << this->fields[i].name << "]" << " -> ";
+                os << "[" << this->names[i] << "]" << " -> ";
                 if(recursive)
                 {
-                    this->fields[i].object->print(os, level + 1, recursive);
+                    this->objects[i]->print(os, level + 1, recursive);
                 }
                 else
                 {
@@ -448,12 +538,12 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
                 prlvl(os, level);
                 if(recursive)
                 {
-                    os << "[" << this->fields[i].name << "]" << " -> "
-                            << this->fields[i].object << std::endl;
+                    os << "[" << this->names[i] << "]" << " -> "
+                            << this->objects[i] << std::endl;
                 }
                 else
                 {
-                    os << "[" << this->fields[i].name << "]" << " -> "
+                    os << "[" << this->names[i] << "]" << " -> "
                             << "<non-recursive-print>" << std::endl;
                 }
             }
@@ -461,7 +551,7 @@ void TTObject::print(std::ostream &os, uint32_t level, bool recursive)
         else
         {
             prlvl(os, level);
-            os << "[" << this->fields[i].name << "]" << " -> " << "LITERAL <";
+            os << "[" << this->names[i] << "]" << " -> " << "LITERAL <";
             if(this->getLiteral())
             {
                 if(recursive)

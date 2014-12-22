@@ -135,10 +135,10 @@ void Interpreter::setupFile()
 
 void Interpreter::loadTTLib()
 {
-    std::ifstream init("../../tinytalk/ttlib/init.tt", std::ifstream::in);
-    std::ifstream control("../../tinytalk/ttlib/control.tt", std::ifstream::in);
-    std::ifstream clazz("../../tinytalk/ttlib/class.tt", std::ifstream::in);
-    std::ifstream number("../../tinytalk/ttlib/number.tt", std::ifstream::in);
+    std::ifstream init("ttlib/init.tt", std::ifstream::in);
+    std::ifstream control("ttlib/control.tt", std::ifstream::in);
+    std::ifstream clazz("ttlib/class.tt", std::ifstream::in);
+    std::ifstream number("ttlib/number.tt", std::ifstream::in);
 
     if(init.fail() || control.fail() || clazz.fail())
     {
