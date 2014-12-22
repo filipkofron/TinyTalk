@@ -462,7 +462,9 @@ RefPtr<TTObject> BytecodeInterpreter::interpret(RefPtr<TTObject> block, RefPtr<T
         bindStackFrame();
     } while(true);
 
+#ifdef DEBUG
     std::cout << "End sp: " << stack.sp << std::endl;
+#endif
 
     return (TTObject *) stack.popPtr();
 }

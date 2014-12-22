@@ -23,6 +23,14 @@ class Builtin;
     } \
     do {} while(false)
 
+#define BUILTIN_CHECK_EXPRESSION(x) \
+    if (values[x]->type != TT_EXPR) \
+    { \
+        std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " builtin function cannot use anything else than TT_EXPR." << std::endl; \
+        throw std::exception(); \
+    } \
+    do {} while(false)
+
 #define BUILTIN_CHECK_INTEGER(x) \
     if (values[x]->getLiteral()->type != LITERAL_TYPE_INTEGER) \
     { \

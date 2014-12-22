@@ -57,6 +57,8 @@ BuiltinPool::BuiltinPool()
     registerBultin("file_writeChar:", std::shared_ptr<Builtin> (new BuiltinFileWriteChar));
 
     registerBultin("system_runFile:", std::shared_ptr<Builtin> (new BuiltinSystemRunFile));
+    registerBultin("system_parse:", std::shared_ptr<Builtin> (new BuiltinSystemParse));
+    registerBultin("system_generateBytecode:", std::shared_ptr<Builtin> (new BuiltinSystemGenerateBytecode));
 
     std::cout << "[BuiltinPool]: initialized." << std::endl;
 }

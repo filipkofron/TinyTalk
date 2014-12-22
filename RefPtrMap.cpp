@@ -50,7 +50,7 @@ void RefPtrMap::unreg(RefPtrBase *refPtr)
     int stop = index;
     while(vals[index] != refPtr)
     {
-        index = (int) ((index + 1) % REF_PTR_MAX_VALS);
+        index = (index + 1) % REF_PTR_MAX_VALS;
         if(index == stop)
         {
             std::cerr << "RefPTRMAP slot not found!" << std::endl;

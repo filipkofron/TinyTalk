@@ -1,0 +1,15 @@
+| Exec |;
+
+Exec = Object createWith:
+{
+    "execString:", [ :execString: |
+        | expr block byteCode |;
+        expr = System parse: execString;
+        block = [ nil ];
+        byteCode = System generateBytecode: expr;
+        Object object: block set: "blockExpr" value: expr;
+        Object object: block set: "blockByteCode" value: byteCode;
+
+        block value
+    ]
+}

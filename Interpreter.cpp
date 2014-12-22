@@ -140,27 +140,36 @@ void Interpreter::setupSystem()
     system->setField(TO_TT_STR("parent"), object);
 
     BuiltinUtil::addMultipleMethod(system, "runFile:", {"runFile"}, "system_runFile:");
+    BuiltinUtil::addMultipleMethod(system, "parse:", {"parse"}, "system_parse:");
+    BuiltinUtil::addMultipleMethod(system, "generateBytecode:", {"generateBytecode"}, "system_generateBytecode:");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("System"), system);
 }
 
-void Interpreter::loadTTLib()
+void Interpreter::loadTTLibModule(std::string name)
 {
-    std::ifstream init("ttlib/init.tt", std::ifstream::in);
-    std::ifstream control("ttlib/control.tt", std::ifstream::in);
-    std::ifstream clazz("ttlib/class.tt", std::ifstream::in);
-    std::ifstream number("ttlib/number.tt", std::ifstream::in);
+    std::cout << "TTLib: Loading '" << name << "'." << std::endl;
+    std::string path = "ttlib/";
+    path.append(name);
+    std::ifstream file(path, std::ifstream::in);
 
-    if(init.fail() || control.fail() || clazz.fail())
+    if(file.fail())
     {
-        std::cerr << "TTLib: Cannot open ttlib files!!" << std::endl;
+        std::cerr << "TTLib: Cannot open ttlib file: '" << name << "'!!" << std::endl;
         throw std::exception();
     }
 
-    interpretFile(init, true);
-    interpretFile(control, true);
-    interpretFile(clazz, true);
-    interpretFile(number, true);
+
+    interpretFile(file, true);
+}
+
+void Interpreter::loadTTLib()
+{
+    loadTTLibModule("init.tt");
+    loadTTLibModule("control.tt");
+    loadTTLibModule("class.tt");
+    loadTTLibModule("exec.tt");
+    loadTTLibModule("number.tt");
 }
 
 Interpreter::~Interpreter()
