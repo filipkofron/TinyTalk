@@ -12,6 +12,8 @@ set(SOURCE_FILES    Builtin.h
                     BuiltinPool.cpp
                     BuiltinString.h
                     BuiltinString.cpp
+                    BuiltinSystem.h
+                    BuiltinSystem.cpp
                     BuiltinUtil.cpp
                     BytecodeGen.h
                     BytecodeGen.cpp

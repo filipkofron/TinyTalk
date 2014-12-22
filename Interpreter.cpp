@@ -24,6 +24,7 @@ void Interpreter::initialize()
     setupObject();
     setupLiterals();
     setupFile();
+    setupSystem();
 
     std::cout << "%% Loading TTLib." << std::endl;
     loadTTLib();
@@ -117,20 +118,30 @@ void Interpreter::setupLiterals()
     Runtime::globalEnvironment->addField(TO_TT_STR("Array"), array);
 }
 
-
 void Interpreter::setupFile()
 {
     RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
     RefPtr<TTObject> file = TTObject::createObject(TT_OBJECT);
     file->setField(TO_TT_STR("parent"), object);
-    BuiltinUtil::addMultipleMethod(object, "openPath:", {"openPath"}, "file_openPath:");
+    BuiltinUtil::addMultipleMethod(file, "openPath:", {"openPath"}, "file_openPath:");
     BuiltinUtil::addSimpleMethod(file, "close", "file_close");
     BuiltinUtil::addSimpleMethod(file, "isEOF", "file_isEOF");
     BuiltinUtil::addSimpleMethod(file, "readChar", "file_readChar");
-    BuiltinUtil::addMultipleMethod(object, "writeChar:", {"writeChar"}, "file_writeChar:");
+    BuiltinUtil::addMultipleMethod(file, "writeChar:", {"writeChar"}, "file_writeChar:");
     BuiltinUtil::addSimpleMethod(file, "length", "array_size");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("File"), file);
+}
+
+void Interpreter::setupSystem()
+{
+    RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
+    RefPtr<TTObject> system = TTObject::createObject(TT_OBJECT);
+    system->setField(TO_TT_STR("parent"), object);
+
+    BuiltinUtil::addMultipleMethod(system, "runFile:", {"runFile"}, "system_runFile:");
+
+    Runtime::globalEnvironment->addField(TO_TT_STR("System"), system);
 }
 
 void Interpreter::loadTTLib()

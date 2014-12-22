@@ -231,7 +231,7 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
         {
             if(oldNames[i])
             {
-                thiz->addField(oldNames[i], oldObjects[i]);
+                thiz->__gc_safe_addField(oldNames[i], oldObjects[i]);
             }
         }
     }
@@ -252,6 +252,33 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
     thiz->objects[i] = &object;
 
     thiz->count++;
+
+    return true;
+}
+
+bool TTObject::__gc_safe_addField(const uint8_t *name, RefPtr<TTObject> object)
+{
+#ifdef DEBUG
+    std::cout << "======================= Adding field of name: " << ((const char *) name) << std::endl;
+#endif
+
+    uint32_t hash;
+
+    hash = strHash32(name) % this->size;
+
+    uint32_t i = hash;
+    while(this->names[i]) // we have space for sure, find first empty slot
+    {
+        i++;
+        if(i == this->size)
+        {
+            i = 0;
+        }
+    }
+    this->names[i] = (uint8_t *) name;
+    this->objects[i] = &object;
+
+    this->count++;
 
     return true;
 }
@@ -402,7 +429,7 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
         {
             if(oldNames[i])
             {
-                thiz->addField(oldNames[i], oldObjects[i]);
+                thiz->__gc_safe_addField(oldNames[i], oldObjects[i]);
             }
         }
     }

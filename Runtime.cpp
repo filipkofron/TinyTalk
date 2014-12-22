@@ -301,11 +301,12 @@ RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, 
     return NULL;
 }
 
-//int numrunHAX = 0; // TODO: Remove this debug hax
+int numrunHAX = 0; // TODO: Remove this debug hax
 
 void Runtime::runCopyGC()
 {
-    /*if(numrunHAX++ == 2)
+    numrunHAX++;
+    /*if(numrunHAX == 94)
     {
         *(int *) NULL = 0;
     }*/
@@ -389,7 +390,7 @@ void Runtime::runCopyGC()
     long int prevSz = MemAllocator::getCurrent()->getCapacity() - MemAllocator::getCurrent()->getFreeMemory();
     long int currSz = newAllocator->getCapacity() - newAllocator->getFreeMemory();
     long int diff = prevSz - currSz;
-    std::cout << "GC: collected: " << (diff < 0 ? 0 : diff) << " bytes, free: " << newAllocator->getFreeMemory() << std::endl;
+    std::cout << "[" << numrunHAX << "] GC: collected: " << (diff < 0 ? 0 : diff) << " bytes, free: " << newAllocator->getFreeMemory() << std::endl;
 
    // std::cout << "GC: Debug exit." << std::endl;
 

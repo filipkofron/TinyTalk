@@ -4,6 +4,7 @@
 #include "BuiltinObject.h"
 #include "BuiltinString.h"
 #include "BuiltinObjectArray.h"
+#include "BuiltinSystem.h"
 
 BuiltinPool::BuiltinPool()
 {
@@ -54,6 +55,8 @@ BuiltinPool::BuiltinPool()
     registerBultin("file_isEOF", std::shared_ptr<Builtin> (new BuiltinFileIsEOF));
     registerBultin("file_readChar", std::shared_ptr<Builtin> (new BuiltinFileReadChar));
     registerBultin("file_writeChar:", std::shared_ptr<Builtin> (new BuiltinFileWriteChar));
+
+    registerBultin("system_runFile:", std::shared_ptr<Builtin> (new BuiltinSystemRunFile));
 
     std::cout << "[BuiltinPool]: initialized." << std::endl;
 }

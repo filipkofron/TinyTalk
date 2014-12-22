@@ -14,6 +14,7 @@ private:
     void setupObject();
     void setupLiterals();
     void setupFile();
+    void setupSystem();
     void loadTTLib();
 public:
     Interpreter();

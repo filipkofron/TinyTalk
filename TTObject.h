@@ -86,6 +86,12 @@ struct TTObject
     bool addField(const uint8_t *name, RefPtr<TTObject> object);
 
     /**
+    * Add a new field. Will return false if it alread exists.
+    * Will not allocate string, will only use the existing ones.
+    */
+    bool __gc_safe_addField(const uint8_t *name, RefPtr<TTObject> object);
+
+    /**
     * Returns true if the field name exists.
     */
     bool hasField(const uint8_t *name);
