@@ -18,6 +18,10 @@ Object inObject: False createField: "ifFalse:ifTrue:" withValue: [:ifFalse: :ifT
 
 True createField: "not" withValue: [ False ];
 False createField: "not" withValue: [ True ];
+True createField: "or:" withValue: [ :or: | True ];
+True createField: "and:" withValue: [ :and: | and ];
+False createField: "or:" withValue: [ :or: | or ];
+False createField: "and:" withValue: [ :and: | False ];
 
 True createField: "toString" withValue: [ "True" ];
 False createField: "toString" withValue: [ "False" ];

@@ -163,6 +163,7 @@ void Interpreter::loadTTLib()
     loadTTLibModule("control.tt");
     loadTTLibModule("class.tt");
     loadTTLibModule("exec.tt");
+    loadTTLibModule("file.tt");
     loadTTLibModule("number.tt");
 }
 

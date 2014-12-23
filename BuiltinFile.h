@@ -5,7 +5,7 @@ class BuiltinFile;
 
 #include "Builtin.h"
 
-class BuiltinFileIOOpenPathModeFile : public Builtin
+class BuiltinFileIOOpenModeFile : public Builtin
 {
 private:
 public:
@@ -26,18 +26,19 @@ public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
 
-class BuiltinFileIOFileWrite : public Builtin
+class BuiltinFileIOWriteFile : public Builtin
 {
 private:
 public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
 
-class BuiltinFileIOReadLine : public Builtin
+class BuiltinFileIOIsOK : public Builtin
 {
 private:
 public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
+
 
 #endif

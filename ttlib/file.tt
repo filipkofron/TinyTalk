@@ -1,0 +1,66 @@
+| File |;
+File = Object createWith:
+{
+	"eof", False,
+
+	"openReadOnly:", [ :openReadOnly: |
+		| file |;
+		file = this new;
+		FileIO open: open mode: "rb" file: file;
+		file
+	],
+
+	"openReadWrite:", [ :openReadWrite: |
+        | file |;
+        file = this new;
+        FileIO open: open mode: "wb+" file: file;
+        file
+    ],
+
+    "openAppend:", [ :openAppend: |
+        | file |;
+        file = this new;
+        FileIO open: open mode: "ab+" file: file;
+        file
+    ],
+
+	"close", [ :close |
+		FileIO close: this;
+		this
+	],
+
+	"read", [ :read |
+		|val|;
+		val = FileIO read: this;
+		(val equals: -1)
+			ifTrue: [eof = True];
+		val
+	],
+
+	"readChar", [ :readChar |
+		| int |;
+		int = FileIO read: this;
+		(int equals: -1)
+			ifTrue: [eof = True; ""]
+			ifFalse: [int charValue]
+	],
+
+	"write:", [ :write: |
+		FileIO write: write file: this;
+		this
+	],
+
+	"writeChar;", [ :write: |
+		FileIO write: (write charAsIntAt: 0) file: this;
+		this
+	],
+
+	"isEOF", [ :isEOF |
+		eof
+	],
+
+	"isOK", [ :isOk |
+		FileIO isOK: this;
+		this
+	]
+}

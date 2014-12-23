@@ -24,10 +24,3 @@ Object createField: "set:value:" withValue:
     ];
 
 Object inObject: nil createField: "toString" withValue: ["nil"];
-
-| Rec1 Rec2 |;
-Rec1 = (Object new);
-Rec2 = (Rec1 new);
-
-Rec1 createField: "foo" withValue: [ Rec2 bar ];
-Rec2 createField: "bar" withValue: [ Rec1 foo ];
