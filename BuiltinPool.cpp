@@ -50,11 +50,7 @@ BuiltinPool::BuiltinPool()
     registerBultin("array_empty", std::shared_ptr<Builtin> (new BuiltinObjectArrayEmpty));
     registerBultin("array_toString", std::shared_ptr<Builtin> (new BuiltinObjectArrayToString));
 
-    registerBultin("file_openPath:", std::shared_ptr<Builtin> (new BuiltinFileOpenPath));
-    registerBultin("file_close", std::shared_ptr<Builtin> (new BuiltinFileClose));
-    registerBultin("file_isEOF", std::shared_ptr<Builtin> (new BuiltinFileIsEOF));
-    registerBultin("file_readChar", std::shared_ptr<Builtin> (new BuiltinFileReadChar));
-    registerBultin("file_writeChar:", std::shared_ptr<Builtin> (new BuiltinFileWriteChar));
+    registerBultin("fileio_openPath:mode:file:", std::shared_ptr<Builtin> (new BuiltinFileIOOpenPathModeFile));
 
     registerBultin("system_runFile:", std::shared_ptr<Builtin> (new BuiltinSystemRunFile));
     registerBultin("system_parse:", std::shared_ptr<Builtin> (new BuiltinSystemParse));

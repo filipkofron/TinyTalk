@@ -47,6 +47,22 @@ class Builtin;
     } \
     do {} while(false)
 
+#define BUILTIN_CHECK_BYTE_ARRAY(x) \
+    if (values[x]->getLiteral()->type != LITERAL_TYPE_BYTE_ARRAY) \
+    { \
+        std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " function can only use byte array now." << std::endl; \
+        throw std::exception(); \
+    } \
+    do {} while(false)
+
+#define BUILTIN_CHECK_LITERAL_SIZE(x, size) \
+    if (values[x]->getLiteral()->length != size) \
+    { \
+        std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " invalid literal size. expected: " << size << " got: " << values[x]->getLiteral()->length << std::endl; \
+        throw std::exception(); \
+    } \
+    do {} while(false)
+
 class Builtin
 {
 public:
