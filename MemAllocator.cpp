@@ -50,11 +50,23 @@ uint8_t *MemAllocator::allocate(size_t bytes)
     std::cout << "MemAllocator::allocate(): called to allocate " << bytes << " bytes, remaining: " << (capacity - (top + bytes)) << std::endl;
 #endif
 
-    if ((top + bytes) < (capacity - 1024))
+    if(this == getCurrent())
     {
-        top += bytes;
-        memset(nextAddr, 0, bytes);
-        return nextAddr;
+        if ((top + bytes) < (capacity - 1024))
+        {
+            top += bytes;
+            memset(nextAddr, 0, bytes);
+            return nextAddr;
+        }
+    }
+    else
+    {
+        if ((top + bytes) < (capacity - 512))
+        {
+            top += bytes;
+            memset(nextAddr, 0, bytes);
+            return nextAddr;
+        }
     }
 
 #ifdef DEBUG

@@ -199,3 +199,16 @@ RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::ve
 
     return res;
 }
+
+RefPtr<TTObject> BuiltinIntegerCharValue::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 0);
+
+    uint8_t str[2];
+    str[0] = (uint8_t) *((int32_t *) dest->getLiteral()->data);
+    str[1] = '\0';
+
+    RefPtr<TTObject> res = TTLiteral::createStringLiteral(str);
+
+    return res;
+}

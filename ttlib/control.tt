@@ -77,7 +77,7 @@ Object
         [ :createWith: |
             | first object name |;
             first = True;
-            object = Object new;
+            object = this new;
             createWith
                 inject:
                     [ :item: |

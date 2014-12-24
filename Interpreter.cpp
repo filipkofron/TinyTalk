@@ -80,6 +80,7 @@ void Interpreter::setupLiterals()
     BuiltinUtil::addMultipleMethod(integer, "div:", {"div"},"integer_div:");
     BuiltinUtil::addMultipleMethod(integer, "mod:", {"mod"},"integer_mod:");
     BuiltinUtil::addSimpleMethod(integer, "toString", "integer_toString");
+    BuiltinUtil::addSimpleMethod(integer, "charValue", "integer_charValue");
     BuiltinUtil::addMultipleMethod(integer, "lessThan:", {"lessThan"},"integer_lessThan:");
     BuiltinUtil::addMultipleMethod(integer, "greaterThan:", {"greaterThan"},"integer_greaterThan:");
     BuiltinUtil::addMultipleMethod(integer, "equals:", {"equals"},"integer_equals:");
@@ -93,6 +94,7 @@ void Interpreter::setupLiterals()
     string->setLiteral(stringLit);
     string->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addMultipleMethod(string, "charAt:", {"charAt"},"string_charAt:");
+    BuiltinUtil::addMultipleMethod(string, "charAsIntAt:", {"charAsIntAt"},"string_charAsIntAt:");
     BuiltinUtil::addMultipleMethod(string, "setChar:at:", {"setChar", "at"},"string_setChar:at:");
     BuiltinUtil::addSimpleMethod(string, "toLower", "string_toLower");
     BuiltinUtil::addSimpleMethod(string, "toUpper", "string_toUpper");
@@ -123,6 +125,13 @@ void Interpreter::setupFile()
     RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
     RefPtr<TTObject> file = TTObject::createObject(TT_OBJECT);
     file->setField(TO_TT_STR("parent"), object);
+
+    BuiltinUtil::addMultipleMethod(file, "openPath:mode:file:", {"openPath", "mode", "file"}, "fileio_openPath:mode:file:");
+    BuiltinUtil::addMultipleMethod(file, "close:", {"close"}, "fileio_close:");
+    BuiltinUtil::addMultipleMethod(file, "read:", {"read"}, "fileio_read:");
+    BuiltinUtil::addMultipleMethod(file, "write:file:", {"write", "file"}, "fileio_write:file:");
+    BuiltinUtil::addMultipleMethod(file, "isOK:", {"isOK"}, "fileio_isOK:");
+    BuiltinUtil::addMultipleMethod(file, "readLine:", {"readLine"}, "fileio_readLine:");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("FileIO"), file);
 }

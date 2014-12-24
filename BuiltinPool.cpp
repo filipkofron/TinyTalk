@@ -34,8 +34,10 @@ BuiltinPool::BuiltinPool()
     registerBultin("integer_lessThanOrEqual:", std::shared_ptr<Builtin> (new BuiltinIntegerLessThanOrEqual));
     registerBultin("integer_greaterThanOrEqual", std::shared_ptr<Builtin> (new BuiltinIntegerGreaterThanOrEqual));
     registerBultin("integer_fromString:", std::shared_ptr<Builtin> (new BuiltinIntegerFromString));
+    registerBultin("integer_charValue", std::shared_ptr<Builtin> (new BuiltinIntegerCharValue));
 
     registerBultin("string_charAt:", std::shared_ptr<Builtin> (new BuiltinStringCharAt));
+    registerBultin("string_charAsIntAt:", std::shared_ptr<Builtin> (new BuiltinStringCharAsIntAt));
     registerBultin("string_setChar:at:", std::shared_ptr<Builtin> (new BuiltinStringSetCharAt));
     registerBultin("string_toLower", std::shared_ptr<Builtin> (new BuiltinStringToLower));
     registerBultin("string_toUpper", std::shared_ptr<Builtin> (new BuiltinStringToUpper));
@@ -50,7 +52,12 @@ BuiltinPool::BuiltinPool()
     registerBultin("array_empty", std::shared_ptr<Builtin> (new BuiltinObjectArrayEmpty));
     registerBultin("array_toString", std::shared_ptr<Builtin> (new BuiltinObjectArrayToString));
 
-    registerBultin("fileio_openPath:mode:file:", std::shared_ptr<Builtin> (new BuiltinFileIOOpenPathModeFile));
+    registerBultin("fileio_openPath:mode:file:", std::shared_ptr<Builtin> (new BuiltinFileIOOpenModeFile));
+    registerBultin("fileio_close:", std::shared_ptr<Builtin> (new BuiltinFileIOClose));
+    registerBultin("fileio_read:", std::shared_ptr<Builtin> (new BuiltinFileIORead));
+    registerBultin("fileio_write:file:", std::shared_ptr<Builtin> (new BuiltinFileIOWriteFile));
+    registerBultin("fileio_isOK:", std::shared_ptr<Builtin> (new BuiltinFileIOIsOK));
+    registerBultin("fileio_readLine:", std::shared_ptr<Builtin> (new BuiltinFileIOReadLine));
 
     registerBultin("system_runFile:", std::shared_ptr<Builtin> (new BuiltinSystemRunFile));
     registerBultin("system_parse:", std::shared_ptr<Builtin> (new BuiltinSystemParse));

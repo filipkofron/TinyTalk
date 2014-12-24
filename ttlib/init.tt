@@ -15,6 +15,7 @@ Object inObject: Object createField: "createField:withValue:" withValue:
     ];
 
 Object createField: "getParent" withValue: [ parent ];
+Object createField: "setParent:" withValue: [ :setParent: | Object object: this set: "parent" value: setParent ];
 Object createField: "clone" withValue: [ this clone: this ];
 Object createField: "objectDoesntUnderstand:" withValue: [ nil ];
 

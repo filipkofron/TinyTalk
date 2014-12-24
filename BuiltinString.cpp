@@ -30,6 +30,29 @@ RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<
     return res;
 }
 
+RefPtr<TTObject> BuiltinStringCharAsIntAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    BUILTIN_CHECK_LITERAL(0);
+    BUILTIN_CHECK_INTEGER(0);
+
+    RefPtr<TTLiteral> thisStr = dest->getLiteral();
+    RefPtr<TTLiteral> argInt = values[0]->getLiteral();
+
+    int32_t index = *((int32_t *) argInt->data);
+
+    if((int32_t) thisStr->length <= index + 1)
+    {
+        std::cerr << "[Builtin]: Invalid string index " << *((int32_t *) argInt->data) << " string length: " << (thisStr->length - 1) << std::endl;
+        throw std::exception();
+    }
+
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral((uint8_t) thisStr->data[index]);
+
+    return res;
+}
+
 RefPtr<TTObject> BuiltinStringSetCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);

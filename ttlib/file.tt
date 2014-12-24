@@ -1,26 +1,31 @@
 | File |;
 File = Object createWith:
 {
-	"eof", False,
+	"new", [ :new |
+		| res |;
+		res = this getParent createWith: { "eof", False };
+		res setParent: this;
+		res
+	],
 
 	"openReadOnly:", [ :openReadOnly: |
 		| file |;
 		file = this new;
-		FileIO open: open mode: "rb" file: file;
+		FileIO openPath: openReadOnly mode: "rb" file: file;
 		file
 	],
 
 	"openReadWrite:", [ :openReadWrite: |
         | file |;
         file = this new;
-        FileIO open: open mode: "wb+" file: file;
+        FileIO openPath: openReadWrite mode: "wb+" file: file;
         file
     ],
 
     "openAppend:", [ :openAppend: |
         | file |;
         file = this new;
-        FileIO open: open mode: "ab+" file: file;
+        FileIO openPath: openAppend mode: "ab+" file: file;
         file
     ],
 
@@ -45,6 +50,10 @@ File = Object createWith:
 			ifFalse: [int charValue]
 	],
 
+	"readLine", [ :readLine |
+		FileIO readLine: this
+	],
+
 	"write:", [ :write: |
 		FileIO write: write file: this;
 		this
@@ -59,7 +68,7 @@ File = Object createWith:
 		eof
 	],
 
-	"isOK", [ :isOk |
+	"isOK", [ :isOK |
 		FileIO isOK: this;
 		this
 	]
