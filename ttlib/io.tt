@@ -1,0 +1,20 @@
+| In Out Err |;
+
+In = File createWith:
+{
+    "close", nil
+};
+
+Out = File createWith:
+{
+    "close", nil
+};
+
+Err = File createWith:
+{
+    "close", nil
+};
+
+System bindIn: In;
+System bindOut: Out;
+System bindErr: Err;

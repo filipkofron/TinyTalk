@@ -56,11 +56,15 @@ BuiltinPool::BuiltinPool()
     registerBultin("fileio_close:", std::shared_ptr<Builtin> (new BuiltinFileIOClose));
     registerBultin("fileio_read:", std::shared_ptr<Builtin> (new BuiltinFileIORead));
     registerBultin("fileio_write:file:", std::shared_ptr<Builtin> (new BuiltinFileIOWriteFile));
+    registerBultin("fileio_writeString:file:", std::shared_ptr<Builtin> (new BuiltinFileIOWriteStringFile));
     registerBultin("fileio_isOK:", std::shared_ptr<Builtin> (new BuiltinFileIOIsOK));
     registerBultin("fileio_readLine:", std::shared_ptr<Builtin> (new BuiltinFileIOReadLine));
 
     registerBultin("system_runFile:", std::shared_ptr<Builtin> (new BuiltinSystemRunFile));
     registerBultin("system_parse:", std::shared_ptr<Builtin> (new BuiltinSystemParse));
+    registerBultin("system_bindIn:", std::shared_ptr<Builtin> (new BuiltinSystemBindIn));
+    registerBultin("system_bindOut:", std::shared_ptr<Builtin> (new BuiltinSystemBindOut));
+    registerBultin("system_bindErr:", std::shared_ptr<Builtin> (new BuiltinSystemBindErr));
     registerBultin("system_generateBytecode:", std::shared_ptr<Builtin> (new BuiltinSystemGenerateBytecode));
 
     std::cout << "[BuiltinPool]: initialized." << std::endl;

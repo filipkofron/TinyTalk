@@ -96,8 +96,42 @@ RefPtr<TTObject> BuiltinFileIOWriteFile::invoke(RefPtr<TTObject> dest, std::vect
     BUILTIN_CHECK_LITERAL(0);
     BUILTIN_CHECK_INTEGER(0);
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[1]);
-    fputc(*(int32_t *) values[0]->getLiteral()->data, *fd);
-    return dest;
+    int ret = fputc(*(int32_t *) values[0]->getLiteral()->data, *fd);
+    RefPtr<TTObject> written;
+
+    if(ret != -1)
+    {
+        written = Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+    }
+    else
+    {
+        written = Runtime::globalEnvironment->getField(TO_TT_STR("False"));
+    }
+
+    return written;
+}
+
+RefPtr<TTObject> BuiltinFileIOWriteStringFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(2, 2);
+    BUILTIN_CHECK_LITERAL(0);
+    BUILTIN_CHECK_STRING(0);
+
+    FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[1]);
+
+    int ret = fputs((const char *) values[0]->getLiteral()->data, *fd);
+    RefPtr<TTObject> written;
+
+    if(ret != -1)
+    {
+        written = Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+    }
+    else
+    {
+        written = Runtime::globalEnvironment->getField(TO_TT_STR("False"));
+    }
+
+    return written;
 }
 
 RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)

@@ -31,17 +31,29 @@ False createField: "toString" withValue: [ "False" ];
 | While |;
 While = (Object new);
 
-//While isTrue: [10 equals: 10] do: [ "True" ];
-
 While createField: "toString" withValue: ["While"];
 
 While
     createField: "isTrue:do:"
     withValue:
         [ :isTrue: :do: |
-            | thisThis |;
+            | thisThis doFun |;
 
             thisThis = this;
+
+            doFun = [ (isTrue value) ifTrue: [do value] ];
+
+            // Do this multiple times so we lower the stack complexity ten times
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
+            doFun value;
 
             (isTrue value)
                 ifTrue:

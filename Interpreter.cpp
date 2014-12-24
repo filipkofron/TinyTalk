@@ -130,6 +130,7 @@ void Interpreter::setupFile()
     BuiltinUtil::addMultipleMethod(file, "close:", {"close"}, "fileio_close:");
     BuiltinUtil::addMultipleMethod(file, "read:", {"read"}, "fileio_read:");
     BuiltinUtil::addMultipleMethod(file, "write:file:", {"write", "file"}, "fileio_write:file:");
+    BuiltinUtil::addMultipleMethod(file, "writeString:file:", {"writeString", "file"}, "fileio_writeString:file:");
     BuiltinUtil::addMultipleMethod(file, "isOK:", {"isOK"}, "fileio_isOK:");
     BuiltinUtil::addMultipleMethod(file, "readLine:", {"readLine"}, "fileio_readLine:");
 
@@ -144,6 +145,9 @@ void Interpreter::setupSystem()
 
     BuiltinUtil::addMultipleMethod(system, "runFile:", {"runFile"}, "system_runFile:");
     BuiltinUtil::addMultipleMethod(system, "parse:", {"parse"}, "system_parse:");
+    BuiltinUtil::addMultipleMethod(system, "bindIn:", {"bindIn"}, "system_bindIn:");
+    BuiltinUtil::addMultipleMethod(system, "bindOut:", {"bindOut"}, "system_bindOut:");
+    BuiltinUtil::addMultipleMethod(system, "bindErr:", {"bindErr"}, "system_bindErr:");
     BuiltinUtil::addMultipleMethod(system, "generateBytecode:", {"generateBytecode"}, "system_generateBytecode:");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("System"), system);
@@ -168,11 +172,14 @@ void Interpreter::loadTTLibModule(std::string name)
 
 void Interpreter::loadTTLib()
 {
+    // basic libs
     loadTTLibModule("init.tt");
     loadTTLibModule("control.tt");
-    loadTTLibModule("class.tt");
     loadTTLibModule("exec.tt");
     loadTTLibModule("file.tt");
+    loadTTLibModule("io.tt");
+
+    // math
     loadTTLibModule("number.tt");
 }
 

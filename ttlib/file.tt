@@ -66,13 +66,20 @@ File = Object createWith:
 	],
 
 	"write:", [ :write: |
-		FileIO write: write file: this;
-		this
+		FileIO write: write file: this
+	],
+
+	"writeString:", [ :writeString: |
+		FileIO writeString: writeString file: this
+	],
+
+	"writeLine:", [ :writeLine: |
+		writeLine = writeLine append: "\n";
+		FileIO writeString: writeLine file: this
 	],
 
 	"writeChar;", [ :write: |
-		FileIO write: (write charAsIntAt: 0) file: this;
-		this
+		FileIO write: (write charAsIntAt: 0) file: this
 	],
 
 	"isEOF", [ :isEOF |

@@ -75,3 +75,45 @@ RefPtr<TTObject> BuiltinSystemGenerateBytecode::invoke(RefPtr<TTObject> dest, st
 
     return byteCode;
 }
+
+RefPtr<TTObject> BuiltinSystemBindIn::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    RefPtr<TTObject> file = values[0];
+
+    RefPtr<TTObject> fd = TTLiteral::createByteArray(sizeof(FILE *));
+    FILE **fileHandle = (FILE **) fd->getLiteral()->data;
+    *fileHandle = stdin;
+    file->addField(TO_TT_STR("fd"), fd);
+
+    return dest;
+}
+
+RefPtr<TTObject> BuiltinSystemBindOut::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    RefPtr<TTObject> file = values[0];
+
+    RefPtr<TTObject> fd = TTLiteral::createByteArray(sizeof(FILE *));
+    FILE **fileHandle = (FILE **) fd->getLiteral()->data;
+    *fileHandle = stdout;
+    file->addField(TO_TT_STR("fd"), fd);
+
+    return dest;
+}
+
+RefPtr<TTObject> BuiltinSystemBindErr::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    RefPtr<TTObject> file = values[0];
+
+    RefPtr<TTObject> fd = TTLiteral::createByteArray(sizeof(FILE *));
+    FILE **fileHandle = (FILE **) fd->getLiteral()->data;
+    *fileHandle = stderr;
+    file->addField(TO_TT_STR("fd"), fd);
+
+    return dest;
+}
