@@ -284,9 +284,9 @@ void BytecodeGen::runGC(MemAllocator *oldMem, MemAllocator *newMem)
     uint32_t lenMax = (uint32_t) byteCode.size();
     for (uint32_t i = 0; i < lenMax / sizeof(TTObject *); i++)
     {
-//#ifdef DEBUG
+#ifdef DEBUG
                 std::cout << "GC: BC_gen: i/pcMax: " << i << "/" << lenMax / sizeof(TTObject *) << std::endl;
-//#endif
+#endif
         //&(((TTObject **) byteCode.data())[i])
         TTObject::_gc_COPY_copy(&(((TTObject **) byteCode.data())[i]), oldMem, newMem);
     }

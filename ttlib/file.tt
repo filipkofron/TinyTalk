@@ -54,6 +54,17 @@ File = Object createWith:
 		FileIO readLine: this
 	],
 
+	"eachLineDo:", [ :eachLineDo: |
+		| fileThiz |;
+		fileThiz = this;
+		While
+			isTrue: [fileThiz isEOF not]
+			do: [
+				eachLineDo value: (fileThiz readLine)
+			];
+		fileThiz
+	],
+
 	"write:", [ :write: |
 		FileIO write: write file: this;
 		this

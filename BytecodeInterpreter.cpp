@@ -352,30 +352,30 @@ void BytecodeInterpreter::refreshAfterGC()
 
 void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
 {
-//#ifdef DEBUG
+#ifdef DEBUG
     std::cout << "BytecodeInterpreter::runGC ==== BEGIN ====" << std::endl;
-//#endif
+#endif
     TTObject *stackFramePtr = &stackFrame;
     TTObject::_gc_COPY_copy(&stackFramePtr, oldMem, newMem);
     if(stackFramePtr)
     {
-//#ifdef DEBUG
+#ifdef DEBUG
         std::cout << "stackframe: " << (unsigned long) stackFramePtr << std::endl;
         std::cout << "stackframe cnt: " << stackFramePtr->count << std::endl;
         stackFramePtr->print(std::cout, 0, false);
-//#endif
+#endif
         TTObject *obj = stackFramePtr->getField(TO_TT_STR("byteCode"));
-//#ifdef DEBUG
+#ifdef DEBUG
         std::cout << "byteCodeObj: " << (unsigned long) obj << std::endl;
-//#endif
+#endif
         if(obj)
         {
             TTLiteral *byteCodeLit = obj->getLiteral();
             for (uint32_t i = 0; i < pcMax / sizeof(TTObject *); i++)
             {
-//#ifdef DEBUG
+#ifdef DEBUG
                 std::cout << "GC: BC: i/pcMax: " << i << "/" << pcMax / sizeof(TTObject *) << std::endl;
-//#endif
+#endif
                 TTObject::_gc_COPY_copy(&(((TTObject **) byteCodeLit->data)[i]), oldMem, newMem);
 
 #ifdef DEBUG
@@ -384,9 +384,9 @@ void BytecodeInterpreter::runGC(MemAllocator *oldMem, MemAllocator *newMem)
             }
         }
     }
-//#ifdef DEBUG
+#ifdef DEBUG
     std::cout << "BytecodeInterpreter::runGC ==== END ====" << std::endl;
-//#endif
+#endif
     stack.runGC(oldMem, newMem);
 }
 

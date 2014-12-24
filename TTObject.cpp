@@ -8,9 +8,9 @@
 
 void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator *newMem)
 {
-//#ifdef DEBUG
+#ifdef DEBUG
     std::cout << ">> TTObject::_gc_COPY_copy ptr: " << ((unsigned long) (uintptr_t) *ptr) << std::endl;
-//#endif
+#endif
 //#ifdef DEBUG
 //    if(*ptr == NULL)
 //    {
@@ -26,55 +26,55 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 
     if(newMem->isInside((uintptr_t) *ptr))
     {
-//#ifdef DEBUG
+#ifdef DEBUG
         std::cout << "is new already" << std::endl;
-//#endif
+#endif
         return;
     }
     else
     {
         {
-//#ifdef DEBUG
+#ifdef DEBUG
             std::cout << "not new" << std::endl;
-//#endif
+#endif
         }
     }
 
     if(!oldMem->isInside((uintptr_t) *ptr))
     {
-//#ifdef DEBUG
+#ifdef DEBUG
         std::cout << "is also not in OLD ????????" << std::endl;
-//#endif
+#endif
         return;
     }else
     {
         {
-//#ifdef DEBUG
+#ifdef DEBUG
             std::cout << "is old" << std::endl;
-//#endif
+#endif
         }
     }
 
     if(IS_MOVED_OBJECT(ptr[0]))
     {
-//#ifdef DEBUG
+#ifdef DEBUG
         std::cout << "is moved already new addr: " << ((unsigned long) (uintptr_t) *ptr) << std::endl;
-//#endif
+#endif
         *ptr = (TTObject *) *(uintptr_t *) ptr[0];
         return;
     }
 
-//#ifdef DEBUG
+#ifdef DEBUG
     std::cout << "Making copy of:";
     ptr[0]->print(std::cout, 1, false);
     std::cout << std::endl;
-//#endif
+#endif
 
     TTObject *newObj = newMem->allocateObject();
     memcpy(newObj, *ptr, sizeof(**ptr));
-//#ifdef DEBUG
+#ifdef DEBUG
     std::cout << "Allocating capacity: newObj->fieldCapacity: " << newObj->size << " newObj->fieldCount: " << newObj->count << std::endl;
-//#endif
+#endif
     newMem->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * newObj->size);
     uint8_t **_temp_GCnames = (uint8_t **) newMem->allocate(sizeof(uint8_t *) * newObj->size);
     TTObject **_temp_GCobjects = (TTObject **) newMem->allocate(sizeof(TTObject *) * newObj->size);
@@ -124,9 +124,9 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
     {
         if (newObj->names[i])
         {
-//#ifdef DEBUG
+#ifdef DEBUG
         std::cout << "Will copy '" << newObj->names[i] << "'" << std::endl;
-//#endif
+#endif
             uint8_t *_temp_GCStr = newMem->cloneString(newObj->names[i]);
             newObj->names[i] = _temp_GCStr;
 #ifdef DEBUG

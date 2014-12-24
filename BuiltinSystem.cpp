@@ -19,7 +19,7 @@ RefPtr<TTObject> BuiltinSystemRunFile::invoke(RefPtr<TTObject> dest, std::vector
 
     if(file.fail())
     {
-        std::cerr << "Error: Cannot run file: '" << (const char *) values[0]->getLiteral()->data << "'" << std::endl;
+        std::cerr << "[Builtin]: Error: Cannot run file: '" << (const char *) values[0]->getLiteral()->data << "'" << std::endl;
         throw std::exception();
     }
 
@@ -58,9 +58,20 @@ RefPtr<TTObject> BuiltinSystemGenerateBytecode::invoke(RefPtr<TTObject> dest, st
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
-    BUILTIN_CHECK_EXPRESSION(0);
+    RefPtr<TTObject> expr = values[0];
 
-    RefPtr<TTObject> byteCode = Runtime::bytecodeGen.generate(values[0]);
+    if(values[0]->type != TT_EXPR)
+    {
+        if(&values[0] != Runtime::globalEnvironment->getField(TO_TT_STR("nil")))
+        {
+            std::cerr << "[Builtin]: GenerateBytecode Error: Invalid expression (must be expression or nil)" << std::endl;
+            throw std::exception();
+        }
+        RefPtr<TTObject> name = TTLiteral::createStringLiteral(TO_TT_STR("nil"));
+        expr = Expression::createSymbolValue(name->getLiteral());
+    }
+
+    RefPtr<TTObject> byteCode = Runtime::bytecodeGen.generate(expr);
 
     return byteCode;
 }

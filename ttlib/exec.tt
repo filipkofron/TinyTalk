@@ -11,5 +11,12 @@ Exec = Object createWith:
         Object object: block set: "blockByteCode" value: byteCode;
 
         block value
+    ],
+
+    "execFile:", [ :execFile: |
+        | contents |;
+        contents = "";
+        (File openReadOnly: execFile) eachLineDo: [ :each: | contents = contents append: each ];
+        this execString: contents
     ]
 }
