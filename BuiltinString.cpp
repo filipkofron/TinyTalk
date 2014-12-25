@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "BuiltinString.h"
 #include "Common.h"
+#include "Runtime.h"
 
 RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
@@ -189,4 +190,53 @@ RefPtr<TTObject> BuiltinStringLength::invoke(RefPtr<TTObject> dest, std::vector<
 RefPtr<TTObject> BuiltinStringToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     return dest;
+}
+
+RefPtr<TTObject> BuiltinStringStartsWith::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    BUILTIN_CHECK_LITERAL(0);
+    BUILTIN_CHECK_STRING(0);
+
+    uint8_t *destStr = dest->getLiteral()->data;
+    uint8_t *givenStr = values[0]->getLiteral()->data;
+
+    while(*destStr && *givenStr)
+    {
+        if(*destStr++ != *givenStr++)
+        {
+            return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
+        }
+    }
+
+    if(!*destStr && !*givenStr)
+    {
+        return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+    }
+
+    if(!*destStr)
+    {
+        return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
+    }
+
+    return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+}
+
+RefPtr<TTObject> BuiltinStringEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    BUILTIN_CHECK_LITERAL(0);
+    BUILTIN_CHECK_STRING(0);
+
+    uint8_t *destStr = dest->getLiteral()->data;
+    uint8_t *givenStr = values[0]->getLiteral()->data;
+
+    if(COMPARE_NAME(destStr, givenStr) == 0)
+    {
+        return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+    }
+
+    return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }

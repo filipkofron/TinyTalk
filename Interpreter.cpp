@@ -20,6 +20,7 @@ void Interpreter::initialize()
     Runtime::globalEnvironment = &TTObject::createObject(TT_ENV);
     Runtime::globalEnvironment->addField(TO_TT_STR("nil"), TTObject::createObject(TT_NIL));
     Runtime::globalEnvironment->addField(TO_TT_STR("parentEnv"), Runtime::globalEnvironment->getField(TO_TT_STR("nil")));
+    Runtime::globalEnvironment->addField(TO_TT_STR("Global"), Runtime::globalEnvironment);
 
     setupObject();
     setupLiterals();
@@ -46,6 +47,8 @@ void Interpreter::setupObject()
     BuiltinUtil::addSimpleMethod(object, "alloc", "object_alloc");
     BuiltinUtil::addMultipleMethod(object, "object:addField:", {"object", "addField"},"object_add");
     BuiltinUtil::addMultipleMethod(object, "object:get:", {"object", "get"},"object_get");
+    BuiltinUtil::addSimpleMethod(object, "getFieldNames", "object_getFieldNames");
+    BuiltinUtil::addSimpleMethod(object, "getFieldValues", "object_getFieldValues");
     BuiltinUtil::addMultipleMethod(object, "object:set:value:", {"object", "set", "value"},"object_set");
     BuiltinUtil::addMultipleMethod(object, "clone:", {"clone"},"object_clone");
     BuiltinUtil::addSimpleMethod(object, "new", "object_new");
@@ -103,7 +106,8 @@ void Interpreter::setupLiterals()
     BuiltinUtil::addMultipleMethod(string, "append:", {"append"},"string_append:");
     BuiltinUtil::addSimpleMethod(string, "length", "string_length");
     BuiltinUtil::addSimpleMethod(string, "toString", "string_toString");
-
+    BuiltinUtil::addMultipleMethod(string, "startsWith:", {"startsWith"},"string_startsWith:");
+    BuiltinUtil::addMultipleMethod(string, "equals:", {"equals"},"string_equals:");
 
     RefPtr<TTObject> array = TTObject::createObject(TT_LITERAL);
     RefPtr<TTLiteral> arrayLit = TTLiteral::createObjectArray(0)->getLiteral(); // to override null parent
@@ -190,6 +194,7 @@ void Interpreter::loadTTLib()
     // basic libs
     loadTTLibModule("init.tt");
     loadTTLibModule("control.tt");
+    loadTTLibModule("cont.tt");
     loadTTLibModule("exec.tt");
     loadTTLibModule("file.tt");
     loadTTLibModule("socket.tt");

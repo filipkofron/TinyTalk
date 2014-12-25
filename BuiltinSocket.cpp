@@ -80,6 +80,13 @@ RefPtr<TTObject> BuiltinSocketCreateTCPServerSocketAddressPortFile::invoke(RefPt
     serv_addr.sin_addr.s_addr = inet_addr((const char *)values[0]->getLiteral()->data);
     serv_addr.sin_port = htons((uint16_t) *(int32_t *) values[1]->getLiteral()->data);
 
+    int on = 1;
+
+    setsockopt(sfd, SOL_SOCKET,
+            SO_REUSEADDR,
+            (const char *) &on, sizeof(on));
+
+
     if (bind(sfd, (struct sockaddr *) &serv_addr,
             sizeof(serv_addr)) < 0)
     {
@@ -139,6 +146,23 @@ RefPtr<TTObject> BuiltinSocketTCPServerSocketAcceptClientFile::invoke(RefPtr<TTO
         clientSd = accept(listenSd, (sockaddr *) &clientAddr, &clientAddrSize);
     } while(clientSd < 0);
 
+
+    int on = 1;
+
+    setsockopt(clientSd, SOL_SOCKET,
+            SO_REUSEADDR,
+            (const char *) &on, sizeof(on));
+
+    struct timeval timeout;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+
+    setsockopt (clientSd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,
+            sizeof(timeout));
+
+    setsockopt (clientSd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout,
+            sizeof(timeout));
+
     RefPtr<TTObject> clientSocketFd = TTLiteral::createByteArray(sizeof(int));
     RefPtr<TTObject> clientSocketAddr = TTLiteral::createByteArray(sizeof(clientAddr));
 
@@ -161,8 +185,8 @@ RefPtr<TTObject> BuiltinSocketCloseTCPClientSocketFile::invoke(RefPtr<TTObject> 
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
     checkServerSocketMissing(values[0]);
+    checkIfExistsAndCloseFile(values[0]);
     checkServerSocketOpened(values[0]);
     closeServerSocketIfOpened(values[0]);
-    checkIfExistsAndCloseFile(values[0]);
     return dest;
 }

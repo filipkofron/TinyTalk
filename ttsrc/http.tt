@@ -1,0 +1,73 @@
+| HttpServer |;
+
+HttpServer = Object createWith:
+{
+    "createWithSocket:", [ :createWithSocket: |
+        | inst |;
+        inst = this getParent createWith:
+        {
+            "serverSocket", createWithSocket
+        };
+        inst setParent: this;
+        inst
+    ],
+
+    "address:port:", [ :address: :port: |
+        |inst|;
+        inst = this createWithSocket: (TCPServerSocket openAddress: address port: port);
+        inst
+    ],
+
+    "start", [ :start |
+        | server |;
+        server = this;
+        Loop
+            repeat:
+            [
+                Loop repeat:
+                [
+                    | client |;
+                    client = serverSocket accept;
+
+                    Out writeLine: "Got client";
+
+                    server handleClient: client
+                ]
+                times: 1024
+            ]
+            times: 1024
+    ],
+
+    "handleClient:", [ :handleClient: |
+        | end fullRequest lastLine |;
+        end = False;
+        fullRequest = "";
+        lastLine = "";
+        While
+            isTrue: [end not]
+            do:
+            [
+                | line |;
+                line = handleClient readLine;
+                (line trim equals: "")
+                    ifFalse: [ fullRequest = fullRequest append: (line append: "\n") ]
+                    ifTrue:
+                    [
+                        (lastLine equals: "")
+                            ifTrue: [ end = True ];
+                            fullRequest = fullRequest append: "\n"
+                    ];
+                lastLine = line;
+                (fullRequest length greaterThan: 32768) ifTrue: [end = True]
+            ];
+
+        handleClient readLine;
+        Out writeLine: "full request:";
+        Out writeLine: fullRequest;
+        handleClient writeString: "Content-type: text/html\r\n\r\n";
+        handleClient writeLine: "Hello from TinyTalk! :)\n";
+        handleClient close
+    ]
+};
+
+HttpServer

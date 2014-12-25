@@ -61,7 +61,7 @@ uint8_t *MemAllocator::allocate(size_t bytes)
     }
     else
     {
-        if ((top + bytes) < (capacity - 512))
+        if ((top + bytes) < capacity)
         {
             top += bytes;
             memset(nextAddr, 0, bytes);

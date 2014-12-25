@@ -1,0 +1,39 @@
+| Map |;
+
+Map = Object createWith:
+{
+    "mapPrefix", "map_val_",
+
+    "new", [ :new |
+        | inst |;
+        inst = this getParent createWith:
+        {
+            "values", Object alloc
+        };
+        inst setParent: this;
+        inst
+    ],
+
+    "eachValueDo:", [ :eachValueDo: |
+        | ns vs i |;
+        ns = values getFieldNames;
+        vs = values getFieldValues;
+
+        i = 0;
+
+        ns inject: [ :each: |
+            (each startsWith: mapPrefix)
+                ifTrue: [ eachValueDo value: (vs at: i) ];
+            i = i add: 1
+        ]
+    ],
+
+    "addKey:value:", [ :addKey: :value: |
+        Object inObject: values createField: (mapPrefix append: (addKey toString)) withValue: value;
+        this
+    ],
+
+    "getKey:", [ :getKey: |
+        Object object: values get: (mapPrefix append: (getKey toString))
+    ]
+}

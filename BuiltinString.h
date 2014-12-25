@@ -66,4 +66,18 @@ public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
 
+class BuiltinStringStartsWith : public Builtin
+{
+private:
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
+};
+
+class BuiltinStringEquals : public Builtin
+{
+private:
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
+};
+
 #endif

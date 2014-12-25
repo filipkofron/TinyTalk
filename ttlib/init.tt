@@ -14,6 +14,7 @@ Object inObject: Object createField: "createField:withValue:" withValue:
         Object inObject: this createField: createField withValue: withValue
     ];
 
+Object createField: "isNil" withValue: [ False ];
 Object createField: "getParent" withValue: [ parent ];
 Object createField: "setParent:" withValue: [ :setParent: | Object object: this set: "parent" value: setParent ];
 Object createField: "clone" withValue: [ this clone: this ];
@@ -25,3 +26,5 @@ Object createField: "set:value:" withValue:
     ];
 
 Object inObject: nil createField: "toString" withValue: ["nil"];
+
+Object inObject: nil createField: "isNil" withValue: [ True ];

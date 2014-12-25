@@ -28,8 +28,9 @@ False createField: "toString" withValue: [ "False" ];
 
 // While
 
-| While |;
+| While Loop |;
 While = (Object new);
+Loop = (Object new);
 
 While createField: "toString" withValue: ["While"];
 
@@ -64,6 +65,49 @@ While
                 ifFalse:
                  [ thisThis ]
          ];
+
+While
+    createField: "isTrue:doSafely:"
+    withValue:
+        [ :isTrue: :doSafely: |
+            | thisThis doFun |;
+
+            thisThis = this;
+
+            doFun = [ (isTrue value) ifTrue: [doSafely value] ];
+
+            // Do this multiple times so we lower the stack complexity ten times
+            Loop repeat: doFun times: 8;
+
+            (isTrue value)
+                ifTrue: [ Loop repeat: doFun times: 32 ];
+
+            (isTrue value)
+                ifTrue: [ Loop repeat: doFun times: 256 ];
+
+            (isTrue value)
+                ifTrue: [ Loop repeat: doFun times: 1024 ];
+
+            (isTrue value)
+                ifTrue:
+                 [
+                    do value;
+                    thisThis isTrue: isTrue doSafely: doSafely
+                    ]
+                ifFalse:
+                 [ thisThis ]
+         ];
+
+Loop createField: "toString" withValue: ["Loop"];
+
+Loop
+    createField: "repeat:times:"
+    withValue:
+    [ :repeat: :times: |
+        While
+            isTrue: [ times greaterThan: 0 ]
+            do: [ times = times minus: 1; repeat value ]
+    ];
 
 Array
     createField: "inject:"

@@ -15,6 +15,8 @@ BuiltinPool::BuiltinPool()
     registerBultin("object_add", std::shared_ptr<Builtin> (new BuiltinObjectAddField));
     registerBultin("object_get", std::shared_ptr<Builtin> (new BuiltinObjectGetter()));
     registerBultin("object_set", std::shared_ptr<Builtin> (new BuiltinObjectSetter()));
+    registerBultin("object_getFieldNames", std::shared_ptr<Builtin> (new BuiltinObjectGetFieldNames()));
+    registerBultin("object_getFieldValues", std::shared_ptr<Builtin> (new BuiltinObjectGetFieldValues()));
     registerBultin("object_debugprint", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrint));
     registerBultin("object_debugprintrec", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrintRec));
     registerBultin("object_debugprintstring", std::shared_ptr<Builtin> (new BuiltinObjectDebugPrintString));
@@ -46,6 +48,8 @@ BuiltinPool::BuiltinPool()
     registerBultin("string_append:", std::shared_ptr<Builtin> (new BuiltinStringAppend));
     registerBultin("string_length", std::shared_ptr<Builtin> (new BuiltinStringLength));
     registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
+    registerBultin("string_startsWith:", std::shared_ptr<Builtin> (new BuiltinStringStartsWith));
+    registerBultin("string_equals:", std::shared_ptr<Builtin> (new BuiltinStringEquals));
 
     registerBultin("array_size", std::shared_ptr<Builtin> (new BuiltinObjectArraySize));
     registerBultin("array_at:", std::shared_ptr<Builtin> (new BuiltinObjectArrayAt));

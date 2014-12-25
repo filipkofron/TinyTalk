@@ -65,8 +65,7 @@ RefPtr<TTObject> BuiltinObjectGetter::invoke(RefPtr<TTObject> dest, std::vector<
 
     if (!object->hasField(TO_TT_STR(name.c_str())))
     {
-        std::cerr << "[Builtin]: Field not found!" << std::endl;
-        throw std::exception();
+        return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
     }
 #ifdef DEBUG
     std::cout << "[Builtin]: Getting field from dest = " << object << std::endl;
@@ -206,6 +205,78 @@ RefPtr<TTObject> BuiltinObjectNew::invoke(RefPtr<TTObject> dest, std::vector<std
     res->setField(TO_TT_STR("parent"), dest);
 
     return res;
+}
+
+RefPtr<TTObject> BuiltinObjectGetFieldNames::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 0);
+
+    uint32_t size = dest->size;
+    uint32_t nonLiteralSize = 0;
+
+    for(uint32_t i = 0; i < size; i++)
+    {
+        if (dest->names[i])
+        {
+            if (*dest->names[i])
+            {
+                nonLiteralSize++;
+            }
+        }
+    }
+
+    RefPtr<TTObject> result = TTLiteral::createObjectArray(nonLiteralSize);
+
+    uint32_t objI = 0;
+    for(uint32_t i = 0; i < size; i++)
+    {
+        if(dest->names[i])
+        {
+            if(*dest->names[i])
+            {
+                std::string nameStr = (const char *) dest->names[i];
+                RefPtr<TTObject> name = TTLiteral::createStringLiteral(TO_TT_STR(nameStr.c_str()));
+                ((TTObject **) result->getLiteral()->data)[objI++] = &name;
+            }
+        }
+    }
+
+    return result;
+}
+
+RefPtr<TTObject> BuiltinObjectGetFieldValues::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 0);
+
+    uint32_t size = dest->size;
+    uint32_t nonLiteralSize = 0;
+
+    for(uint32_t i = 0; i < size; i++)
+    {
+        if (dest->names[i])
+        {
+            if (*dest->names[i])
+            {
+                nonLiteralSize++;
+            }
+        }
+    }
+
+    RefPtr<TTObject> result = TTLiteral::createObjectArray(nonLiteralSize);
+
+    uint32_t objI = 0;
+    for(uint32_t i = 0; i < size; i++)
+    {
+        if(dest->names[i])
+        {
+            if(*dest->names[i])
+            {
+                ((TTObject **) result->getLiteral()->data)[objI++] = dest->objects[i];
+            }
+        }
+    }
+
+    return result;
 }
 
 RefPtr<TTObject> BuiltinObjectToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)

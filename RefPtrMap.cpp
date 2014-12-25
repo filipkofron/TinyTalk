@@ -1,6 +1,6 @@
 #include "RefPtrMap.h"
 
-#define REF_PTR_MAX_VALS (8192) // must be 2 to the power of n !!!
+#define REF_PTR_MAX_VALS (8192 * 16) // must be 2 to the power of n !!!
 
 #define CALC_INDEX(ptr, size) ((int) (((((uint16_t *) &refPtr)[0]) ^ (((uint16_t *) &refPtr)[1])) & (size - 1)))
 

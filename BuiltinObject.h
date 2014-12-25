@@ -65,6 +65,18 @@ public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
 };
 
+class BuiltinObjectGetFieldNames : public Builtin
+{
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
+};
+
+class BuiltinObjectGetFieldValues : public Builtin
+{
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values);
+};
+
 class BuiltinObjectToString : public Builtin
 {
 public:

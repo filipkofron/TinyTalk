@@ -62,7 +62,6 @@ RefPtr<TTObject> BuiltinObjectArrayAtSet::invoke(RefPtr<TTObject> dest, std::vec
     return dest;
 }
 
-
 RefPtr<TTObject>  BuiltinObjectArrayEmpty::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
