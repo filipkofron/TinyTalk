@@ -1,0 +1,31 @@
+| TCPClientSocket TCPServerSocket |;
+
+TCPClientSocket = File createWith:
+{
+    "close", [ :close |
+        SocketIO closeTCPClientSocketFile: this;
+        this
+    ]
+};
+
+TCPServerSocket = File createWith:
+{
+    "openAddress:port:", [ :openAddress: :port: |
+        | inst |;
+        inst = this new;
+        SocketIO createTCPServerSocketAddress: openAddress port: port file: inst;
+        inst
+    ],
+
+    "close", [ :close |
+        SocketIO closeTCPServerSocketFile: this;
+        this
+    ],
+
+    "accept", [ :accept |
+        | client |;
+        client = TCPClientSocket new;
+        SocketIO TCPServerSocket: this acceptClientFile: client;
+        client
+    ]
+}

@@ -10,6 +10,8 @@ set(SOURCE_FILES    Builtin.h
                     BuiltinObject.cpp
                     BuiltinObjectArray.cpp
                     BuiltinPool.cpp
+                    BuiltinSocket.h
+                    BuiltinSocket.cpp
                     BuiltinString.h
                     BuiltinString.cpp
                     BuiltinSystem.h

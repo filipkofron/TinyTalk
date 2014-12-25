@@ -89,7 +89,7 @@ public:
 
     RefPtr<T> &operator = (const RefPtr<T> &orig)
     {
-        // cannot check this because we have the & operator .. fuu
+        // cannot check this because we have the & operator .. but it doesn't matter
         ((RefPtrBase &) *this) = ((RefPtrBase &) orig);
         return *this;
     }

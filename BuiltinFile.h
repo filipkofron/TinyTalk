@@ -5,6 +5,10 @@ class BuiltinFile;
 
 #include "Builtin.h"
 
+bool checkIfExistsAndCloseFile(RefPtr<TTObject> file);
+void createFileHandle(RefPtr<TTObject> file);
+FILE **checkIfExistsAndIsOpenedThenReturnFD(RefPtr<TTObject> file);
+
 class BuiltinFileIOOpenModeFile : public Builtin
 {
 private:

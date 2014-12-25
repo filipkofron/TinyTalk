@@ -1,7 +1,7 @@
 #include "BuiltinFile.h"
 #include "Runtime.h"
 
-static bool checkIfExistsAndCloseFile(RefPtr<TTObject> file)
+bool checkIfExistsAndCloseFile(RefPtr<TTObject> file)
 {
     RefPtr<TTObject> fd = file->getField(TO_TT_STR("fd"));
     if(&fd)
@@ -22,7 +22,7 @@ static bool checkIfExistsAndCloseFile(RefPtr<TTObject> file)
     return false;
 }
 
-static void createFileHandle(RefPtr<TTObject> file)
+void createFileHandle(RefPtr<TTObject> file)
 {
     RefPtr<TTObject> fd = TTLiteral::createByteArray(sizeof(FILE *));
     FILE **fileHandle = (FILE **) fd->getLiteral()->data;

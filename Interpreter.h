@@ -14,6 +14,7 @@ private:
     void setupObject();
     void setupLiterals();
     void setupFile();
+    void setupSocket();
     void setupSystem();
     void loadTTLibModule(std::string name);
     void loadTTLib();

@@ -5,6 +5,7 @@
 #include "BuiltinString.h"
 #include "BuiltinObjectArray.h"
 #include "BuiltinSystem.h"
+#include "BuiltinSocket.h"
 
 BuiltinPool::BuiltinPool()
 {
@@ -59,6 +60,11 @@ BuiltinPool::BuiltinPool()
     registerBultin("fileio_writeString:file:", std::shared_ptr<Builtin> (new BuiltinFileIOWriteStringFile));
     registerBultin("fileio_isOK:", std::shared_ptr<Builtin> (new BuiltinFileIOIsOK));
     registerBultin("fileio_readLine:", std::shared_ptr<Builtin> (new BuiltinFileIOReadLine));
+
+    registerBultin("socketio_createTCPServerSocketAddress:port:file:", std::shared_ptr<Builtin> (new BuiltinSocketCreateTCPServerSocketAddressPortFile));
+    registerBultin("socketio_closeTCPServerSocketFile:", std::shared_ptr<Builtin> (new BuiltinSocketCloseTCPServerSocketFile));
+    registerBultin("socketio_TCPServerSocket:acceptClientFile:", std::shared_ptr<Builtin> (new BuiltinSocketTCPServerSocketAcceptClientFile));
+    registerBultin("socketio_closeTCPClientSocketFile:", std::shared_ptr<Builtin> (new BuiltinSocketCloseTCPClientSocketFile));
 
     registerBultin("system_runFile:", std::shared_ptr<Builtin> (new BuiltinSystemRunFile));
     registerBultin("system_parse:", std::shared_ptr<Builtin> (new BuiltinSystemParse));

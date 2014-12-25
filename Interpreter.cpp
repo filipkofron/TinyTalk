@@ -24,6 +24,7 @@ void Interpreter::initialize()
     setupObject();
     setupLiterals();
     setupFile();
+    setupSocket();
     setupSystem();
 
     std::cout << "%% Loading TTLib." << std::endl;
@@ -137,6 +138,20 @@ void Interpreter::setupFile()
     Runtime::globalEnvironment->addField(TO_TT_STR("FileIO"), file);
 }
 
+void Interpreter::setupSocket()
+{
+    RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
+    RefPtr<TTObject> socket = TTObject::createObject(TT_OBJECT);
+    socket->setField(TO_TT_STR("parent"), object);
+
+    BuiltinUtil::addMultipleMethod(socket, "createTCPServerSocketAddress:port:file:", {"createTCPServerSocketAddress", "port", "file"}, "socketio_createTCPServerSocketAddress:port:file:");
+    BuiltinUtil::addMultipleMethod(socket, "closeTCPServerSocketFile:", {"closeTCPServerSocketFile"}, "socketio_closeTCPServerSocketFile:");
+    BuiltinUtil::addMultipleMethod(socket, "TCPServerSocket:acceptClientFile:", {"TCPServerSocket", "acceptClientFile"}, "socketio_TCPServerSocket:acceptClientFile:");
+    BuiltinUtil::addMultipleMethod(socket, "closeTCPClientSocketFile:", {"closeTCPClientSocketFile"}, "socketio_closeTCPClientSocketFile:");
+
+    Runtime::globalEnvironment->addField(TO_TT_STR("SocketIO"), socket);
+}
+
 void Interpreter::setupSystem()
 {
     RefPtr<TTObject> object = Runtime::globalEnvironment->getField(TO_TT_STR("Object"));
@@ -177,6 +192,7 @@ void Interpreter::loadTTLib()
     loadTTLibModule("control.tt");
     loadTTLibModule("exec.tt");
     loadTTLibModule("file.tt");
+    loadTTLibModule("socket.tt");
     loadTTLibModule("io.tt");
 
     // math
