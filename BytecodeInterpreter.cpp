@@ -123,11 +123,13 @@ void sendSimple(BytecodeInterpreter &bi)
 
     RefPtr<TTObject> thiz = thizPtr;
 
+    RefPtr<TTObject> blockEnv = expression->getField(TO_TT_STR("blockEnv"));
+
     RefPtr<TTObject> blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
     if(&blockNativeName)
     {
         std::string nativeName = (char *) blockNativeName->getLiteral()->data;
-        RefPtr<TTObject> res = Runtime::executeSimpleNativeMessage(nativeName, dest, safeName, thiz);
+        RefPtr<TTObject> res = Runtime::executeSimpleNativeMessage(nativeName, dest, safeName, blockEnv, thiz);
         bi.stack.pushPtr((uintptr_t) &res);
         return;
     }
@@ -138,7 +140,6 @@ void sendSimple(BytecodeInterpreter &bi)
     {
         bi.stack.pushPtr((uintptr_t) &bi.stackFrame);
     }
-    RefPtr<TTObject> blockEnv = expression->getField(TO_TT_STR("blockEnv"));
     bi.setupStackFrame(expression, blockEnv, thiz);
     bi.bindStackFrame();
 }
@@ -162,6 +163,8 @@ void sendMultiple(BytecodeInterpreter &bi)
 
     RefPtr<TTObject> blockNativeName = expression->getField(TO_TT_STR("blockNativeName"));
 
+    RefPtr<TTObject> blockEnv = expression->getField(TO_TT_STR("blockEnv"));
+
     if(&blockNativeName)
     {
         std::vector<std::string> argNames(argCount);
@@ -177,7 +180,7 @@ void sendMultiple(BytecodeInterpreter &bi)
         {
             argNames[0] = (const char *) ((TTObject **) expression->getField(TO_TT_STR("blockArgNames"))->getLiteral()->data)[0]->getLiteral()->data;
         }
-        RefPtr<TTObject> res = Runtime::executeMultipleNativeMessage(nativeName, dest, fullName, argNames, argValues, thiz);
+        RefPtr<TTObject> res = Runtime::executeMultipleNativeMessage(nativeName, dest, fullName, argNames, argValues, blockEnv, thiz);
         bi.stack.pushPtr((uintptr_t) &res);
         return;
     }
@@ -185,8 +188,6 @@ void sendMultiple(BytecodeInterpreter &bi)
     RefPtr<TTObject> pc = bi.stackFrame->getField(TO_TT_STR("pc"));
     *((uint32_t *) pc->getLiteral()->data) = bi.pc;
     RefPtr<TTObject> oldStackFrame = bi.stackFrame;
-
-    RefPtr<TTObject> blockEnv = expression->getField(TO_TT_STR("blockEnv"));
 
     bi.setupStackFrame(expression, blockEnv, thiz);
     bi.bindStackFrame();
@@ -266,6 +267,9 @@ void BytecodeInterpreter::bindStackFrame()
     env = stackFrame->getField(TO_TT_STR("env"));
 }
 
+// lock so that we generate code only once
+SpinLock genCodeLock;
+
 void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObject> parentEnv, RefPtr<TTObject> thiz)
 {
 #ifdef DEBUG
@@ -285,6 +289,7 @@ void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObjec
 #endif
     stackFrame = TTObject::createObject(TT_STACK_FRAME);
 
+    genCodeLock.lock();
     RefPtr<TTObject> byteCodeObj = block->getField(TO_TT_STR("blockByteCode"));
     if(!&byteCodeObj)
     {
@@ -294,6 +299,7 @@ void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObjec
         byteCodeObj = Runtime::bytecodeGen.generate(block->getField(TO_TT_STR("blockExpr")));
         block->addField(TO_TT_STR("blockByteCode"), byteCodeObj);
     }
+    genCodeLock.unlock();
 
 #ifdef DEBUG
     std::cout << "print bytecode:" << std::endl;
@@ -452,7 +458,7 @@ RefPtr<TTObject> BytecodeInterpreter::interpret(RefPtr<TTObject> block, RefPtr<T
             (*instr)(*this);
         }
 
-        if(stack.sp > stack.len - 2 * sizeof(uintptr_t))
+        if(stack.sp == sizeof(uintptr_t))
         {
             break;
         }

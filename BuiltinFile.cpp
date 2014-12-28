@@ -53,7 +53,7 @@ FILE **checkIfExistsAndIsOpenedThenReturnFD(RefPtr<TTObject> file)
     return fileHandle;
 }
 
-RefPtr<TTObject> BuiltinFileIOOpenModeFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIOOpenModeFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(3, 3);
     BUILTIN_CHECK_LITERAL(0);
@@ -74,7 +74,7 @@ RefPtr<TTObject> BuiltinFileIOOpenModeFile::invoke(RefPtr<TTObject> dest, std::v
     return dest;
 }
 
-RefPtr<TTObject> BuiltinFileIOClose::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIOClose::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
     checkIfExistsAndCloseFile(values[0]);
@@ -82,7 +82,7 @@ RefPtr<TTObject> BuiltinFileIOClose::invoke(RefPtr<TTObject> dest, std::vector<s
     return dest;
 }
 
-RefPtr<TTObject> BuiltinFileIORead::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIORead::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[0]);
@@ -90,7 +90,7 @@ RefPtr<TTObject> BuiltinFileIORead::invoke(RefPtr<TTObject> dest, std::vector<st
     return res;
 }
 
-RefPtr<TTObject> BuiltinFileIOWriteFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIOWriteFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
     BUILTIN_CHECK_LITERAL(0);
@@ -111,7 +111,7 @@ RefPtr<TTObject> BuiltinFileIOWriteFile::invoke(RefPtr<TTObject> dest, std::vect
     return written;
 }
 
-RefPtr<TTObject> BuiltinFileIOWriteStringFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIOWriteStringFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
     BUILTIN_CHECK_LITERAL(0);
@@ -134,7 +134,7 @@ RefPtr<TTObject> BuiltinFileIOWriteStringFile::invoke(RefPtr<TTObject> dest, std
     return written;
 }
 
-RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
     RefPtr<TTObject> fd = values[0]->getField(TO_TT_STR("fd"));
@@ -158,7 +158,7 @@ RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<st
 
 #define LINE_LENGTH_MAX 1024 * 1024
 
-RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[0]);

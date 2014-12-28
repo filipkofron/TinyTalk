@@ -52,7 +52,7 @@ void closeServerSocketIfOpened(RefPtr<TTObject> socket)
     }
 }
 
-RefPtr<TTObject> BuiltinSocketCreateTCPServerSocketAddressPortFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSocketCreateTCPServerSocketAddressPortFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(3, 3);
 
@@ -113,7 +113,7 @@ RefPtr<TTObject> BuiltinSocketCreateTCPServerSocketAddressPortFile::invoke(RefPt
     return dest;
 }
 
-RefPtr<TTObject> BuiltinSocketCloseTCPServerSocketFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSocketCloseTCPServerSocketFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -124,7 +124,7 @@ RefPtr<TTObject> BuiltinSocketCloseTCPServerSocketFile::invoke(RefPtr<TTObject> 
     return dest;
 }
 
-RefPtr<TTObject> BuiltinSocketTCPServerSocketAcceptClientFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSocketTCPServerSocketAcceptClientFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
 
@@ -180,7 +180,7 @@ RefPtr<TTObject> BuiltinSocketTCPServerSocketAcceptClientFile::invoke(RefPtr<TTO
     return dest;
 }
 
-RefPtr<TTObject> BuiltinSocketCloseTCPClientSocketFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSocketCloseTCPClientSocketFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 

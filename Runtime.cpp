@@ -251,7 +251,7 @@ RefPtr<TTObject> Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTOb
     return resExpr;
 }
 
-RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> thiz)
+RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(nativeName);
     std::vector<std::string> singleList;
@@ -263,9 +263,9 @@ RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, Re
 #endif
         if(&thiz)
         {
-            return builtin->invoke(&thiz, singleList, std::vector<RefPtr<TTObject> >());
+            return builtin->invoke(&thiz, singleList, std::vector<RefPtr<TTObject> >(), env, thiz);
         }
-        return builtin->invoke(&dest, singleList, std::vector<RefPtr<TTObject> >());
+        return builtin->invoke(&dest, singleList, std::vector<RefPtr<TTObject> >(), env, thiz);
     }
     else
     {
@@ -275,7 +275,7 @@ RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, Re
     return NULL;
 }
 
-RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> thiz)
+RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
 #ifdef DEBUG
     std::cout << "(executeMultipleNativeMessage)" << std::endl;
@@ -289,9 +289,9 @@ RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, 
 #endif
         if(&thiz)
         {
-            return builtin->invoke(thiz, argNames, values);
+            return builtin->invoke(thiz, argNames, values, env, thiz);
         }
-        return builtin->invoke(dest, argNames, values);
+        return builtin->invoke(dest, argNames, values, env, thiz);
     }
     else
     {

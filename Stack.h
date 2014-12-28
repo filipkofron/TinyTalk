@@ -6,7 +6,7 @@ struct Stack;
 #include <cstdint>
 #include "MemAllocator.h"
 
-#define STACK_DEFAULT_SIZE 1024 * 1024
+#define STACK_DEFAULT_SIZE 1024 * 64 // Default 64kiB
 
 struct Stack
 {

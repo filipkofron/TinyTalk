@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
-project(TinyTalk)
+project(TinyTalk C CXX)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -g -Wall -march=native -O0 -fbuiltin")
+list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -g -Wall -march=native -O0 -fbuiltin -pthread")
 
 set(SOURCE_FILES    Builtin.h
                     BuiltinFile.h
@@ -34,10 +34,19 @@ set(SOURCE_FILES    Builtin.h
                     RefPtr.cpp
                     RefPtrMap.cpp
                     Runtime.cpp
+                    SpinLock.h
+                    SpinLock.cpp
+                    Stack.h
                     Stack.cpp
+                    Token.h
                     Token.cpp
+                    Tokenizer.h
                     Tokenizer.cpp
+                    TokenizerException.h
                     TokenizerException.cpp
+                    TTLiteral.h
                     TTLiteral.cpp
+                    TTObject.h
                     TTObject.cpp)
+
 add_executable(TinyTalk ${SOURCE_FILES})

@@ -3,7 +3,7 @@
 #include "Runtime.h"
 #include "Evaluator.h"
 
-RefPtr<TTObject> BuiltinObjectAlloc::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectAlloc::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
 #ifdef DEBUG
     std::cout << "[Builtin]: Allocating a new object." << std::endl;
@@ -12,7 +12,7 @@ RefPtr<TTObject> BuiltinObjectAlloc::invoke(RefPtr<TTObject> dest, std::vector<s
     return TTObject::createObject(TT_OBJECT);
 }
 
-RefPtr<TTObject> BuiltinObjectAddField::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectAddField::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 2 || values.size() != 2)
     {
@@ -38,7 +38,7 @@ RefPtr<TTObject> BuiltinObjectAddField::invoke(RefPtr<TTObject> dest, std::vecto
     return dest;
 }
 
-RefPtr<TTObject> BuiltinObjectGetter::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectGetter::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 2 || values.size() != 2)
     {
@@ -74,7 +74,7 @@ RefPtr<TTObject> BuiltinObjectGetter::invoke(RefPtr<TTObject> dest, std::vector<
     return object->getField(TO_TT_STR(name.c_str()));
 }
 
-RefPtr<TTObject> BuiltinObjectSetter::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectSetter::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 3 || values.size() != 3)
     {
@@ -119,7 +119,7 @@ RefPtr<TTObject> BuiltinObjectSetter::invoke(RefPtr<TTObject> dest, std::vector<
     return dest;
 }
 
-RefPtr<TTObject> BuiltinObjectDebugPrint::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectDebugPrint::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -134,7 +134,7 @@ RefPtr<TTObject> BuiltinObjectDebugPrint::invoke(RefPtr<TTObject> dest, std::vec
     return dest;
 }
 
-RefPtr<TTObject> BuiltinObjectDebugPrintRec::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectDebugPrintRec::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -149,7 +149,7 @@ RefPtr<TTObject> BuiltinObjectDebugPrintRec::invoke(RefPtr<TTObject> dest, std::
     return dest;
 }
 
-RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -170,7 +170,7 @@ RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, st
     return dest;
 }
 
-RefPtr<TTObject> BuiltinObjectDebugGC::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectDebugGC::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -179,7 +179,7 @@ RefPtr<TTObject> BuiltinObjectDebugGC::invoke(RefPtr<TTObject> dest, std::vector
     return dest;
 }
 
-RefPtr<TTObject> BuiltinObjectClone::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectClone::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 1 || values.size() != 1)
     {
@@ -193,7 +193,7 @@ RefPtr<TTObject> BuiltinObjectClone::invoke(RefPtr<TTObject> dest, std::vector<s
     return  res;
 }
 
-RefPtr<TTObject> BuiltinObjectNew::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectNew::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 1 || values.size() != 0)
     {
@@ -207,7 +207,7 @@ RefPtr<TTObject> BuiltinObjectNew::invoke(RefPtr<TTObject> dest, std::vector<std
     return res;
 }
 
-RefPtr<TTObject> BuiltinObjectGetFieldNames::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectGetFieldNames::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -244,7 +244,7 @@ RefPtr<TTObject> BuiltinObjectGetFieldNames::invoke(RefPtr<TTObject> dest, std::
     return result;
 }
 
-RefPtr<TTObject> BuiltinObjectGetFieldValues::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectGetFieldValues::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -279,7 +279,7 @@ RefPtr<TTObject> BuiltinObjectGetFieldValues::invoke(RefPtr<TTObject> dest, std:
     return result;
 }
 
-RefPtr<TTObject> BuiltinObjectToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     if (argNames.size() != 1 || values.size() != 0)
     {

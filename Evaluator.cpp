@@ -32,7 +32,7 @@ RefPtr<TTObject> Evaluator::executeSimpleExpression(RefPtr<TTObject> expression,
     {
         std::string nativeName = (char *) blockNativeName->getLiteral()->data;
 
-        return Runtime::executeSimpleNativeMessage(nativeName, dest, msgName, thiz);
+        return Runtime::executeSimpleNativeMessage(nativeName, dest, msgName, blockEnv, thiz);
     }
 
     return evaluate(blockExpr, env);
@@ -297,7 +297,7 @@ RefPtr<TTObject> Evaluator::executeMultipleExpression(RefPtr<TTObject> expressio
     {
         std::string nativeName = (char *) blockNativeName->getLiteral()->data;
 
-        return Runtime::executeMultipleNativeMessage(nativeName, dest, msgName, argNames, values, thiz);
+        return Runtime::executeMultipleNativeMessage(nativeName, dest, msgName, argNames, values, blockEnv, thiz);
     }
 
     for(size_t i = 0; i < argNames.size(); i++)

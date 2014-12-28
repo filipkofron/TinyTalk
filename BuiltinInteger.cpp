@@ -3,7 +3,7 @@
 #include "Runtime.h"
 #include <iostream>
 
-RefPtr<TTObject> BuiltinIntegerAdd::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerAdd::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -17,7 +17,7 @@ RefPtr<TTObject> BuiltinIntegerAdd::invoke(RefPtr<TTObject> dest, std::vector<st
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerMinus::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerMinus::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -30,7 +30,7 @@ RefPtr<TTObject> BuiltinIntegerMinus::invoke(RefPtr<TTObject> dest, std::vector<
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerMul::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerMul::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -44,7 +44,7 @@ RefPtr<TTObject> BuiltinIntegerMul::invoke(RefPtr<TTObject> dest, std::vector<st
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerDiv::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerDiv::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -64,7 +64,7 @@ RefPtr<TTObject> BuiltinIntegerDiv::invoke(RefPtr<TTObject> dest, std::vector<st
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerMod::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerMod::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -84,7 +84,7 @@ RefPtr<TTObject> BuiltinIntegerMod::invoke(RefPtr<TTObject> dest, std::vector<st
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -95,7 +95,7 @@ RefPtr<TTObject> BuiltinIntegerToString::invoke(RefPtr<TTObject> dest, std::vect
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerLessThan::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerLessThan::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -112,7 +112,7 @@ RefPtr<TTObject> BuiltinIntegerLessThan::invoke(RefPtr<TTObject> dest, std::vect
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-RefPtr<TTObject> BuiltinIntegerGreaterThan::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerGreaterThan::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -129,7 +129,7 @@ RefPtr<TTObject> BuiltinIntegerGreaterThan::invoke(RefPtr<TTObject> dest, std::v
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-RefPtr<TTObject> BuiltinIntegerEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -146,7 +146,7 @@ RefPtr<TTObject> BuiltinIntegerEquals::invoke(RefPtr<TTObject> dest, std::vector
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-RefPtr<TTObject> BuiltinIntegerLessThanOrEqual::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerLessThanOrEqual::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -163,7 +163,7 @@ RefPtr<TTObject> BuiltinIntegerLessThanOrEqual::invoke(RefPtr<TTObject> dest, st
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-RefPtr<TTObject> BuiltinIntegerGreaterThanOrEqual::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerGreaterThanOrEqual::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -180,7 +180,7 @@ RefPtr<TTObject> BuiltinIntegerGreaterThanOrEqual::invoke(RefPtr<TTObject> dest,
     return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
 }
 
-RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -200,7 +200,7 @@ RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::ve
     return res;
 }
 
-RefPtr<TTObject> BuiltinIntegerCharValue::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinIntegerCharValue::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 

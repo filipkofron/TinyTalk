@@ -167,6 +167,7 @@ void Interpreter::setupSystem()
     BuiltinUtil::addMultipleMethod(system, "bindIn:", {"bindIn"}, "system_bindIn:");
     BuiltinUtil::addMultipleMethod(system, "bindOut:", {"bindOut"}, "system_bindOut:");
     BuiltinUtil::addMultipleMethod(system, "bindErr:", {"bindErr"}, "system_bindErr:");
+    BuiltinUtil::addMultipleMethod(system, "startThread:", {"startThread"}, "system_startThread:");
     BuiltinUtil::addMultipleMethod(system, "generateBytecode:", {"generateBytecode"}, "system_generateBytecode:");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("System"), system);

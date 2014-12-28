@@ -1,6 +1,6 @@
 #include "RefPtrMap.h"
 
-#define REF_PTR_MAX_VALS (8192 * 16) // must be 2 to the power of n !!!
+#define REF_PTR_MAX_VALS (8192 * 32) // must be 2 to the power of n !!!
 
 #define CALC_INDEX(ptr, size) ((int) (((((uint16_t *) &refPtr)[0]) ^ (((uint16_t *) &refPtr)[1])) & (size - 1)))
 
@@ -22,6 +22,7 @@ RefPtrMap::~RefPtrMap()
 
 void RefPtrMap::reg(RefPtrBase *refPtr, bool object)
 {
+    lock.lock();
 #ifdef HASHMAP_FAST
     // TODO: Check endian during compile time!
     int index = CALC_INDEX(refPtr, REF_PTR_MAX_VALS);
@@ -40,10 +41,12 @@ void RefPtrMap::reg(RefPtrBase *refPtr, bool object)
 #else
     refs.insert(refPtr);
 #endif
+    lock.unlock();
 }
 
 void RefPtrMap::unreg(RefPtrBase *refPtr)
 {
+    lock.lock();
 #ifdef HASHMAP_FAST
     // TODO: Check endian during compile time!, use full size!
     int index = CALC_INDEX(refPtr, REF_PTR_MAX_VALS);
@@ -61,6 +64,7 @@ void RefPtrMap::unreg(RefPtrBase *refPtr)
 #else
     refs.erase(refPtr);
 #endif
+    lock.unlock();
 }
 
 std::vector<RefPtrBase *> RefPtrMap::collectRoots()

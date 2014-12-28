@@ -1,5 +1,6 @@
 #include <fstream>
 #include <sstream>
+#include <thread>
 #include "BuiltinSystem.h"
 #include "BytecodeInterpreter.h"
 #include "Reader.h"
@@ -8,7 +9,7 @@
 #include "Expression.h"
 #include "Runtime.h"
 
-RefPtr<TTObject> BuiltinSystemRunFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSystemRunFile::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -36,7 +37,7 @@ RefPtr<TTObject> BuiltinSystemRunFile::invoke(RefPtr<TTObject> dest, std::vector
     return result;
 }
 
-RefPtr<TTObject> BuiltinSystemParse::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSystemParse::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -54,7 +55,7 @@ RefPtr<TTObject> BuiltinSystemParse::invoke(RefPtr<TTObject> dest, std::vector<s
     return expression;
 }
 
-RefPtr<TTObject> BuiltinSystemGenerateBytecode::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSystemGenerateBytecode::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -76,7 +77,7 @@ RefPtr<TTObject> BuiltinSystemGenerateBytecode::invoke(RefPtr<TTObject> dest, st
     return byteCode;
 }
 
-RefPtr<TTObject> BuiltinSystemBindIn::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSystemBindIn::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -90,7 +91,7 @@ RefPtr<TTObject> BuiltinSystemBindIn::invoke(RefPtr<TTObject> dest, std::vector<
     return dest;
 }
 
-RefPtr<TTObject> BuiltinSystemBindOut::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSystemBindOut::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -104,7 +105,7 @@ RefPtr<TTObject> BuiltinSystemBindOut::invoke(RefPtr<TTObject> dest, std::vector
     return dest;
 }
 
-RefPtr<TTObject> BuiltinSystemBindErr::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinSystemBindErr::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -114,6 +115,40 @@ RefPtr<TTObject> BuiltinSystemBindErr::invoke(RefPtr<TTObject> dest, std::vector
     FILE **fileHandle = (FILE **) fd->getLiteral()->data;
     *fileHandle = stderr;
     file->addField(TO_TT_STR("fd"), fd);
+
+    return dest;
+}
+
+static void thread_entry(RefPtr<TTObject> block, RefPtr<TTObject> thiz)
+{
+    BytecodeInterpreter bytecodeInterpreter;
+
+    // we must create the new environment manually, since the entry for Bytecode Interpreter
+    // forces the outer environment to be the actual (why..)
+    RefPtr<TTObject> parentEnv = block->getField(TO_TT_STR("blockEnv"));
+    RefPtr<TTObject> newEnv = TTObject::createObject(TT_ENV);
+    newEnv->addField(TO_TT_STR("parentEnv"), parentEnv);
+
+    if(&thiz)
+    {
+        newEnv->addField(TO_TT_STR("this"), thiz);
+    }
+
+    bytecodeInterpreter.interpret(block, newEnv, thiz);
+}
+
+RefPtr<TTObject> BuiltinSystemStartThread::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    if(values[0]->type != TT_EXPR || values[0]->flags != EXPRESSION_BLOCK)
+    {
+        std::cerr << "[Builtin]: StartThread Error: Invalid expression (must be block)" << std::endl;
+        throw std::exception();
+    }
+
+    std::thread myThread(thread_entry, values[0], thiz);
+    myThread.detach();
 
     return dest;
 }

@@ -25,8 +25,8 @@ struct Runtime
     static TTObject *findBlockAtNonExpression(TTObject *object, const uint8_t *safeName, TTObject **next);
     static RefPtr<TTObject> findBlock(const uint8_t *safeName, TTObject *obj, TTObject *env, TTObject **thiz);
 
-    static RefPtr<TTObject> executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> thiz);
-    static RefPtr<TTObject> executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> thiz);
+    static RefPtr<TTObject> executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
+    static RefPtr<TTObject> executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
 
     static bool running;
     static void runCopyGC();

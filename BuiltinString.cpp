@@ -4,7 +4,7 @@
 #include "Common.h"
 #include "Runtime.h"
 
-RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -31,7 +31,7 @@ RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<
     return res;
 }
 
-RefPtr<TTObject> BuiltinStringCharAsIntAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringCharAsIntAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -54,7 +54,7 @@ RefPtr<TTObject> BuiltinStringCharAsIntAt::invoke(RefPtr<TTObject> dest, std::ve
     return res;
 }
 
-RefPtr<TTObject> BuiltinStringSetCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringSetCharAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
 
@@ -87,7 +87,7 @@ RefPtr<TTObject> BuiltinStringSetCharAt::invoke(RefPtr<TTObject> dest, std::vect
     return res;
 }
 
-RefPtr<TTObject> BuiltinStringToLower::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringToLower::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -102,7 +102,7 @@ RefPtr<TTObject> BuiltinStringToLower::invoke(RefPtr<TTObject> dest, std::vector
     return res;
 }
 
-RefPtr<TTObject> BuiltinStringToUpper::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringToUpper::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -131,7 +131,7 @@ static inline std::string &trim(std::string &s) {
     return ltrim(rtrim(s));
 }
 
-RefPtr<TTObject> BuiltinStringTrim::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringTrim::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -146,7 +146,7 @@ RefPtr<TTObject> BuiltinStringTrim::invoke(RefPtr<TTObject> dest, std::vector<st
     return res;
 }
 
-RefPtr<TTObject> BuiltinStringAppend::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringAppend::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -176,7 +176,7 @@ RefPtr<TTObject> BuiltinStringAppend::invoke(RefPtr<TTObject> dest, std::vector<
     return appendedObj;
 }
 
-RefPtr<TTObject> BuiltinStringLength::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringLength::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -187,12 +187,12 @@ RefPtr<TTObject> BuiltinStringLength::invoke(RefPtr<TTObject> dest, std::vector<
     return res;
 }
 
-RefPtr<TTObject> BuiltinStringToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     return dest;
 }
 
-RefPtr<TTObject> BuiltinStringStartsWith::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringStartsWith::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -223,7 +223,7 @@ RefPtr<TTObject> BuiltinStringStartsWith::invoke(RefPtr<TTObject> dest, std::vec
     return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
 }
 
-RefPtr<TTObject> BuiltinStringEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinStringEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 

@@ -5,7 +5,7 @@
 
 #include <sstream>
 
-RefPtr<TTObject> BuiltinObjectArraySize::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectArraySize::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -14,7 +14,7 @@ RefPtr<TTObject> BuiltinObjectArraySize::invoke(RefPtr<TTObject> dest, std::vect
     return sizeObj;
 }
 
-RefPtr<TTObject> BuiltinObjectArrayAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectArrayAt::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
 
@@ -40,7 +40,7 @@ RefPtr<TTObject> BuiltinObjectArrayAt::invoke(RefPtr<TTObject> dest, std::vector
     return obj;
 }
 
-RefPtr<TTObject> BuiltinObjectArrayAtSet::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject> BuiltinObjectArrayAtSet::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
 
@@ -62,7 +62,7 @@ RefPtr<TTObject> BuiltinObjectArrayAtSet::invoke(RefPtr<TTObject> dest, std::vec
     return dest;
 }
 
-RefPtr<TTObject>  BuiltinObjectArrayEmpty::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject>  BuiltinObjectArrayEmpty::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 
@@ -73,7 +73,7 @@ RefPtr<TTObject>  BuiltinObjectArrayEmpty::invoke(RefPtr<TTObject> dest, std::ve
     return Runtime::globalEnvironment->getField(TO_TT_STR(toFind));
 }
 
-RefPtr<TTObject>  BuiltinObjectArrayToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values)
+RefPtr<TTObject>  BuiltinObjectArrayToString::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 0);
 

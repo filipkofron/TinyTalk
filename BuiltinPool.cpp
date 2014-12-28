@@ -76,6 +76,7 @@ BuiltinPool::BuiltinPool()
     registerBultin("system_bindOut:", std::shared_ptr<Builtin> (new BuiltinSystemBindOut));
     registerBultin("system_bindErr:", std::shared_ptr<Builtin> (new BuiltinSystemBindErr));
     registerBultin("system_generateBytecode:", std::shared_ptr<Builtin> (new BuiltinSystemGenerateBytecode));
+    registerBultin("system_startThread:", std::shared_ptr<Builtin> (new BuiltinSystemStartThread));
 
     std::cout << "[BuiltinPool]: initialized." << std::endl;
 }

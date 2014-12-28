@@ -29,9 +29,7 @@ HttpServer = Object createWith:
                     | client |;
                     client = serverSocket accept;
 
-                    Out writeLine: "Got client";
-
-                    server handleClient: client
+                    System startThread: [server handleClient: client]
                 ]
                 times: 1024
             ]
@@ -40,6 +38,7 @@ HttpServer = Object createWith:
 
     "handleClient:", [ :handleClient: |
         | end fullRequest lastLine |;
+        Out writeLine: "Got client";
         end = False;
         fullRequest = "";
         lastLine = "";

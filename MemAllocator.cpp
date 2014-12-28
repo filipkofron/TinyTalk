@@ -39,8 +39,11 @@ bool MemAllocator::isInside(uintptr_t ptr)
     return (uintptr_t ) pool <= ptr && ptr < (uintptr_t) &pool[capacity];
 }
 
+SpinLock allocLock;
+
 uint8_t *MemAllocator::allocate(size_t bytes)
 {
+    allocLock.lock();
     /*uint8_t *hack = (uint8_t *)  malloc(bytes);
     memset(hack, 0, bytes);
     return hack;*/
@@ -56,6 +59,7 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         {
             top += bytes;
             memset(nextAddr, 0, bytes);
+            allocLock.unlock();
             return nextAddr;
         }
     }
@@ -65,13 +69,19 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         {
             top += bytes;
             memset(nextAddr, 0, bytes);
+            allocLock.unlock();
             return nextAddr;
         }
     }
 
+    // TODO: Create Barrier that will stop at all pre blocking/allocating
+
+
 #ifdef DEBUG
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
 #endif
+
+    allocLock.unlock();
 
     Runtime::runCopyGC();
 
@@ -90,11 +100,14 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         Runtime::runCopyGC();
     }
 
-    return getCurrent()->allocate(bytes);
+    uint8_t *res = getCurrent()->allocate(bytes);
+
+    return res;
 }
 
 void MemAllocator::ensure(size_t bytes)
 {
+    allocLock.lock();
 /*uint8_t *hack = (uint8_t *)  malloc(bytes);
     memset(hack, 0, bytes);
     return hack;*/
@@ -105,12 +118,15 @@ void MemAllocator::ensure(size_t bytes)
 
     if ((top + bytes) < (capacity - 1024))
     {
+        allocLock.unlock();
         return;
     }
 
 #ifdef DEBUG
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
 #endif
+
+    allocLock.unlock();
 
     Runtime::runCopyGC();
 
