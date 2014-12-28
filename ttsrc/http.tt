@@ -1,4 +1,77 @@
-| HttpServer |;
+| HttpServer HttpHandler HttpRequest HttpResponse |;
+
+HttpRequest = Object createWith:
+{
+    "new", [ :new |
+        | res |;
+        res = this getParent createWith:
+        {
+            "path", nil,
+            "host", nil
+        };
+        res setParent: this;
+        res
+    ],
+
+    "setPath:", [ :setPath: |
+        path = setPath
+    ],
+    "getPath", [ :getPath |
+        path
+    ],
+
+    "setHost:", [ :setHost: |
+        host = setHost
+    ],
+    "getHost", [ :getHost |
+        host
+    ]
+};
+
+HttpResponse = Object createWith:
+{
+    "new", [ :new |
+        | res |;
+        res = this getParent createWith:
+        {
+            "output", nil
+        };
+        res setParent: this;
+        res
+    ],
+
+    "setOutput:", [ :setOutput: |
+        output = setOutput
+    ],
+    "getOutput", [ :getOutput |
+        output
+    ]
+};
+
+HttpHandler = Object createWith:
+{
+    "createForPath:", [ :createForPath: |
+        | inst |;
+        inst = this getParent createWith:
+        {
+            "path", createForPath
+        };
+        inst setParent: this;
+        inst
+    ],
+
+    "createResponseForRequest:", [ :createResponseForRequest: |
+        | req resp |;
+        req = createResponseForRequest;
+        resp = HttpResponse new;
+        resp setOutput: "Default handler";
+        resp
+    ],
+
+    "getPath", [ :getPath |
+        path
+    ]
+};
 
 HttpServer = Object createWith:
 {
@@ -6,9 +79,12 @@ HttpServer = Object createWith:
         | inst |;
         inst = this getParent createWith:
         {
-            "serverSocket", createWithSocket
+            "serverSocket", createWithSocket,
+            "handlers", Map new
         };
         inst setParent: this;
+
+        inst registerHandler: (HttpHandler createForPath: "/");
         inst
     ],
 
@@ -63,9 +139,12 @@ HttpServer = Object createWith:
         handleClient readLine;
         Out writeLine: "full request:";
         Out writeLine: fullRequest;
-        handleClient writeString: "Content-type: text/html\r\n\r\n";
-        handleClient writeLine: "Hello from TinyTalk! :)\n";
+        handleClient writeLine: "Hello from TinyTalk! :)";
         handleClient close
+    ],
+
+    "registerHandler:", [ :registerHandler: |
+        handlers addKey: (registerHandler getPath) value: registerHandler
     ]
 };
 
