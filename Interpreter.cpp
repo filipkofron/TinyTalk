@@ -220,8 +220,8 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
     do
     {
-        try
-        {
+       /* try
+        {*/
             RefPtr<TTObject> expression = parser.parse(false, false);
 
 #ifdef DEBUG
@@ -230,6 +230,8 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
             expression->print(std::cout, 1, false);
             std::cout << std::endl;
 #endif
+
+            std::set_terminate(std::abort);
 
             if(&expression != NULL)
             {
@@ -271,7 +273,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
                     std::cout << std::endl;
                 }
             }
-        }
+       /* }
         catch (TokenizerException &e)
         {
             std::cerr << "Runtime error: Caught exception: " << e.what() << std::endl;
@@ -281,7 +283,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
         {
             std::cerr << "Runtime error: Caught exception: " << ex.what() << std::endl;
             break;
-        }
+        }*/
     } while (!tokenizer->hasReachedEOF());
 }
 

@@ -28,6 +28,7 @@ RefPtr<TTObject> BuiltinSystemRunFile::invoke(RefPtr<TTObject> dest, std::vector
     std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
 
     Parser parser(tokenizer);
+
     RefPtr<TTObject> expression = parser.parse(false, false);
     RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
 
@@ -121,6 +122,7 @@ RefPtr<TTObject> BuiltinSystemBindErr::invoke(RefPtr<TTObject> dest, std::vector
 
 static void thread_entry(RefPtr<TTObject> block, RefPtr<TTObject> thiz)
 {
+    Runtime::gcBarrier.reg();
     BytecodeInterpreter bytecodeInterpreter;
 
     // we must create the new environment manually, since the entry for Bytecode Interpreter
@@ -135,6 +137,7 @@ static void thread_entry(RefPtr<TTObject> block, RefPtr<TTObject> thiz)
     }
 
     bytecodeInterpreter.interpret(block, newEnv, thiz);
+    Runtime::gcBarrier.unreg();
 }
 
 RefPtr<TTObject> BuiltinSystemStartThread::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)

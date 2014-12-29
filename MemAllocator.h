@@ -35,7 +35,9 @@ public:
     bool isInside(uintptr_t ptr);
 
     uint8_t *allocate(size_t bytes);
-    void ensure(size_t bytes);
+    uint8_t *allocateSureAndThreadUnsafe(size_t bytes);
+    void ensureWithLock(size_t bytes);
+    void ensureWithUnlock();
     uint8_t *cloneString(const uint8_t *str);
 
     TTObject *allocateObject();

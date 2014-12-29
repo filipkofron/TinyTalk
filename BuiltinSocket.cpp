@@ -1,5 +1,6 @@
 #include "BuiltinSocket.h"
 #include "BuiltinFile.h"
+#include "Runtime.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -141,11 +142,12 @@ RefPtr<TTObject> BuiltinSocketTCPServerSocketAcceptClientFile::invoke(RefPtr<TTO
 
     int clientSd = 0;
 
+    Runtime::gcBarrier.enteringBlocking();
     do
     {
         clientSd = accept(listenSd, (sockaddr *) &clientAddr, &clientAddrSize);
     } while(clientSd < 0);
-
+    Runtime::gcBarrier.leavingBlocking();
 
     int on = 1;
 

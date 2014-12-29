@@ -25,6 +25,8 @@ set(SOURCE_FILES    Builtin.h
                     Common.cpp
                     Evaluator.cpp
                     Expression.cpp
+                    GCBarrier.h
+                    GCBarrier.cpp
                     Interpreter.cpp
                     main.cpp
                     MemAllocator.cpp

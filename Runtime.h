@@ -6,6 +6,7 @@ struct Runtime;
 #include "BuiltinPool.h"
 #include "RefPtrMap.h"
 #include "BytecodeGen.h"
+#include "GCBarrier.h"
 #include <set>
 
 struct Runtime
@@ -13,6 +14,7 @@ struct Runtime
     static size_t allocSize;
     static BuiltinPool builtinPool;
     static RefPtrMap refPtrMap;
+    static GCBarrier gcBarrier;
     static std::set<BytecodeInterpreter *> interpretersAlive;
     static BytecodeGen bytecodeGen;
     static TTObject *globalEnvironment;

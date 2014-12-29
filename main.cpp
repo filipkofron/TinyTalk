@@ -20,8 +20,14 @@ int main()
 
     std::cout << std::endl;
     std::cout << std::endl;
+
+    // Register the main thread, this is the only safe place to do it
+    Runtime::gcBarrier.reg();
     Interpreter interpreter;
     interpreter.interpretCommandLine(std::cin);
+
+    // Unregister the main thread
+    Runtime::gcBarrier.unreg();
     std::cout << std::endl;
     std::cout << ">> Bye." << std::endl;
 

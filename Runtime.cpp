@@ -5,6 +5,7 @@
 size_t Runtime::allocSize = MEMORY_ALLCOATOR_SIZE_DEFAULT;
 BuiltinPool Runtime::builtinPool;
 RefPtrMap Runtime::refPtrMap;
+GCBarrier Runtime::gcBarrier;
 BytecodeGen Runtime::bytecodeGen;
 TTObject *Runtime::globalEnvironment = NULL;
 

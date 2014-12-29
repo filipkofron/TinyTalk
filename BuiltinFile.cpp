@@ -86,7 +86,10 @@ RefPtr<TTObject> BuiltinFileIORead::invoke(RefPtr<TTObject> dest, std::vector<st
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[0]);
-    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(fgetc(*fd));
+    Runtime::gcBarrier.enteringBlocking();
+    int val = fgetc(*fd);
+    Runtime::gcBarrier.leavingBlocking();
+    RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(val);
     return res;
 }
 
@@ -96,7 +99,10 @@ RefPtr<TTObject> BuiltinFileIOWriteFile::invoke(RefPtr<TTObject> dest, std::vect
     BUILTIN_CHECK_LITERAL(0);
     BUILTIN_CHECK_INTEGER(0);
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[1]);
-    int ret = fputc(*(int32_t *) values[0]->getLiteral()->data, *fd);
+    int val = *(int32_t *) values[0]->getLiteral()->data;
+    Runtime::gcBarrier.enteringBlocking();
+    int ret = fputc(val, *fd);
+    Runtime::gcBarrier.leavingBlocking();
     RefPtr<TTObject> written;
 
     if(ret != -1)
@@ -119,7 +125,12 @@ RefPtr<TTObject> BuiltinFileIOWriteStringFile::invoke(RefPtr<TTObject> dest, std
 
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[1]);
 
-    int ret = fputs((const char *) values[0]->getLiteral()->data, *fd);
+    uint8_t *temp = (uint8_t *) malloc(values[0]->getLiteral()->length);
+    memcpy(temp, values[0]->getLiteral()->data, values[0]->getLiteral()->length);
+    Runtime::gcBarrier.enteringBlocking();
+    int ret = fputs((const char *) temp, *fd);
+    free(temp);
+    Runtime::gcBarrier.leavingBlocking();
     RefPtr<TTObject> written;
 
     if(ret != -1)
@@ -163,6 +174,7 @@ RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vecto
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
     FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[0]);
 
+    Runtime::gcBarrier.enteringBlocking();
     uint32_t size = 1;
     char *buffer = (char *) malloc(size + 1);
     uint32_t i = 0;
@@ -190,6 +202,7 @@ RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vecto
 
     buffer[i] = '\0';
 
+    Runtime::gcBarrier.leavingBlocking();
     RefPtr<TTObject> res = TTLiteral::createStringLiteral(TO_TT_STR(buffer));
     free(buffer);
     return res;

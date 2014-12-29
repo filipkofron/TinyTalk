@@ -75,9 +75,10 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 #ifdef DEBUG
     std::cout << "Allocating capacity: newObj->fieldCapacity: " << newObj->size << " newObj->fieldCount: " << newObj->count << std::endl;
 #endif
-    newMem->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * newObj->size);
-    uint8_t **_temp_GCnames = (uint8_t **) newMem->allocate(sizeof(uint8_t *) * newObj->size);
-    TTObject **_temp_GCobjects = (TTObject **) newMem->allocate(sizeof(TTObject *) * newObj->size);
+    newMem->ensureWithLock((sizeof(uint8_t *) + sizeof(TTObject *)) * newObj->size);
+    uint8_t **_temp_GCnames = (uint8_t **) newMem->allocateSureAndThreadUnsafe(sizeof(uint8_t *) * newObj->size);
+    TTObject **_temp_GCobjects = (TTObject **) newMem->allocateSureAndThreadUnsafe(sizeof(TTObject *) * newObj->size);
+    newMem->ensureWithUnlock();
     newObj->names = _temp_GCnames;
     newObj->objects = _temp_GCobjects;
     if(ptr[0]->names && ptr[0]->objects)
@@ -90,6 +91,7 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
         newObj->names = NULL;
         newObj->objects = NULL;
     }
+
 #ifdef DEBUG
     std::cout << "old obj bytes before: " << std::endl;
     print_bytes(sizeof(TTObject), ptr[0]);
@@ -162,13 +164,13 @@ RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocate
     RefPtr<TTObject> newObject = tempHax;
 
     // ensure we don't get the GC call here!
-    MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * fieldsPreallocated);
-    uint8_t **allocedNames = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * fieldsPreallocated);
-    TTObject **allocedObjects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * fieldsPreallocated);
+    MemAllocator::getCurrent()->ensureWithLock((sizeof(uint8_t *) + sizeof(TTObject *)) * fieldsPreallocated);
+    uint8_t **allocedNames = (uint8_t **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(uint8_t *) * fieldsPreallocated);
+    TTObject **allocedObjects = (TTObject **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(TTObject *) * fieldsPreallocated);
+    MemAllocator::getCurrent()->ensureWithUnlock();
     newObject->names = allocedNames;
     newObject->objects = allocedObjects;
     newObject->size = fieldsPreallocated; // hax for GC, it must not know, because of the above
-
     // the gc can occure now
     if(type != TT_ENV)
     {
@@ -193,9 +195,10 @@ RefPtr<TTObject> TTObject::clone(RefPtr<TTObject> cloned)
     memcpy(&newObject, &cloned, sizeof(*cloned));
 
     // ensure we don't get the GC call here!
-    MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * cloned->size);
-    uint8_t **_temp_GC_Names = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * cloned->size);
-    TTObject **_temp_GC_Objects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * cloned->size);
+    MemAllocator::getCurrent()->ensureWithLock((sizeof(uint8_t *) + sizeof(TTObject *)) * cloned->size);
+    uint8_t **_temp_GC_Names = (uint8_t **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(uint8_t *) * cloned->size);
+    TTObject **_temp_GC_Objects = (TTObject **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(TTObject *) * cloned->size);
+    MemAllocator::getCurrent()->ensureWithUnlock();
     newObject->names = _temp_GC_Names;
     newObject->objects = _temp_GC_Objects;
 
@@ -222,7 +225,7 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
 
     if(thiz->count == thiz->size)
     {
-        MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * ((uint32_t) ((thiz->size + 1) * 2)));
+        MemAllocator::getCurrent()->ensureWithLock((sizeof(uint8_t *) + sizeof(TTObject *)) * ((uint32_t) ((thiz->size + 1) * 2)));
         uint8_t **oldNames = thiz->names;
         TTObject **oldObjects = thiz->objects;
 
@@ -230,8 +233,10 @@ bool TTObject::addField(const uint8_t *name, RefPtr<TTObject> object)
 
         thiz->size = (uint32_t) ((thiz->size + 1) * 2);
 
-        thiz->names = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * thiz->size);
-        thiz->objects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * thiz->size);
+        thiz->names = (uint8_t **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(uint8_t *) * thiz->size);
+        thiz->objects = (TTObject **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(TTObject *) * thiz->size);
+
+        MemAllocator::getCurrent()->ensureWithUnlock();
 
         thiz->count = 0;
 
@@ -426,7 +431,7 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
 
     if(thiz->count == thiz->size)
     {
-        MemAllocator::getCurrent()->ensure((sizeof(uint8_t *) + sizeof(TTObject *)) * ((uint32_t) ((thiz->size + 1) * 2)));
+        MemAllocator::getCurrent()->ensureWithLock((sizeof(uint8_t *) + sizeof(TTObject *)) * ((uint32_t) ((thiz->size + 1) * 2)));
         uint8_t **oldNames = thiz->names;
         TTObject **oldObjects = thiz->objects;
 
@@ -434,8 +439,10 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
 
         thiz->size = (uint32_t) ((thiz->size + 1) * 2);
 
-        thiz->names = (uint8_t **) MemAllocator::getCurrent()->allocate(sizeof(uint8_t *) * thiz->size);
-        thiz->objects = (TTObject **) MemAllocator::getCurrent()->allocate(sizeof(TTObject *) * thiz->size);
+        thiz->names = (uint8_t **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(uint8_t *) * thiz->size);
+        thiz->objects = (TTObject **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(TTObject *) * thiz->size);
+
+        MemAllocator::getCurrent()->ensureWithUnlock();
 
         thiz->count = 0;
 

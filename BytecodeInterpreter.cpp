@@ -79,6 +79,9 @@ void saveSymbol(BytecodeInterpreter &bi)
     bi.stack.pushPtr((uintptr_t) &res);
 }
 
+// lock so that we generate code only once
+SpinLock genCodeLock;
+
 void loadBlock(BytecodeInterpreter &bi)
 {
 #ifdef DEBUG
@@ -87,7 +90,7 @@ void loadBlock(BytecodeInterpreter &bi)
     RefPtr<TTObject> block = (TTObject *) *(uintptr_t *) (uintptr_t) &bi.byteCode[bi.pc];
     bi.pc += sizeof(uintptr_t);
 
-
+    genCodeLock.lock();
     RefPtr<TTObject> byteCodeObj = block->getField(TO_TT_STR("blockByteCode"));
     if(!&byteCodeObj)
     {
@@ -97,6 +100,7 @@ void loadBlock(BytecodeInterpreter &bi)
         byteCodeObj = Runtime::bytecodeGen.generate(block->getField(TO_TT_STR("blockExpr")));
         block->addField(TO_TT_STR("blockByteCode"), byteCodeObj);
     }
+    genCodeLock.unlock();
 
     RefPtr<TTObject> newBlock = TTObject::clone(block);
 
@@ -113,6 +117,8 @@ void sendSimple(BytecodeInterpreter &bi)
 #ifdef DEBUG
     std::cout << "<sendSimple>" << std::endl;
 #endif
+    Runtime::gcBarrier.tryCatchAnyWhere();
+
     RefPtr<TTObject> dest = (TTObject *) bi.stack.popPtr();
     RefPtr<TTObject> name = (TTObject *) bi.stack.popPtr();
 
@@ -149,6 +155,8 @@ void sendMultiple(BytecodeInterpreter &bi)
 #ifdef DEBUG
     std::cout << "<sendMultiple>" << std::endl;
 #endif
+    Runtime::gcBarrier.tryCatchAnyWhere();
+
     RefPtr<TTObject> argCountObj = (TTObject *) bi.stack.popPtr();
     int32_t argCount = *(int32_t *) argCountObj->getLiteral()->data;
     RefPtr<TTObject> fullNameObj = (TTObject *) bi.stack.popPtr();
@@ -262,13 +270,13 @@ void BytecodeInterpreter::bindStackFrame()
 #endif
     RefPtr<TTObject> byteCodeObj = stackFrame->getField(TO_TT_STR("byteCode"));
     byteCode = byteCodeObj->getLiteral()->data;
+
     pcMax = byteCodeObj->getLiteral()->length;
     pc = *((uint32_t *) (stackFrame->getField(TO_TT_STR("pc")))->getLiteral()->data);
     env = stackFrame->getField(TO_TT_STR("env"));
 }
 
-// lock so that we generate code only once
-SpinLock genCodeLock;
+SpinLock HAXLOCK;
 
 void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObject> parentEnv, RefPtr<TTObject> thiz)
 {

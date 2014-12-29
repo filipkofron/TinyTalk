@@ -39,11 +39,31 @@ bool MemAllocator::isInside(uintptr_t ptr)
     return (uintptr_t ) pool <= ptr && ptr < (uintptr_t) &pool[capacity];
 }
 
-SpinLock allocLock;
+bool running = false;
+
+SpinLock HAXOR;
 
 uint8_t *MemAllocator::allocate(size_t bytes)
 {
-    allocLock.lock();
+    HAXOR.lock();
+    uint8_t *resss = (uint8_t *) calloc(1, bytes);
+    HAXOR.unlock();
+    return resss;
+
+    bool runAgain = false;
+    Runtime::gcBarrier.enteringAlloc(runAgain);
+    if(runAgain)
+    {
+        Runtime::gcBarrier.leavingAlloc();
+        return getCurrent()->allocate(bytes);
+    }
+
+    if(running)
+    {
+        *((int *) NULL) = 666;
+    }
+    running = true;
+
     /*uint8_t *hack = (uint8_t *)  malloc(bytes);
     memset(hack, 0, bytes);
     return hack;*/
@@ -58,8 +78,9 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         if ((top + bytes) < (capacity - 1024))
         {
             top += bytes;
+            running = false;
+            Runtime::gcBarrier.leavingAlloc();
             memset(nextAddr, 0, bytes);
-            allocLock.unlock();
             return nextAddr;
         }
     }
@@ -68,20 +89,23 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         if ((top + bytes) < capacity)
         {
             top += bytes;
+            running = false;
+            Runtime::gcBarrier.leavingAlloc();
             memset(nextAddr, 0, bytes);
-            allocLock.unlock();
+            running = false;
             return nextAddr;
         }
     }
 
+    running = false;
+
     // TODO: Create Barrier that will stop at all pre blocking/allocating
+    Runtime::gcBarrier.enteringGC();
 
 
 #ifdef DEBUG
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
 #endif
-
-    allocLock.unlock();
 
     Runtime::runCopyGC();
 
@@ -100,14 +124,58 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         Runtime::runCopyGC();
     }
 
+    Runtime::gcBarrier.leavingGC();
+    Runtime::gcBarrier.leavingAlloc();
+
     uint8_t *res = getCurrent()->allocate(bytes);
 
     return res;
 }
 
-void MemAllocator::ensure(size_t bytes)
+uint8_t *MemAllocator::allocateSureAndThreadUnsafe(size_t bytes)
 {
-    allocLock.lock();
+    HAXOR.lock();
+    uint8_t *ress = (uint8_t *) calloc(1, bytes);
+    HAXOR.unlock();
+    return ress;
+
+    /*uint8_t *hack = (uint8_t *)  malloc(bytes);
+    memset(hack, 0, bytes);
+    return hack;*/
+    uint8_t *nextAddr = pool + top;
+
+    if(!running)
+    {
+        *((int *) NULL) = 666;
+    }
+
+#ifdef DEBUG
+    std::cout << "MemAllocator::allocate(): called to allocate " << bytes << " bytes, remaining: " << (capacity - (top + bytes)) << std::endl;
+#endif
+    top += bytes;
+    memset(nextAddr, 0, bytes);
+
+    return nextAddr;
+}
+
+void MemAllocator::ensureWithLock(size_t bytes)
+{
+    bool runAgain = false;
+    Runtime::gcBarrier.enteringAlloc(runAgain);
+    if(runAgain)
+    {
+        Runtime::gcBarrier.leavingAlloc();
+        getCurrent()->ensureWithLock(bytes);
+        return;
+    }
+
+    if(running)
+    {
+        std::cout << " POOOOOOOOOOOOF " << std::endl;
+        *((int *) NULL) = 666;
+    }
+    running = true;
+
 /*uint8_t *hack = (uint8_t *)  malloc(bytes);
     memset(hack, 0, bytes);
     return hack;*/
@@ -118,7 +186,6 @@ void MemAllocator::ensure(size_t bytes)
 
     if ((top + bytes) < (capacity - 1024))
     {
-        allocLock.unlock();
         return;
     }
 
@@ -126,7 +193,7 @@ void MemAllocator::ensure(size_t bytes)
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
 #endif
 
-    allocLock.unlock();
+    Runtime::gcBarrier.enteringGC();
 
     Runtime::runCopyGC();
 
@@ -144,6 +211,14 @@ void MemAllocator::ensure(size_t bytes)
         Runtime::allocSize = (size_t) (Runtime::allocSize * 1.5);
         Runtime::runCopyGC();
     }
+
+    Runtime::gcBarrier.leavingGC();
+}
+
+void MemAllocator::ensureWithUnlock()
+{
+    running = false;
+    Runtime::gcBarrier.leavingAlloc();
 }
 
 uint8_t *MemAllocator::allocateString(const uint8_t *str)
