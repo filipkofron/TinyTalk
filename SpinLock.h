@@ -82,6 +82,10 @@ public:
     {
         mutex.unlock();
     }
+    inline bool tryLock()
+    {
+        mutex.try_lock();
+    }
 
 private:
 

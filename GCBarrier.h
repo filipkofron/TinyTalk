@@ -15,10 +15,12 @@ private:
     std::set<std::thread::id> threads;
     std::set<std::thread::id> waiting;
     std::thread::id gcRunner;
-    std::mutex mutex;
-    std::condition_variable allocatingCV;
-    std::condition_variable waitingCV;
-    std::condition_variable gcCV;
+    //std::mutex mutex;
+    SpinLock allocMutex;
+    SpinLock gcMutex;
+    //std::condition_variable allocatingCV;
+    //std::condition_variable waitingCV;
+    //std::condition_variable gcCV;
 
     bool allocating;
     bool gcing;

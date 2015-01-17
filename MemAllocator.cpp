@@ -160,6 +160,8 @@ uint8_t *MemAllocator::allocateSureAndThreadUnsafe(size_t bytes)
 
 void MemAllocator::ensureWithLock(size_t bytes)
 {
+    return;
+
     bool runAgain = false;
     Runtime::gcBarrier.enteringAlloc(runAgain);
     if(runAgain)
