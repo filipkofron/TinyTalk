@@ -7,6 +7,8 @@
 MemAllocator *MemAllocator::defaultAllocator = NULL;
 MemAllocator *MemAllocator::nextAllocator = NULL;
 
+// #define DEBUG_MALLOC_HAX
+
 MemAllocator::MemAllocator(size_t poolCapacity)
         : capacity(poolCapacity), top(0)
 {
@@ -39,16 +41,18 @@ bool MemAllocator::isInside(uintptr_t ptr)
     return (uintptr_t ) pool <= ptr && ptr < (uintptr_t) &pool[capacity];
 }
 
-bool running = false;
-
+#ifdef DEBUG_MALLOC_HAX
 SpinLock HAXOR;
+#endif
 
 uint8_t *MemAllocator::allocate(size_t bytes)
 {
+#ifdef DEBUG_MALLOC_HAX
     HAXOR.lock();
     uint8_t *resss = (uint8_t *) calloc(1, bytes);
     HAXOR.unlock();
     return resss;
+#endif
 
     bool runAgain = false;
     Runtime::gcBarrier.enteringAlloc(runAgain);
@@ -58,15 +62,6 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         return getCurrent()->allocate(bytes);
     }
 
-    if(running)
-    {
-        *((int *) NULL) = 666;
-    }
-    running = true;
-
-    /*uint8_t *hack = (uint8_t *)  malloc(bytes);
-    memset(hack, 0, bytes);
-    return hack;*/
     uint8_t *nextAddr = pool + top;
 
 #ifdef DEBUG
@@ -78,7 +73,6 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         if ((top + bytes) < (capacity - 1024))
         {
             top += bytes;
-            running = false;
             Runtime::gcBarrier.leavingAlloc();
             memset(nextAddr, 0, bytes);
             return nextAddr;
@@ -89,15 +83,11 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         if ((top + bytes) < capacity)
         {
             top += bytes;
-            running = false;
             Runtime::gcBarrier.leavingAlloc();
             memset(nextAddr, 0, bytes);
-            running = false;
             return nextAddr;
         }
     }
-
-    running = false;
 
     // TODO: Create Barrier that will stop at all pre blocking/allocating
     Runtime::gcBarrier.enteringGC();
@@ -134,20 +124,17 @@ uint8_t *MemAllocator::allocate(size_t bytes)
 
 uint8_t *MemAllocator::allocateSureAndThreadUnsafe(size_t bytes)
 {
+#ifdef DEBUG_MALLOC_HAX
     HAXOR.lock();
     uint8_t *ress = (uint8_t *) calloc(1, bytes);
     HAXOR.unlock();
     return ress;
+#endif
 
     /*uint8_t *hack = (uint8_t *)  malloc(bytes);
     memset(hack, 0, bytes);
     return hack;*/
     uint8_t *nextAddr = pool + top;
-
-    if(!running)
-    {
-        *((int *) NULL) = 666;
-    }
 
 #ifdef DEBUG
     std::cout << "MemAllocator::allocate(): called to allocate " << bytes << " bytes, remaining: " << (capacity - (top + bytes)) << std::endl;
@@ -160,7 +147,9 @@ uint8_t *MemAllocator::allocateSureAndThreadUnsafe(size_t bytes)
 
 void MemAllocator::ensureWithLock(size_t bytes)
 {
+#ifdef DEBUG_MALLOC_HAX
     return;
+#endif
 
     bool runAgain = false;
     Runtime::gcBarrier.enteringAlloc(runAgain);
@@ -170,17 +159,6 @@ void MemAllocator::ensureWithLock(size_t bytes)
         getCurrent()->ensureWithLock(bytes);
         return;
     }
-
-    if(running)
-    {
-        std::cout << " POOOOOOOOOOOOF " << std::endl;
-        *((int *) NULL) = 666;
-    }
-    running = true;
-
-/*uint8_t *hack = (uint8_t *)  malloc(bytes);
-    memset(hack, 0, bytes);
-    return hack;*/
 
 #ifdef DEBUG
     std::cout << "MemAllocator::allocate(): called to allocate " << bytes << " bytes, remaining: " << (capacity - (top + bytes)) << std::endl;
@@ -219,7 +197,6 @@ void MemAllocator::ensureWithLock(size_t bytes)
 
 void MemAllocator::ensureWithUnlock()
 {
-    running = false;
     Runtime::gcBarrier.leavingAlloc();
 }
 

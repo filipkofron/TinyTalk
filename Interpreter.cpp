@@ -212,6 +212,7 @@ Interpreter::~Interpreter()
 
 void Interpreter::interpretFile(std::istream &is, bool silent)
 {
+    Runtime::gcBarrier.reg();
     std::shared_ptr<Reader> reader(new Reader(&is));
     std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
     Parser parser(tokenizer);
@@ -285,6 +286,7 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
             break;
         }*/
     } while (!tokenizer->hasReachedEOF());
+    Runtime::gcBarrier.unreg();
 }
 
 void Interpreter::interpretCommandLine(std::istream &is)

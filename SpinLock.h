@@ -84,7 +84,7 @@ public:
     }
     inline bool tryLock()
     {
-        mutex.try_lock();
+        return mutex.try_lock();
     }
 
 private:

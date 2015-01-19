@@ -18,6 +18,7 @@ private:
     //std::mutex mutex;
     SpinLock allocMutex;
     SpinLock gcMutex;
+    SpinLock waitingMutex;
     //std::condition_variable allocatingCV;
     //std::condition_variable waitingCV;
     //std::condition_variable gcCV;
