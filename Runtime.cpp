@@ -254,6 +254,9 @@ RefPtr<TTObject> Runtime::findBlock(const uint8_t *safeName, TTObject *obj, TTOb
 
 RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
+#ifdef VERBOSE
+    std::cout << "(executeSimpleNativeMessage): " << nativeName << std::endl;
+#endif
     std::shared_ptr<Builtin> builtin = Runtime::builtinPool.lookupBultin(nativeName);
     std::vector<std::string> singleList;
     singleList.push_back(msgName);
@@ -278,6 +281,9 @@ RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, Re
 
 RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, RefPtr<TTObject> dest, std::string &msgName, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
+#ifdef VERBOSE
+    std::cout << "(executeMultipleNativeMessage): " << nativeName << std::endl;
+#endif
 #ifdef DEBUG
     std::cout << "(executeMultipleNativeMessage)" << std::endl;
 #endif

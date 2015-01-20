@@ -21,7 +21,7 @@ Map = Object createWith:
 
         i = 0;
 
-        ns inject: [ :each: |
+        ns do: [ :each: |
             (each startsWith: mapPrefix)
                 ifTrue: [ eachValueDo value: (vs at: i) ];
             i = i add: 1

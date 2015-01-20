@@ -28,11 +28,12 @@ private:
 #endif
 
     SpinLock lock;
+    void reg_threadunsafe(RefPtrBase *refPtr);
 public:
     RefPtrMap();
     ~RefPtrMap();
 
-    void reg(RefPtrBase *refPtr, bool object);
+    void reg(RefPtrBase *refPtr);
     void unreg(RefPtrBase *refPtr);
 
     std::vector<RefPtrBase *> collectRoots();

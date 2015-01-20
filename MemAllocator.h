@@ -41,6 +41,7 @@ public:
     uint8_t *cloneString(const uint8_t *str);
 
     TTObject *allocateObject();
+    TTObject *allocateObject_threadunsafe();
     TTLiteral *allocateLiteral();
 
     static MemAllocator *getCurrent();

@@ -20,7 +20,29 @@ RefPtrMap::~RefPtrMap()
 #endif
 }
 
-void RefPtrMap::reg(RefPtrBase *refPtr, bool object)
+void RefPtrMap::reg_threadunsafe(RefPtrBase *refPtr)
+{
+#ifdef HASHMAP_FAST
+    // TODO: Check endian during compile time!
+    int index = CALC_INDEX(refPtr, REF_PTR_MAX_VALS);
+    int stop = index;
+    while(vals[index])
+    {
+        index = (int) ((index + 1) % REF_PTR_MAX_VALS);
+        if(index == stop)
+        {
+            std::cerr << "RefPTRMAP Out of slots!" << std::endl;
+            exit(1);
+        }
+    }
+
+    vals[index] = refPtr;
+#else
+    refs.insert(refPtr);
+#endif
+}
+
+void RefPtrMap::reg(RefPtrBase *refPtr)
 {
     lock.lock();
 #ifdef HASHMAP_FAST
@@ -61,6 +83,21 @@ void RefPtrMap::unreg(RefPtrBase *refPtr)
         }
     }
     vals[index] = NULL;
+    RefPtrBase *temp;
+    stop = ++index;
+    while(vals[index])
+    {
+        temp = vals[index];
+        vals[index] = NULL;
+        reg_threadunsafe(temp);
+
+        index = (index + 1) % REF_PTR_MAX_VALS;
+        if(index == stop)
+        {
+            std::cerr << "RefPTRMAP slot is FULL!" << std::endl;
+            exit(1);
+        }
+    }
 #else
     refs.erase(refPtr);
 #endif

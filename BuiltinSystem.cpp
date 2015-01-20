@@ -122,21 +122,25 @@ RefPtr<TTObject> BuiltinSystemBindErr::invoke(RefPtr<TTObject> dest, std::vector
 
 static void thread_entry(RefPtr<TTObject> block, RefPtr<TTObject> thiz)
 {
+    Runtime::gcBarrier.unlockBeforeNewThread();
     Runtime::gcBarrier.reg();
-    BytecodeInterpreter bytecodeInterpreter;
-
-    // we must create the new environment manually, since the entry for Bytecode Interpreter
-    // forces the outer environment to be the actual (why..)
-    RefPtr<TTObject> parentEnv = block->getField(TO_TT_STR("blockEnv"));
-    RefPtr<TTObject> newEnv = TTObject::createObject(TT_ENV);
-    newEnv->addField(TO_TT_STR("parentEnv"), parentEnv);
-
-    if(&thiz)
+    // ensure the byteCodeInterpreter destructs before
     {
-        newEnv->addField(TO_TT_STR("this"), thiz);
-    }
+        BytecodeInterpreter bytecodeInterpreter;
 
-    bytecodeInterpreter.interpret(block, newEnv, thiz);
+        // we must create the new environment manually, since the entry for Bytecode Interpreter
+        // forces the outer environment to be the actual (why..)
+        RefPtr<TTObject> parentEnv = block->getField(TO_TT_STR("blockEnv"));
+        RefPtr<TTObject> newEnv = TTObject::createObject(TT_ENV);
+        newEnv->addField(TO_TT_STR("parentEnv"), parentEnv);
+
+        if (&thiz)
+        {
+            newEnv->addField(TO_TT_STR("this"), thiz);
+        }
+
+        bytecodeInterpreter.interpret(block, newEnv, thiz);
+    }
     Runtime::gcBarrier.unreg();
 }
 
@@ -150,6 +154,7 @@ RefPtr<TTObject> BuiltinSystemStartThread::invoke(RefPtr<TTObject> dest, std::ve
         throw std::exception();
     }
 
+    Runtime::gcBarrier.lockBeforeNewThread();
     std::thread myThread(thread_entry, values[0], thiz);
     myThread.detach();
 

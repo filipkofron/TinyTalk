@@ -48,7 +48,7 @@ FILE **checkIfExistsAndIsOpenedThenReturnFD(RefPtr<TTObject> file)
     if (!*fileHandle)
     {
         std::cerr << "[Builtin] File: not opened!" << std::endl;
-        throw std::exception();
+        KILL;
     }
     return fileHandle;
 }
@@ -85,9 +85,9 @@ RefPtr<TTObject> BuiltinFileIOClose::invoke(RefPtr<TTObject> dest, std::vector<s
 RefPtr<TTObject> BuiltinFileIORead::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
-    FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[0]);
+    FILE *fd = *checkIfExistsAndIsOpenedThenReturnFD(values[0]);
     Runtime::gcBarrier.enteringBlocking();
-    int val = fgetc(*fd);
+    int val = fgetc(fd);
     Runtime::gcBarrier.leavingBlocking();
     RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(val);
     return res;
@@ -98,10 +98,10 @@ RefPtr<TTObject> BuiltinFileIOWriteFile::invoke(RefPtr<TTObject> dest, std::vect
     BUILTIN_CHECK_ARGS_COUNT(2, 2);
     BUILTIN_CHECK_LITERAL(0);
     BUILTIN_CHECK_INTEGER(0);
-    FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[1]);
+    FILE *fd = *checkIfExistsAndIsOpenedThenReturnFD(values[1]);
     int val = *(int32_t *) values[0]->getLiteral()->data;
     Runtime::gcBarrier.enteringBlocking();
-    int ret = fputc(val, *fd);
+    int ret = fputc(val, fd);
     Runtime::gcBarrier.leavingBlocking();
     RefPtr<TTObject> written;
 
@@ -123,12 +123,12 @@ RefPtr<TTObject> BuiltinFileIOWriteStringFile::invoke(RefPtr<TTObject> dest, std
     BUILTIN_CHECK_LITERAL(0);
     BUILTIN_CHECK_STRING(0);
 
-    FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[1]);
+    FILE *fd = *checkIfExistsAndIsOpenedThenReturnFD(values[1]);
 
     uint8_t *temp = (uint8_t *) malloc(values[0]->getLiteral()->length);
     memcpy(temp, values[0]->getLiteral()->data, values[0]->getLiteral()->length);
     Runtime::gcBarrier.enteringBlocking();
-    int ret = fputs((const char *) temp, *fd);
+    int ret = fputs((const char *) temp, fd);
     free(temp);
     Runtime::gcBarrier.leavingBlocking();
     RefPtr<TTObject> written;
@@ -167,12 +167,12 @@ RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<st
     return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
 }
 
-#define LINE_LENGTH_MAX 1024 * 1024
+#define LINE_LENGTH_MAX (1024 * 1024 + 1)
 
 RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
     BUILTIN_CHECK_ARGS_COUNT(1, 1);
-    FILE **fd = checkIfExistsAndIsOpenedThenReturnFD(values[0]);
+    FILE *fd = *checkIfExistsAndIsOpenedThenReturnFD(values[0]);
 
     Runtime::gcBarrier.enteringBlocking();
     uint32_t size = 1;
@@ -180,7 +180,7 @@ RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vecto
     uint32_t i = 0;
     do
     {
-        int c = fgetc(*fd);
+        int c = fgetc(fd);
         if(c == -1)
         {
             RefPtr<TTObject> t = Runtime::globalEnvironment->getField(TO_TT_STR("True"));

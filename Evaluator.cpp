@@ -480,7 +480,7 @@ RefPtr<TTObject> Evaluator::evaluate(RefPtr<TTObject> expression, RefPtr<TTObjec
 
     return res;
 }
-
+// TODO: remove this!!!!!!!!!!!!
 RefPtr<TTObject> Evaluator::sendSimpleMessage(RefPtr<TTObject> object, std::string &name)
 {
 #ifdef DEBUG

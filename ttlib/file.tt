@@ -87,7 +87,6 @@ File = Object createWith:
 	],
 
 	"isOK", [ :isOK |
-		FileIO isOK: this;
-		this
+		FileIO isOK: this
 	]
 }

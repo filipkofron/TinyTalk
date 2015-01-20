@@ -213,15 +213,16 @@ Interpreter::~Interpreter()
 void Interpreter::interpretFile(std::istream &is, bool silent)
 {
     Runtime::gcBarrier.reg();
-    std::shared_ptr<Reader> reader(new Reader(&is));
-    std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
-    Parser parser(tokenizer);
-    Evaluator evaluator;
-    BytecodeInterpreter bytecodeInterpreter;
-
-    do
     {
-       /* try
+        std::shared_ptr<Reader> reader(new Reader(&is));
+        std::shared_ptr<Tokenizer> tokenizer(new Tokenizer(reader));
+        Parser parser(tokenizer);
+        Evaluator evaluator;
+        BytecodeInterpreter bytecodeInterpreter;
+
+        do
+        {
+            /* try
         {*/
             RefPtr<TTObject> expression = parser.parse(false, false);
 
@@ -234,28 +235,28 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
 
             std::set_terminate(std::abort);
 
-            if(&expression != NULL)
+            if (&expression != NULL)
             {
                 //RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);
 
                 RefPtr<TTObject> expr = Expression::createNaiveBlock(expression);
                 RefPtr<TTObject> result = bytecodeInterpreter.interpret(expr, Runtime::globalEnvironment, NULL);
 
-                if(!silent)
+                if (!silent)
                 {
 #ifdef DEBUG
                     std::cout << std::endl << ">>> ======================================" << std::endl;
                     std::cout << "Evaluator result: " << std::endl;
 #endif
 
-                    if(&result)
+                    if (&result)
                     {
                         std::string toStringName = "toString";
                         result = evaluator.sendSimpleMessage(result, toStringName);
                     }
-                    if(&result)
+                    if (&result)
                     {
-                        if(result->type == TT_LITERAL && result->getLiteral()->type == LITERAL_TYPE_STRING)
+                        if (result->type == TT_LITERAL && result->getLiteral()->type == LITERAL_TYPE_STRING)
                         {
                             std::string resultStr = (char *) result->getLiteral()->data;
                             std::cout << resultStr << std::endl;
@@ -274,18 +275,19 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
                     std::cout << std::endl;
                 }
             }
-       /* }
-        catch (TokenizerException &e)
-        {
-            std::cerr << "Runtime error: Caught exception: " << e.what() << std::endl;
-            break;
-        }
-        catch (std::exception &ex)
-        {
-            std::cerr << "Runtime error: Caught exception: " << ex.what() << std::endl;
-            break;
-        }*/
-    } while (!tokenizer->hasReachedEOF());
+            /* }
+                catch (TokenizerException &e)
+                {
+                    std::cerr << "Runtime error: Caught exception: " << e.what() << std::endl;
+                    break;
+                }
+                catch (std::exception &ex)
+                {
+                    std::cerr << "Runtime error: Caught exception: " << ex.what() << std::endl;
+                    break;
+                }*/
+        } while (!tokenizer->hasReachedEOF());
+    }
     Runtime::gcBarrier.unreg();
 }
 

@@ -9,6 +9,32 @@ GCBarrier::GCBarrier()
     gcing = false;
 }
 
+void GCBarrier::lockBeforeNewThread()
+{
+    waitingMutex.lock();
+    waiting.insert(std::this_thread::get_id());
+    waitingMutex.unlock();
+    gcMutex.lock();
+    waitingMutex.lock();
+    waiting.erase(std::this_thread::get_id());
+    waitingMutex.unlock();
+}
+
+void GCBarrier::unlockBeforeNewThread()
+{
+    gcMutex.unlock();
+}
+
+void GCBarrier::lockGC()
+{
+    gcMutex.lock();
+}
+
+void GCBarrier::unlockGC()
+{
+    gcMutex.unlock();
+}
+
 void GCBarrier::reg()
 {
     gcMutex.lock();
@@ -18,7 +44,13 @@ void GCBarrier::reg()
 
 void GCBarrier::unreg()
 {
+    waitingMutex.lock();
+    waiting.insert(std::this_thread::get_id());
+    waitingMutex.unlock();
     gcMutex.lock();
+    waitingMutex.lock();
+    waiting.erase(std::this_thread::get_id());
+    waitingMutex.unlock();
     threads.erase(std::this_thread::get_id());
     gcMutex.unlock();
 }
@@ -66,15 +98,21 @@ void GCBarrier::leavingAlloc()
     allocMutex.unlock();
 }
 
+int HAAAX = 0;
+
 void GCBarrier::enteringGC()
 {
-    std::cout << " >> Entering GC" << std::endl;
     gcMutex.lock();
     gcRunner = std::this_thread::get_id();
     gcing = true;
+    std::chrono::milliseconds sleepTime(1);
+
     while(true)
     {
+#ifdef VERBOSE
         std::cout << " >> Waiting for all threads (current: " << waiting.size() << " all: " << threads.size() << ")." << std::endl;
+#endif
+        if(HAAAX++ > 10000) KILL;
         waitingMutex.lock();
         if(waiting.size() == (threads.size() - 1)) // not counting this thread
         {
@@ -82,7 +120,9 @@ void GCBarrier::enteringGC()
             break;
         }
         waitingMutex.unlock();
+        std::this_thread::sleep_for(sleepTime);
     }
+    HAAAX = 0;
 }
 
 void GCBarrier::leavingGC()
@@ -93,6 +133,7 @@ void GCBarrier::leavingGC()
 
 void GCBarrier::tryCatchAnyWhere()
 {
+    std::chrono::milliseconds sleepTime(1);
     if(!gcMutex.tryLock())
     {
         while (!gcMutex.tryLock())
@@ -100,6 +141,7 @@ void GCBarrier::tryCatchAnyWhere()
             waitingMutex.lock();
             waiting.insert(std::this_thread::get_id());
             waitingMutex.unlock();
+            std::this_thread::sleep_for(sleepTime);
         }
         waitingMutex.lock();
         waiting.erase(std::this_thread::get_id());

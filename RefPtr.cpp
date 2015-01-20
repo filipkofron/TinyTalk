@@ -10,7 +10,7 @@ RefPtrBase::RefPtrBase(uintptr_t ptr, bool object)
 #endif
     if(ptr)
     {
-        Runtime::refPtrMap.reg(this, object);
+        Runtime::refPtrMap.reg(this);
     }
 
 }
@@ -24,7 +24,7 @@ RefPtrBase::RefPtrBase(const RefPtrBase &orig)
 #endif
     if(ptr)
     {
-        Runtime::refPtrMap.reg(this, object);
+        Runtime::refPtrMap.reg(this);
     }
 
 }
@@ -56,7 +56,7 @@ RefPtrBase &RefPtrBase::operator =(const RefPtrBase& orig)
 #endif
         if (ptr)
         {
-            Runtime::refPtrMap.reg(this, object);
+            Runtime::refPtrMap.reg(this);
         }
     }
 
@@ -113,6 +113,6 @@ void RefPtrBase::setBasePtr(uintptr_t ptr, bool object)
 
     if(this->ptr)
     {
-        Runtime::refPtrMap.reg(this, object);
+        Runtime::refPtrMap.reg(this);
     }
 }

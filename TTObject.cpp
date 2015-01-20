@@ -72,6 +72,13 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 
     TTObject *newObj = newMem->allocateObject();
     memcpy(newObj, *ptr, sizeof(**ptr));
+
+    if(!newObj->size)
+    {
+        std::cerr <<"GC: Invalid size 0!!" << std::endl;
+        KILL;
+    }
+
 #ifdef DEBUG
     std::cout << "Allocating capacity: newObj->fieldCapacity: " << newObj->size << " newObj->fieldCount: " << newObj->count << std::endl;
 #endif
@@ -155,7 +162,9 @@ void TTObject::_gc_COPY_copy(TTObject **ptr, MemAllocator *oldMem, MemAllocator 
 
 RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocated)
 {
-    TTObject *tempHax = MemAllocator::getCurrent()->allocateObject();
+    // ensure we don't get the GC call here!
+    MemAllocator::getCurrent()->ensureWithLock(sizeof(TTObject) + (sizeof(uint8_t *) + sizeof(TTObject *)) * fieldsPreallocated);
+    TTObject *tempHax = MemAllocator::getCurrent()->allocateObject_threadunsafe();
     tempHax->size = 0;
     tempHax->count = 0;
     tempHax->type = type;
@@ -163,8 +172,6 @@ RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocate
     tempHax->objects = NULL;
     RefPtr<TTObject> newObject = tempHax;
 
-    // ensure we don't get the GC call here!
-    MemAllocator::getCurrent()->ensureWithLock((sizeof(uint8_t *) + sizeof(TTObject *)) * fieldsPreallocated);
     uint8_t **allocedNames = (uint8_t **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(uint8_t *) * fieldsPreallocated);
     TTObject **allocedObjects = (TTObject **) MemAllocator::getCurrent()->allocateSureAndThreadUnsafe(sizeof(TTObject *) * fieldsPreallocated);
     MemAllocator::getCurrent()->ensureWithUnlock();
@@ -388,8 +395,8 @@ TTLiteral *TTObject::getLiteral()
 #endif
     if(type != TT_LITERAL)
     {
-        std::cerr << "Object is not literal: Cannot get literal value!" << std::endl;
-        throw std::exception();
+        std::cerr << "Object is not literal: Cannot get literal value! KILLING" << std::endl;
+        KILL;
     }
 
     if(!size)

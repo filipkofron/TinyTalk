@@ -179,6 +179,8 @@ RefPtr<TTObject> BuiltinSocketTCPServerSocketAcceptClientFile::invoke(RefPtr<TTO
     FILE **fileHandle = (FILE **) fd->getLiteral()->data;
     *fileHandle = fdopen(clientSd, "wb+");
 
+    // TODO: Check for errors
+
     return dest;
 }
 

@@ -29,6 +29,12 @@ private:
 public:
     GCBarrier();
 
+    void lockBeforeNewThread();
+    void unlockBeforeNewThread();
+
+    void lockGC();
+    void unlockGC();
+
     void reg();
     void unreg();
 

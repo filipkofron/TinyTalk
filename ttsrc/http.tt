@@ -104,10 +104,10 @@ HttpServer = Object createWith:
                 [
                     | client |;
                     client = serverSocket accept;
-
-                    server handleClient: client
-
-                    // System startThread: [server handleClient: client]
+                    client isOK ifTrue:
+                    [
+                        System startThread: [ server handleClient: client ]
+                    ]
                 ]
                 times: 1024
             ]

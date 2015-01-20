@@ -125,6 +125,10 @@ void sendSimple(BytecodeInterpreter &bi)
     TTObject *thizPtr = NULL;
     std::string safeName = (const char *) name->getLiteral()->data;
 
+#ifdef VERBOSE
+    std::cout << "([" << std::this_thread::get_id() << "]*" << safeName <<")" << std::endl;
+#endif
+
     RefPtr<TTObject> expression = Runtime::findBlock(TO_TT_STR(safeName.c_str()), &dest, &bi.env, &thizPtr);
 
     RefPtr<TTObject> thiz = thizPtr;
@@ -163,6 +167,10 @@ void sendMultiple(BytecodeInterpreter &bi)
     RefPtr<TTObject> dest = (TTObject *) bi.stack.popPtr();
 
     std::string fullName = (const char *) fullNameObj->getLiteral()->data;
+
+#ifdef VERBOSE
+    std::cout << "([" << std::this_thread::get_id() << "]*" << fullName <<")" << std::endl;
+#endif
 
     TTObject *thizPtr = NULL;
 
@@ -442,13 +450,10 @@ void BytecodeInterpreter::test(MemAllocator *oldMem, MemAllocator *newMem)
 
 RefPtr<TTObject> BytecodeInterpreter::interpret(RefPtr<TTObject> block, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
 {
-#ifdef DEBUG
-    std::cout << " --> Interpreting!" << std::endl;
-#endif
     setupStackFrame(block, env, thiz);
     bindStackFrame();
 
-    // hack so that we have correct env
+    // hack so that we have correct env at the beginning
     this->env = env;
     stackFrame->setField(TO_TT_STR("env"), env);
 
@@ -460,9 +465,7 @@ RefPtr<TTObject> BytecodeInterpreter::interpret(RefPtr<TTObject> block, RefPtr<T
         {
             *(uintptr_t *) &instr = *(uintptr_t *) &byteCode[pc];
             pc += sizeof(uintptr_t);
-#ifdef DEBUG
-            std::cout << " (*) -> " << std::endl;
-#endif
+
             (*instr)(*this);
         }
 

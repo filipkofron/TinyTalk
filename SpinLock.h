@@ -1,8 +1,8 @@
 #ifndef SPINLOCK_H
 #define SPINLOCK_H
 
-/*class SpinLock;
-
+class SpinLock;
+/*
 #include <atomic>
 
 class SpinLock
@@ -15,7 +15,7 @@ public:
 private:
     std::atomic_flag lck = ATOMIC_FLAG_INIT;
 };*/
-/*
+
 #include <atomic>
 #include <thread>
 
@@ -54,7 +54,7 @@ public:
         }
     }
 
-    inline bool try_lock()
+    inline bool tryLock()
     {
         return !m_lock.test_and_set(std::memory_order_acquire);
     }
@@ -67,8 +67,8 @@ public:
 private:
 
     std::atomic_flag m_lock;
-};*/
-
+};
+/*
 #include <mutex>
 
 class SpinLock
@@ -90,5 +90,5 @@ public:
 private:
 
     std::mutex mutex;
-};
+};*/
 #endif

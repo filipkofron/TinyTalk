@@ -227,6 +227,17 @@ TTObject* MemAllocator::allocateObject()
 #endif
 }
 
+TTObject *MemAllocator::allocateObject_threadunsafe()
+{
+#ifdef DEBUG
+    TTObject *obj = (TTObject *) allocate(sizeof(TTObject));
+    nextAllocator->objects.insert((uintptr_t) obj);
+    return obj;
+#else
+    return (TTObject *) allocateSureAndThreadUnsafe(sizeof(TTObject));
+#endif
+}
+
 TTLiteral* MemAllocator::allocateLiteral()
 {
 #ifdef DEBUG

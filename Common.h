@@ -1,5 +1,9 @@
 // #define DEBUG
-#define VERBOSE
+//#define VERBOSE
+
+#ifdef DEBUG
+    #define VERBOSE
+#endif
 
 //#define MEMORY_ALLCOATOR_SIZE_DEFAULT (1024 * 256)
 #define MEMORY_ALLCOATOR_SIZE_DEFAULT (1024 * 1024)
@@ -16,7 +20,8 @@ throw std::exception(); \
 
 #define KILL \
 do { \
-    *(int *) NULL = 0; \
+    std::cerr << "** THIS IS FORCED KILL **" << std::endl;\
+    *(int *) NULL = 666; \
 } while(false)
 
 #include <cstdint>

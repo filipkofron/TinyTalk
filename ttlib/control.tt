@@ -110,9 +110,9 @@ Loop
     ];
 
 Array
-    createField: "inject:"
+    createField: "do:"
     withValue:
-        [ :inject: |
+        [ :do: |
             |i thisArray |;
             i = 0;
             thisArray = this;
@@ -121,7 +121,7 @@ Array
                     [i lessThan: (thisArray size)]
                 do:
                     [
-                        inject
+                        do
                             value: (thisArray at: i);
                         i = i add: 1
                     ]
@@ -135,7 +135,7 @@ Object
             first = True;
             object = this new;
             createWith
-                inject:
+                do:
                     [ :item: |
                         first
                             ifTrue: [name = item];
