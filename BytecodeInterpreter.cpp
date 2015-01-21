@@ -347,13 +347,17 @@ void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObjec
 BytecodeInterpreter::BytecodeInterpreter()
     : byteCode(NULL), pc(0), pcMax(0)
 {
+    Runtime::criticalRuntimeGCLock.lock();
     Runtime::interpretersAlive.insert(this);
     nil = Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
+    Runtime::criticalRuntimeGCLock.unlock();
 }
 
 BytecodeInterpreter::~BytecodeInterpreter()
 {
+    Runtime::criticalRuntimeGCLock.lock();
     Runtime::interpretersAlive.erase(this);
+    Runtime::criticalRuntimeGCLock.unlock();
 }
 
 void BytecodeInterpreter::refreshAfterGC()

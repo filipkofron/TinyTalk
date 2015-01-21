@@ -1,5 +1,7 @@
 #include "Common.h"
 #include <iostream>
+#include <chrono>
+#include <stdint.h>
 
 void prlvl(std::ostream &os, uint32_t level)
 {
@@ -69,4 +71,15 @@ uint32_t strHash32(const uint8_t *str)
         res ^= *str++;
     }
     return res;
+}
+
+int64_t currentTimeMilis()
+{
+    namespace sc = std::chrono;
+
+    auto time = sc::system_clock::now();
+    auto since_epoch = time.time_since_epoch();
+    auto millis = sc::duration_cast<sc::milliseconds>(since_epoch);
+
+    return (int64_t) millis.count();
 }

@@ -1,12 +1,14 @@
 #include <iostream>
 #include "GCBarrier.h"
 #include "Common.h"
+#include "Runtime.h"
 
 GCBarrier::GCBarrier()
     : gcRunner(std::this_thread::get_id())
 {
     allocating = false;
     gcing = false;
+    freeHelp = true;
 }
 
 void GCBarrier::lockBeforeNewThread()
@@ -58,6 +60,7 @@ void GCBarrier::unreg()
 void GCBarrier::enteringAlloc(bool &runAgain)
 {
     runAgain = false;
+
     if(!allocMutex.tryLock())
     {
         runAgain = true;
@@ -82,6 +85,16 @@ void GCBarrier::enteringAlloc(bool &runAgain)
             waitingMutex.lock();
             waiting.insert(std::this_thread::get_id());
             waitingMutex.unlock();
+            //allocMutex.lock();
+            //break;
+            //std::chrono::nanoseconds sleepTime((rand() % 2000) * Runtime::interpretersAlive.size());
+            //std::this_thread::sleep_for(sleepTime);
+
+            int max = 20000;
+            for(int i = 0; i < (rand() % 500) != 0 && !freeHelp && max--; i++)
+            {
+            }
+
         }
         waitingMutex.lock();
         waiting.erase(std::this_thread::get_id());

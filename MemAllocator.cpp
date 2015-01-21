@@ -55,10 +55,12 @@ uint8_t *MemAllocator::allocate(size_t bytes)
 #endif
 
     bool runAgain = false;
+    Runtime::gcBarrier.freeHelp = false;
     Runtime::gcBarrier.enteringAlloc(runAgain);
     if(runAgain)
     {
         Runtime::gcBarrier.leavingAlloc();
+        Runtime::gcBarrier.freeHelp = true;
         return getCurrent()->allocate(bytes);
     }
 
@@ -74,6 +76,7 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         {
             top += bytes;
             Runtime::gcBarrier.leavingAlloc();
+            Runtime::gcBarrier.freeHelp = true;
             memset(nextAddr, 0, bytes);
             return nextAddr;
         }
@@ -84,12 +87,21 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         {
             top += bytes;
             Runtime::gcBarrier.leavingAlloc();
+            Runtime::gcBarrier.freeHelp = true;
             memset(nextAddr, 0, bytes);
             return nextAddr;
         }
     }
 
     // TODO: Create Barrier that will stop at all pre blocking/allocating
+
+    if((currentTimeMilis() - Runtime::lastGCRun) < 150)
+    {
+        std::cout << "Runtime: increasing memory from: " << Runtime::allocSize / 1024 << " to ";
+        Runtime::allocSize = (size_t) (1.5 * Runtime::allocSize);
+        std::cout << Runtime::allocSize / 1024 << " kiB" << std::endl;
+    }
+    Runtime::lastGCRun = currentTimeMilis();
     Runtime::gcBarrier.enteringGC();
 
 
@@ -108,14 +120,13 @@ uint8_t *MemAllocator::allocate(size_t bytes)
 
     if(getCurrent()->getFreeMemory() < bytes)
     {
-        /*std::cerr << "Runtime error: Could not free more memory." << std::endl;
-        throw std::exception();*/
         Runtime::allocSize = (size_t) (Runtime::allocSize * 1.5);
         Runtime::runCopyGC();
     }
 
     Runtime::gcBarrier.leavingGC();
     Runtime::gcBarrier.leavingAlloc();
+    Runtime::gcBarrier.freeHelp = true;
 
     uint8_t *res = getCurrent()->allocate(bytes);
 
@@ -153,9 +164,11 @@ void MemAllocator::ensureWithLock(size_t bytes)
 
     bool runAgain = false;
     Runtime::gcBarrier.enteringAlloc(runAgain);
+    Runtime::gcBarrier.freeHelp = false;
     if(runAgain)
     {
         Runtime::gcBarrier.leavingAlloc();
+        Runtime::gcBarrier.freeHelp = true;
         getCurrent()->ensureWithLock(bytes);
         return;
     }
@@ -173,6 +186,14 @@ void MemAllocator::ensureWithLock(size_t bytes)
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
 #endif
 
+    if((currentTimeMilis() - Runtime::lastGCRun) < 150)
+    {
+        std::cout << "Runtime: increasing memory from: " << Runtime::allocSize / 1024 << " to ";
+        Runtime::allocSize = (size_t) (1.5 * Runtime::allocSize);
+        std::cout << Runtime::allocSize / 1024 << " kiB" << std::endl;
+    }
+    Runtime::lastGCRun = currentTimeMilis();
+
     Runtime::gcBarrier.enteringGC();
 
     Runtime::runCopyGC();
@@ -186,8 +207,6 @@ void MemAllocator::ensureWithLock(size_t bytes)
 
     if(getCurrent()->getFreeMemory() < bytes)
     {
-        /*std::cerr << "Runtime error: Could not free more memory." << std::endl;
-        throw std::exception();*/
         Runtime::allocSize = (size_t) (Runtime::allocSize * 1.5);
         Runtime::runCopyGC();
     }
@@ -198,6 +217,7 @@ void MemAllocator::ensureWithLock(size_t bytes)
 void MemAllocator::ensureWithUnlock()
 {
     Runtime::gcBarrier.leavingAlloc();
+    Runtime::gcBarrier.freeHelp = true;
 }
 
 uint8_t *MemAllocator::allocateString(const uint8_t *str)

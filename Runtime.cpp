@@ -8,6 +8,8 @@ RefPtrMap Runtime::refPtrMap;
 GCBarrier Runtime::gcBarrier;
 BytecodeGen Runtime::bytecodeGen;
 TTObject *Runtime::globalEnvironment = NULL;
+SpinLock Runtime::criticalRuntimeGCLock;
+int64_t Runtime::lastGCRun = 0;
 
 std::set<BytecodeInterpreter *> Runtime::interpretersAlive;
 
@@ -308,7 +310,8 @@ RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, 
     return NULL;
 }
 
-int numrunHAX = 0; // TODO: Remove this debug hax
+static int numrunHAX = 0; // TODO: Remove this debug hax
+
 
 void Runtime::runCopyGC()
 {
@@ -323,6 +326,7 @@ void Runtime::runCopyGC()
         throw std::exception();
     }
     running = true;
+
     MemAllocator *newAllocator = new MemAllocator((size_t) (Runtime::allocSize));
     MemAllocator::setNextAllocator(newAllocator);
 
@@ -382,6 +386,7 @@ void Runtime::runCopyGC()
     std::cout << "GC: finished phase ========== " << std::endl;
 #endif
 
+    criticalRuntimeGCLock.lock();
     for(auto inter : interpretersAlive)
     {
         inter->runGC(MemAllocator::getCurrent(), newAllocator);
@@ -394,10 +399,16 @@ void Runtime::runCopyGC()
         inter->refreshAfterGC();
     }
 
+    criticalRuntimeGCLock.unlock();
+
     long int prevSz = MemAllocator::getCurrent()->getCapacity() - MemAllocator::getCurrent()->getFreeMemory();
     long int currSz = newAllocator->getCapacity() - newAllocator->getFreeMemory();
     long int diff = prevSz - currSz;
-    std::cout << "[" << numrunHAX << "] GC: collected: " << (diff < 0 ? 0 : diff) << " bytes, free: " << newAllocator->getFreeMemory() << std::endl;
+    std::cout << "[" << numrunHAX << "] GC: collected: " << (diff < 0 ? 0 : diff) / 1024 << "/"
+            << MemAllocator::getCurrent()->getCapacity() / 1024
+            << " kiB, free: " << newAllocator->getFreeMemory() / 1024
+            << " kiB, alive: " << (newAllocator->getCapacity() - newAllocator->getFreeMemory()) / 1024
+            << " kiB in " << (currentTimeMilis() - lastGCRun) << " ms" << std::endl;
 
    // std::cout << "GC: Debug exit." << std::endl;
 

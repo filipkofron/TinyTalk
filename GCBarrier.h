@@ -29,6 +29,8 @@ private:
 public:
     GCBarrier();
 
+    bool freeHelp;
+
     void lockBeforeNewThread();
     void unlockBeforeNewThread();
 

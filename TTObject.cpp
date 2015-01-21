@@ -396,6 +396,8 @@ TTLiteral *TTObject::getLiteral()
     if(type != TT_LITERAL)
     {
         std::cerr << "Object is not literal: Cannot get literal value! KILLING" << std::endl;
+        print(std::cerr, 2, false);
+        std::cerr.flush();
         KILL;
     }
 

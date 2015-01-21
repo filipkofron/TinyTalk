@@ -44,3 +44,5 @@ void print_bytes(size_t bytes, void *ptr);
 * compute short hash fron string
 */
 uint32_t strHash32(const uint8_t *str);
+
+int64_t currentTimeMilis();
