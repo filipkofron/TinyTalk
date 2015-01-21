@@ -7,7 +7,9 @@ class GCBarrier;
 #include <thread>
 #include <condition_variable>
 #include <mutex>
-#include "SpinLock.h"
+#include "Lock.h"
+
+// #define SPINLOCK_TICKET // for allocation
 
 class GCBarrier
 {
@@ -15,13 +17,15 @@ private:
     std::set<std::thread::id> threads;
     std::set<std::thread::id> waiting;
     std::thread::id gcRunner;
-    //std::mutex mutex;
-    SpinLock allocMutex;
-    SpinLock gcMutex;
-    SpinLock waitingMutex;
-    //std::condition_variable allocatingCV;
-    //std::condition_variable waitingCV;
-    //std::condition_variable gcCV;
+
+    #ifdef SPINLOCK_TICKET
+    TicketLock allocMutex;
+    #else
+    Lock allocMutex;
+    #endif
+
+    Lock gcMutex;
+    Lock waitingMutex;
 
     bool allocating;
     bool gcing;

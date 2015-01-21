@@ -80,7 +80,7 @@ void saveSymbol(BytecodeInterpreter &bi)
 }
 
 // lock so that we generate code only once
-SpinLock genCodeLock;
+Lock genCodeLock;
 
 void loadBlock(BytecodeInterpreter &bi)
 {
@@ -284,7 +284,7 @@ void BytecodeInterpreter::bindStackFrame()
     env = stackFrame->getField(TO_TT_STR("env"));
 }
 
-SpinLock HAXLOCK;
+Lock HAXLOCK;
 
 void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObject> parentEnv, RefPtr<TTObject> thiz)
 {

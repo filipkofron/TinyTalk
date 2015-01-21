@@ -186,6 +186,10 @@ RefPtr<TTObject> TTObject::createObject(uint8_t type, uint32_t fieldsPreallocate
             newObject->addField(TO_TT_STR(pairVal.first.c_str()), &(pairVal.second));
         }
     }
+    else
+    {
+        newObject->addField(TO_TT_STR("env"), newObject);
+    }
 
     return newObject;
 }

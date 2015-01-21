@@ -7,7 +7,7 @@ class RefPtrMap;
 #include <vector>
 #include "Ptr.h"
 #include "RefPtr.h"
-#include "SpinLock.h"
+#include "Lock.h"
 #include <cstdio>
 
 #define HASHMAP_FAST
@@ -27,7 +27,7 @@ private:
     RefPtrBase **vals;
 #endif
 
-    SpinLock lock;
+    Lock lock;
     void reg_threadunsafe(RefPtrBase *refPtr);
 public:
     RefPtrMap();

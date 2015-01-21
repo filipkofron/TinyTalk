@@ -18,7 +18,7 @@ struct Runtime
     static std::set<BytecodeInterpreter *> interpretersAlive;
     static BytecodeGen bytecodeGen;
     static TTObject *globalEnvironment;
-    static SpinLock criticalRuntimeGCLock;
+    static Lock criticalRuntimeGCLock;
     static int64_t lastGCRun;
 
     static RefPtr<TTObject> findSymbolValueInThis(RefPtr<TTObject> thiz, const uint8_t *name, RefPtr<TTObject> &nextThis);

@@ -8,7 +8,7 @@ RefPtrMap Runtime::refPtrMap;
 GCBarrier Runtime::gcBarrier;
 BytecodeGen Runtime::bytecodeGen;
 TTObject *Runtime::globalEnvironment = NULL;
-SpinLock Runtime::criticalRuntimeGCLock;
+Lock Runtime::criticalRuntimeGCLock;
 int64_t Runtime::lastGCRun = 0;
 
 std::set<BytecodeInterpreter *> Runtime::interpretersAlive;

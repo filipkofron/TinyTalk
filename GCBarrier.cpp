@@ -61,7 +61,12 @@ void GCBarrier::enteringAlloc(bool &runAgain)
 {
     runAgain = false;
 
+#ifdef SPINLOCK_TICKET
+    long ticket = allocMutex.getTicket();
+    if(!allocMutex.tryTicket(ticket) || (gcing && gcRunner == std::this_thread::get_id()))
+#else
     if(!allocMutex.tryLock())
+#endif
     {
         runAgain = true;
         if(gcing)
@@ -72,7 +77,14 @@ void GCBarrier::enteringAlloc(bool &runAgain)
                 return;
             }
         }
+        waitingMutex.lock();
+        waiting.insert(std::this_thread::get_id());
+        waitingMutex.unlock();
+#ifdef SPINLOCK_TICKET
+        while (!allocMutex.tryTicket(ticket))
+#else
         while (!allocMutex.tryLock())
+#endif
         {
             if(gcing)
             {
@@ -81,20 +93,13 @@ void GCBarrier::enteringAlloc(bool &runAgain)
                     runAgain = false;
                     return;
                 }
+                std::chrono::nanoseconds sleepTime(1000);
+                std::this_thread::sleep_for(sleepTime);
             }
-            waitingMutex.lock();
-            waiting.insert(std::this_thread::get_id());
-            waitingMutex.unlock();
-            //allocMutex.lock();
-            //break;
-            //std::chrono::nanoseconds sleepTime((rand() % 2000) * Runtime::interpretersAlive.size());
-            //std::this_thread::sleep_for(sleepTime);
-
-            int max = 20000;
-            for(int i = 0; i < (rand() % 500) != 0 && !freeHelp && max--; i++)
+            int max = rand() % 100;
+            while(max--)
             {
             }
-
         }
         waitingMutex.lock();
         waiting.erase(std::this_thread::get_id());
@@ -147,6 +152,7 @@ void GCBarrier::leavingGC()
 void GCBarrier::tryCatchAnyWhere()
 {
     std::chrono::milliseconds sleepTime(1);
+
     if(!gcMutex.tryLock())
     {
         while (!gcMutex.tryLock())

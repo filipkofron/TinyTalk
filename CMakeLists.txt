@@ -36,8 +36,8 @@ set(SOURCE_FILES    Builtin.h
                     RefPtr.cpp
                     RefPtrMap.cpp
                     Runtime.cpp
-                    SpinLock.h
-                    SpinLock.cpp
+                    Lock.h
+                    Lock.cpp
                     Stack.h
                     Stack.cpp
                     Token.h
