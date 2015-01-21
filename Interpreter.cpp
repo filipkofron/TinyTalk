@@ -107,6 +107,8 @@ void Interpreter::setupLiterals()
     BuiltinUtil::addSimpleMethod(string, "length", "string_length");
     BuiltinUtil::addSimpleMethod(string, "toString", "string_toString");
     BuiltinUtil::addMultipleMethod(string, "startsWith:", {"startsWith"},"string_startsWith:");
+    BuiltinUtil::addMultipleMethod(string, "contains:", {"contains"},"string_contains:");
+    BuiltinUtil::addMultipleMethod(string, "splitBy:", {"splitBy"},"string_splitBy:");
     BuiltinUtil::addMultipleMethod(string, "equals:", {"equals"},"string_equals:");
 
     RefPtr<TTObject> array = TTObject::createObject(TT_LITERAL);
@@ -114,6 +116,7 @@ void Interpreter::setupLiterals()
     array->setLiteral(arrayLit);
     array->setField(TO_TT_STR("parent"), object);
     BuiltinUtil::addSimpleMethod(array, "size", "array_size");
+    BuiltinUtil::addMultipleMethod(array, "newWithSize:", {"newWithSize"}, "array_newWithSize:");
     BuiltinUtil::addSimpleMethod(array, "length", "array_size");
     BuiltinUtil::addMultipleMethod(array, "at:", {"at"}, "array_at:");
     BuiltinUtil::addMultipleMethod(array, "at:set:", {"at", "set"}, "array_at:set:");
@@ -183,7 +186,7 @@ void Interpreter::loadTTLibModule(std::string name)
     if(file.fail())
     {
         std::cerr << "TTLib: Cannot open ttlib file: '" << name << "'!!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
 

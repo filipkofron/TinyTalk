@@ -11,7 +11,7 @@ class Builtin;
     if (argNames.size() != x || values.size() != y)\
     {\
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " function accepts " << x << " arguments and " << y << "values" << std::endl;  \
-        throw std::exception(); \
+        KILL; \
     }\
     do {} while(false)
 
@@ -19,7 +19,7 @@ class Builtin;
     if (values[x]->type != TT_LITERAL) \
     { \
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " builtin function cannot use anything else than TT_LITERAL." << std::endl; \
-        throw std::exception(); \
+        KILL; \
     } \
     do {} while(false)
 
@@ -27,7 +27,7 @@ class Builtin;
     if (values[x]->type != TT_EXPR) \
     { \
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " builtin function cannot use anything else than TT_EXPR." << std::endl; \
-        throw std::exception(); \
+        KILL; \
     } \
     do {} while(false)
 
@@ -35,7 +35,7 @@ class Builtin;
     if (values[x]->getLiteral()->type != LITERAL_TYPE_INTEGER) \
     { \
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " function can only use integers now." << std::endl; \
-        throw std::exception(); \
+        KILL; \
     } \
     do {} while(false)
 
@@ -43,7 +43,7 @@ class Builtin;
     if (values[x]->getLiteral()->type != LITERAL_TYPE_STRING) \
     { \
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " function can only use strings now." << std::endl; \
-        throw std::exception(); \
+        KILL; \
     } \
     do {} while(false)
 
@@ -51,7 +51,7 @@ class Builtin;
     if (values[x]->getLiteral()->type != LITERAL_TYPE_BYTE_ARRAY) \
     { \
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " function can only use byte array now." << std::endl; \
-        throw std::exception(); \
+        KILL; \
     } \
     do {} while(false)
 
@@ -59,7 +59,7 @@ class Builtin;
     if (values[x]->getLiteral()->length != size) \
     { \
         std::cerr << "[Builtin]: Error: " << __PRETTY_FUNCTION__ << " invalid literal size. expected: " << size << " got: " << values[x]->getLiteral()->length << std::endl; \
-        throw std::exception(); \
+        KILL; \
     } \
     do {} while(false)
 

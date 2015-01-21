@@ -28,6 +28,19 @@ Map = Object createWith:
         ]
     ],
 
+    "eachNameDo:", [ :eachNameDo: |
+        | ns i |;
+        ns = values getFieldNames;
+
+        i = 0;
+
+        ns do: [ :each: |
+            (each startsWith: mapPrefix)
+                ifTrue: [ eachNameDo value: each ];
+            i = i add: 1
+        ]
+    ],
+
     "addKey:value:", [ :addKey: :value: |
         Object inObject: values createField: (mapPrefix append: (addKey toString)) withValue: value;
         this

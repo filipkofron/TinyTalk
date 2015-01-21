@@ -73,6 +73,20 @@ public:
     virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
 };
 
+class BuiltinStringContains : public Builtin
+{
+private:
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
+};
+
+class BuiltinStringSplitBy : public Builtin
+{
+private:
+public:
+    virtual RefPtr<TTObject> invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz);
+};
+
 class BuiltinStringEquals : public Builtin
 {
 private:

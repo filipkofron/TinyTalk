@@ -17,13 +17,13 @@ void checkServerSocketMissing(RefPtr<TTObject> socket)
     if(!&socketFd)
     {
         std::cerr << "[Buitlin]: Server socket: Missing socket descriptor" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     if(!&socketAddr)
     {
         std::cerr << "[Buitlin]: Server socket: Missing socket address struct" << std::endl;
-        throw std::exception();
+        KILL;
     }
 }
 
@@ -34,7 +34,7 @@ void checkServerSocketOpened(RefPtr<TTObject> socket)
     if(*(int *) socketFd->getLiteral()->data < 0)
     {
         std::cerr << "[Buitlin]: Server socket: Not opened." << std::endl;
-        throw std::exception();
+        KILL;
     }
 }
 
@@ -73,7 +73,7 @@ RefPtr<TTObject> BuiltinSocketCreateTCPServerSocketAddressPortFile::invoke(RefPt
     if (sfd < 0)
     {
         std::cerr << "[Buitlin]: Server socket: ERROR opening socket" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -92,7 +92,7 @@ RefPtr<TTObject> BuiltinSocketCreateTCPServerSocketAddressPortFile::invoke(RefPt
             sizeof(serv_addr)) < 0)
     {
         std::cerr << "[Buitlin]: Server socket: ERROR binding socket" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     listen(sfd,5);

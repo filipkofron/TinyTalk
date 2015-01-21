@@ -256,7 +256,7 @@ void BytecodeGen::gen(RefPtr<TTObject> expr, std::vector<uint8_t> &byteCode)
             break;
         default:
             std::cerr << "[BytecodeGen]: Invalid expression" << std::endl;
-            throw std::exception();
+            KILL;
     }
 }
 

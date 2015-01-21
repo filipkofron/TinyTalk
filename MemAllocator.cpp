@@ -93,6 +93,13 @@ uint8_t *MemAllocator::allocate(size_t bytes)
         }
     }
 
+    if(bytes > (capacity - capacity / 2))
+    {
+        std::cout << "Runtime: increasing memory from: " << Runtime::allocSize / 1024 << " to ";
+        Runtime::allocSize += bytes;
+        std::cout << Runtime::allocSize / 1024 << " kiB" << std::endl;
+    }
+
     // TODO: Create Barrier that will stop at all pre blocking/allocating
 
     if((currentTimeMilis() - Runtime::lastGCRun) < 150)
@@ -186,6 +193,13 @@ void MemAllocator::ensureWithLock(size_t bytes)
     std::cout << "Out of memory, this is " << (this == defaultAllocator ? "" : "not ") << "default allocator" << std::endl;
 #endif
 
+    if(bytes > (capacity - capacity / 2))
+    {
+        std::cout << "Runtime: increasing memory from: " << Runtime::allocSize / 1024 << " to ";
+        Runtime::allocSize += bytes;
+        std::cout << Runtime::allocSize / 1024 << " kiB" << std::endl;
+    }
+
     if((currentTimeMilis() - Runtime::lastGCRun) < 150)
     {
         std::cout << "Runtime: increasing memory from: " << Runtime::allocSize / 1024 << " to ";
@@ -197,6 +211,8 @@ void MemAllocator::ensureWithLock(size_t bytes)
     Runtime::gcBarrier.enteringGC();
 
     Runtime::runCopyGC();
+
+    std::cout << "after" << std::endl;
 
     size_t curr = getCurrent()->getFreeMemory();
     if(curr < (Runtime::allocSize / 8))

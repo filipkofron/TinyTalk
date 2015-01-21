@@ -19,7 +19,7 @@ RefPtr<TTObject> BuiltinStringCharAt::invoke(RefPtr<TTObject> dest, std::vector<
     if((int32_t) thisStr->length <= index + 1)
     {
         std::cerr << "[Builtin]: Invalid string index " << *((int32_t *) argInt->data) << " string length: " << (thisStr->length - 1) << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     uint8_t cr[2] = {0, 0};
@@ -46,7 +46,7 @@ RefPtr<TTObject> BuiltinStringCharAsIntAt::invoke(RefPtr<TTObject> dest, std::ve
     if((int32_t) thisStr->length <= index + 1)
     {
         std::cerr << "[Builtin]: Invalid string index " << *((int32_t *) argInt->data) << " string length: " << (thisStr->length - 1) << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> res = TTLiteral::createIntegerLiteral((uint8_t) thisStr->data[index]);
@@ -73,13 +73,13 @@ RefPtr<TTObject> BuiltinStringSetCharAt::invoke(RefPtr<TTObject> dest, std::vect
     if((int32_t) thisStr->length <= index + 1)
     {
         std::cerr << "[Builtin]: Error: Invalid string index " << *((int32_t *) argInt->data) << " string length: " << (thisStr->length - 1) << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     if((int32_t) argStr->length != 2)
     {
         std::cerr << "[Builtin]: Error: Not a single char !!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> res = TTLiteral::createStringLiteral(thisStr->data);
@@ -221,6 +221,73 @@ RefPtr<TTObject> BuiltinStringStartsWith::invoke(RefPtr<TTObject> dest, std::vec
     }
 
     return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+}
+
+RefPtr<TTObject> BuiltinStringContains::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    BUILTIN_CHECK_LITERAL(0);
+    BUILTIN_CHECK_STRING(0);
+
+    uint8_t *destStr = dest->getLiteral()->data;
+    uint8_t *givenStr = values[0]->getLiteral()->data;
+
+    if(strstr((char *) destStr, (const char *) givenStr))
+    {
+        return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
+    }
+    return Runtime::globalEnvironment->getField(TO_TT_STR("False"));
+}
+
+
+RefPtr<TTObject> BuiltinStringSplitBy::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+
+    BUILTIN_CHECK_LITERAL(0);
+    BUILTIN_CHECK_STRING(0);
+
+    //uint8_t *destStr = dest->getLiteral()->data;
+
+    if(!values[0]->getLiteral()->length || values[0]->getLiteral()->length == 1)
+    {
+        return dest;
+    }
+
+    uint32_t givenStringLen = values[0]->getLiteral()->length - 1;
+
+    std::vector<RefPtr<TTObject>> strings;
+
+    uint32_t destPos = 0;
+
+    while(dest->getLiteral()->data[destPos])
+    {
+        uint8_t *occurencePtrTemp = (uint8_t *) strstr((char *) &dest->getLiteral()->data[destPos], (const char *) values[0]->getLiteral()->data);
+        uint32_t occurencePos = (uint32_t) (occurencePtrTemp - dest->getLiteral()->data);
+        if(occurencePtrTemp)
+        {
+            if(occurencePos != destPos)
+            {
+                RefPtr<TTObject> newStr = TTLiteral::createStringLiteral((uint32_t) (occurencePos - destPos));
+                memcpy(newStr->getLiteral()->data, &dest->getLiteral()->data[destPos], occurencePos - destPos);
+                newStr->getLiteral()->data[occurencePos - destPos] = '\0';
+                strings.push_back(newStr);
+            }
+            destPos = occurencePos + givenStringLen;
+        }
+        else
+        {
+            uint32_t newSize = (uint32_t) strlen((const char *) &dest->getLiteral()->data[destPos]);
+            RefPtr<TTObject> newStr = TTLiteral::createStringLiteral(newSize);
+            memcpy(newStr->getLiteral()->data, &dest->getLiteral()->data[destPos], newSize);
+            newStr->getLiteral()->data[newSize] = '\0';
+            strings.push_back(newStr);
+            break;
+        }
+    }
+
+    return TTLiteral::createObjectArray(strings);
 }
 
 RefPtr<TTObject> BuiltinStringEquals::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)

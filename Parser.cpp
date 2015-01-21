@@ -391,13 +391,13 @@ RefPtr<TTObject> Parser::parseBlock(const bool &parseOnlyOne, const bool &untilC
                 break;
             case Token::Type::BLOCK_CLOSE:
                 std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Block without body." << std::endl;
-                throw std::exception();
+                KILL;
                 //return NULL;
             default:
                 if(maxArgs != PARSER_MAX_METHOD_ARGS + 1)
                 {
                     std::cerr << "[Parser]: Line:" << tokenizer->peekToken().getLine() << " Error: Invalid block argument." << std::endl;
-                    throw std::exception();
+                    KILL;
                     //return NULL;
                 }
                 atEnd = true;
@@ -666,7 +666,7 @@ RefPtr<TTObject> Parser::parse(const bool &parseOnlyOne, const bool &untilChain)
         default:
             std::cerr << "[Parser] Line: " << token.getLine() << ": Token " << token.getTypeInfo()
                     << " of value <" << token.getValue() << "> was unexpected here" << std::endl;
-            throw std::exception();
+            KILL;
     }
 
     if(!&res && token.getType() != Token::Type::TEOF)
@@ -674,7 +674,7 @@ RefPtr<TTObject> Parser::parse(const bool &parseOnlyOne, const bool &untilChain)
         // an error occures, gonna eat the next token
         std::cerr << "parse error, eating next token" << std::endl;
         tokenizer->readToken();
-        throw std::exception();
+        KILL;
     }
 
     return res;

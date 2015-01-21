@@ -51,7 +51,7 @@ void loadSymbol(BytecodeInterpreter &bi)
     if (!&val)
     {
         std::cerr << "Cannot find symbol: " << (const char *) name->getLiteral()->data << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     bi.stack.pushPtr((uintptr_t) &val);

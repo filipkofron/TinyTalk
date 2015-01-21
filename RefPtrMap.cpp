@@ -2,7 +2,7 @@
 
 #define REF_PTR_MAX_VALS (8192 * 32) // must be 2 to the power of n !!!
 
-#define CALC_INDEX(ptr, size) ((int) (((((uint16_t *) &refPtr)[0]) ^ (((uint16_t *) &refPtr)[1])) & (size - 1)))
+#define CALC_INDEX(ptr, size) ((int) ((((uint16_t *) &refPtr)[0] * 3389) ^ (((uint16_t *) &refPtr)[1] * 2039 + 1))  & (size - 1))
 
 RefPtrMap::RefPtrMap()
 {

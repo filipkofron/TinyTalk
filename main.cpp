@@ -21,12 +21,22 @@ int main()
     std::cout << std::endl;
     std::cout << std::endl;
 
-    // Register the main thread, this is the only safe place to do it
 
     Interpreter interpreter;
     interpreter.interpretCommandLine(std::cin);
 
-    // Unregister the main thread
+    if(Runtime::interpretersAlive.size())
+    {
+        std::cout << std::endl << "[Runtime]: Other threads still running..." << std::endl;
+    }
+
+    while(Runtime::interpretersAlive.size())
+    {
+        std::chrono::milliseconds miliseconds(300);
+
+        std::this_thread::sleep_for(miliseconds);
+    }
+
     std::cout << std::endl;
     std::cout << ">> Bye." << std::endl;
 

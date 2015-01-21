@@ -367,5 +367,5 @@ void TTLiteral::setLiteralParent(RefPtr<TTObject> obj, RefPtr<TTLiteral> lit)
         return;
     }
     std::cerr << "Unsupported literal type: " << lit->getTypeInfo() << std::endl;
-    throw std::exception();
+    KILL;
 }

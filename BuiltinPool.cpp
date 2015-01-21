@@ -49,9 +49,12 @@ BuiltinPool::BuiltinPool()
     registerBultin("string_length", std::shared_ptr<Builtin> (new BuiltinStringLength));
     registerBultin("string_toString", std::shared_ptr<Builtin> (new BuiltinStringToString));
     registerBultin("string_startsWith:", std::shared_ptr<Builtin> (new BuiltinStringStartsWith));
+    registerBultin("string_contains:", std::shared_ptr<Builtin> (new BuiltinStringContains));
+    registerBultin("string_splitBy:", std::shared_ptr<Builtin> (new BuiltinStringSplitBy));
     registerBultin("string_equals:", std::shared_ptr<Builtin> (new BuiltinStringEquals));
 
     registerBultin("array_size", std::shared_ptr<Builtin> (new BuiltinObjectArraySize));
+    registerBultin("array_newWithSize:", std::shared_ptr<Builtin> (new BuiltinObjectArrayNewWithSize));
     registerBultin("array_at:", std::shared_ptr<Builtin> (new BuiltinObjectArrayAt));
     registerBultin("array_at:set:", std::shared_ptr<Builtin> (new BuiltinObjectArrayAtSet));
     registerBultin("array_empty", std::shared_ptr<Builtin> (new BuiltinObjectArrayEmpty));

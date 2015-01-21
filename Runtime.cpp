@@ -170,8 +170,8 @@ RefPtr<TTObject> Runtime::assignSymbol(const uint8_t *safeName, RefPtr<TTObject>
         return NULL;
     }
 
-    std::cerr << "(assignSymbol): field not found in anywhere (not going to parent), sorry" << std::endl;
-    throw std::exception();
+    std::cerr << "(assignSymbol): field '" << safeName << "' not found in anywhere (not going to parent), sorry" << std::endl;
+    KILL;
 }
 
 TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *safeName, TTObject **next)
@@ -188,7 +188,7 @@ TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *saf
         if(fieldVal->type != TT_EXPR || fieldVal->flags != EXPRESSION_BLOCK)
         {
             std::cerr << "(findBlockAtNonExpression): Error: NON EXPRESSION FIELD: " << fieldVal << std::endl;
-            throw std::exception();
+            KILL;
         }
         return fieldVal;
     }
@@ -198,7 +198,7 @@ TTObject *Runtime::findBlockAtNonExpression(TTObject *object, const uint8_t *saf
     if(!parent)
     {
         std::cerr << "(findBlockAtNonExpression): Object doesn't understand this message '" << (const char *) safeName << "'" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     // Now, either the field is in this object or in its parents, nowhere else!
@@ -276,7 +276,7 @@ RefPtr<TTObject> Runtime::executeSimpleNativeMessage(std::string &nativeName, Re
     else
     {
         std::cerr << "(executeSimpleNativeMessage): Builtin function '" << nativeName << "' not found!" << std::endl;
-        throw std::exception();
+        KILL;
     }
     return NULL;
 }
@@ -305,7 +305,7 @@ RefPtr<TTObject> Runtime::executeMultipleNativeMessage(std::string &nativeName, 
     else
     {
         std::cerr << "(executeMultipleNativeMessage): Builtin function '" << nativeName << "' not found!" << std::endl;
-        throw std::exception();
+        KILL;
     }
     return NULL;
 }
@@ -315,6 +315,7 @@ static int numrunHAX = 0; // TODO: Remove this debug hax
 
 void Runtime::runCopyGC()
 {
+    std::cout << "running gc" << std::endl;
     numrunHAX++;
     /*if(numrunHAX == 94)
     {
@@ -323,7 +324,7 @@ void Runtime::runCopyGC()
     if(running)
     {
         std::cerr << "GC ERROR: Out of memory! - cannot free more memory" << std::endl;
-        throw std::exception();
+        KILL;
     }
     running = true;
 

@@ -55,7 +55,7 @@ RefPtr<TTObject> BuiltinIntegerDiv::invoke(RefPtr<TTObject> dest, std::vector<st
     if(*((int32_t *) values[0]->getLiteral()->data) == 0)
     {
         std::cerr << "[Builtin]: Division by zero!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
@@ -75,7 +75,7 @@ RefPtr<TTObject> BuiltinIntegerMod::invoke(RefPtr<TTObject> dest, std::vector<st
     if(*((int32_t *) values[0]->getLiteral()->data) == 0)
     {
         std::cerr << "[Builtin]: Division by zero!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(*((int32_t *) dest->getLiteral()->data)
@@ -192,7 +192,7 @@ RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::ve
     if(sscanf((const char *) values[0]->getLiteral()->data, "%d", &a) != 1)
     {
         std::cerr << "[Builtin]: FromString builtin function parse error." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(a);

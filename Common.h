@@ -15,13 +15,7 @@
 #define NOT_IMPLEMENTED \
 do {   \
 std::cerr << "NOT IMPLEMENTED " << __PRETTY_FUNCTION__ << " at " << __FILE__ << ":" << __LINE__ << std::endl;\
-throw std::exception(); \
-} while(false)
-
-#define KILL \
-do { \
-    std::cerr << "** THIS IS FORCED KILL **" << std::endl;\
-    *(int *) NULL = 666; \
+KILL; \
 } while(false)
 
 #include <cstdint>
@@ -32,6 +26,12 @@ do { \
 * Print exact amount of levels spaces.
 */
 void prlvl(std::ostream &os, uint32_t level);
+
+
+/**
+* Print backtrace.
+*/
+void print_backtrace(void);
 
 /*
 
@@ -46,3 +46,10 @@ void print_bytes(size_t bytes, void *ptr);
 uint32_t strHash32(const uint8_t *str);
 
 int64_t currentTimeMilis();
+
+#define KILL \
+do { \
+    std::cerr << "** THIS IS FORCED KILL **" << std::endl;\
+    print_backtrace();\
+    exit(1); \
+} while(false)

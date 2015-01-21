@@ -9,7 +9,7 @@ bool checkIfExistsAndCloseFile(RefPtr<TTObject> file)
         if(fd->getLiteral()->length != sizeof(FILE *))
         {
             std::cerr << "[Builtin] File: Invalid size of file handle." << std::endl;
-            throw std::exception();
+            KILL;
         }
         FILE **fileHandle = (FILE **) fd->getLiteral()->data;
         if(*fileHandle)
@@ -36,13 +36,13 @@ FILE **checkIfExistsAndIsOpenedThenReturnFD(RefPtr<TTObject> file)
     if (!&fd)
     {
         std::cerr << "[Builtin] File: file handle missing!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     if (fd->getLiteral()->length != sizeof(FILE *))
     {
         std::cerr << "[Builtin] File: Invalid size of file handle." << std::endl;
-        throw std::exception();
+        KILL;
     }
     FILE **fileHandle = (FILE **) fd->getLiteral()->data;
     if (!*fileHandle)
@@ -152,13 +152,13 @@ RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<st
     if (!&fd)
     {
         std::cerr << "[Builtin] File: file handle missing!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     if (fd->getLiteral()->length != sizeof(FILE *))
     {
         std::cerr << "[Builtin] File: Invalid size of file handle." << std::endl;
-        throw std::exception();
+        KILL;
     }
     if(*(FILE **) fd->getLiteral()->data == NULL)
     {

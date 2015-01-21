@@ -57,7 +57,7 @@ RefPtr<TTObject> Evaluator::evaluateSimpleMessage(RefPtr<TTObject> simpleMessage
     if(!&destValue)
     {
         std::cerr << "(evaluateSimpleMessage): destValue is NULL!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     TTObject *thiz = NULL;
@@ -105,7 +105,7 @@ RefPtr<TTObject> Evaluator::evaluateSymbolValue(RefPtr<TTObject> symbolValue, Re
         return evaluateSymbolValue(symbolValue, Runtime::globalEnvironment);
     }*/
     std::cerr << "(evaluateSymbolValue): field " << name << " not found in anywhere, sorry" << std::endl;
-    throw std::exception();
+    KILL;
 }
 
 RefPtr<TTObject> Evaluator::evaluateBlock(RefPtr<TTObject> block, RefPtr<TTObject> env)
@@ -204,7 +204,7 @@ RefPtr<TTObject> Evaluator::evaluateAssign(RefPtr<TTObject> expr, RefPtr<TTObjec
     }
 
     std::cerr << "(evaluateAssign): field not found in anywhere (not going to parent), sorry" << std::endl;
-    throw std::exception();
+    KILL;
 }
 
 RefPtr<TTObject> Evaluator::evaluateCreateVariables(RefPtr<TTObject> expr, RefPtr<TTObject> env)
@@ -230,7 +230,7 @@ RefPtr<TTObject> Evaluator::evaluateCreateVariables(RefPtr<TTObject> expr, RefPt
     else
     {
         std::cerr << "(evaluateCreateVariables): variable array is NULL!!" << std::endl;
-        throw std::exception();
+        KILL;
     }
     return Runtime::globalEnvironment->getField(TO_TT_STR("nil"));
 }
@@ -369,7 +369,7 @@ RefPtr<TTObject> Evaluator::evaluateMultipleMessage(RefPtr<TTObject> simpleMessa
     if(!&msgDestValue)
     {
         std::cerr << "(evaluateMultipleMessage): msgDestValue is NULL!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
 #ifdef DEBUG
@@ -475,7 +475,7 @@ RefPtr<TTObject> Evaluator::evaluate(RefPtr<TTObject> expression, RefPtr<TTObjec
             break;
         default:
             std::cerr << "[Runtime]: Error: Invalid expression flags: " << (uint32_t) expression->flags << std::endl;
-            throw std::exception();
+            KILL;
     }
 
     return res;

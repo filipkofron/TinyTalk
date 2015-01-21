@@ -21,7 +21,7 @@ RefPtr<TTObject> BuiltinSystemRunFile::invoke(RefPtr<TTObject> dest, std::vector
     if(file.fail())
     {
         std::cerr << "[Builtin]: Error: Cannot run file: '" << (const char *) values[0]->getLiteral()->data << "'" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     std::shared_ptr<Reader> reader(new Reader(&file));
@@ -67,7 +67,7 @@ RefPtr<TTObject> BuiltinSystemGenerateBytecode::invoke(RefPtr<TTObject> dest, st
         if(&values[0] != Runtime::globalEnvironment->getField(TO_TT_STR("nil")))
         {
             std::cerr << "[Builtin]: GenerateBytecode Error: Invalid expression (must be expression or nil)" << std::endl;
-            throw std::exception();
+            KILL;
         }
         RefPtr<TTObject> name = TTLiteral::createStringLiteral(TO_TT_STR("nil"));
         expr = Expression::createSymbolValue(name->getLiteral());
@@ -151,7 +151,7 @@ RefPtr<TTObject> BuiltinSystemStartThread::invoke(RefPtr<TTObject> dest, std::ve
     if(values[0]->type != TT_EXPR || values[0]->flags != EXPRESSION_BLOCK)
     {
         std::cerr << "[Builtin]: StartThread Error: Invalid expression (must be block)" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     Runtime::gcBarrier.lockBeforeNewThread();

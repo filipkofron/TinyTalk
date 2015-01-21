@@ -24,7 +24,7 @@ uintptr_t Stack::popPtr()
     if(sp <= 0)
     {
         std::cerr << "STACK UNDERFLOW" << std::endl;
-        throw std::exception();
+        KILL;
     }
     sp -= sizeof(uintptr_t);
     uintptr_t val = *((uintptr_t *)(uintptr_t) &data[sp]);
@@ -41,7 +41,7 @@ void Stack::pushPtr(uintptr_t ptr)
         if(!data)
         {
             std::cerr << "STACK OVERFLOW" << std::endl;
-            throw std::exception();
+            KILL;
         }
     }
     *((uintptr_t *)(uintptr_t) &data[sp]) = ptr;

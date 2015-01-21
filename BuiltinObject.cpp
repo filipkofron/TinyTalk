@@ -17,7 +17,7 @@ RefPtr<TTObject> BuiltinObjectAddField::invoke(RefPtr<TTObject> dest, std::vecto
     if (argNames.size() != 2 || values.size() != 2)
     {
         std::cerr << "[Builtin]: Adding field accepts two arguments only." << std::endl;
-        throw std::exception();
+        KILL;
     }
     std::string name = (char *) values[1]->getLiteral()->data;
 #ifdef DEBUG
@@ -43,14 +43,14 @@ RefPtr<TTObject> BuiltinObjectGetter::invoke(RefPtr<TTObject> dest, std::vector<
     if (argNames.size() != 2 || values.size() != 2)
     {
         std::cerr << "[Builtin]: Getting field accepts two arguments only." << std::endl;
-        throw std::exception();
+        KILL;
     }
     else
     {
         if (values[1]->type != TT_LITERAL)
         {
             std::cerr << "[Builtin]: Getting field accepts literal value only!" << std::endl;
-            throw std::exception();
+            KILL;
         }
     }
     std::string name = (char *) values[1]->getLiteral()->data;
@@ -79,21 +79,21 @@ RefPtr<TTObject> BuiltinObjectSetter::invoke(RefPtr<TTObject> dest, std::vector<
     if (argNames.size() != 3 || values.size() != 3)
     {
         std::cerr << "[Builtin]: Setting field accepts 3 arguments only." << std::endl;
-        throw std::exception();
+        KILL;
     }
     else
     {
         if (values[1]->type != TT_LITERAL)
         {
             std::cerr << "[Builtin]: Setting field accepts literal value only!" << std::endl;
-            throw std::exception();
+            KILL;
         }
     }
     if (argNames[2] != "value")
     {
         std::cerr << "[Builtin]: Setting field's third argument must be 'value', '"
                 << argNames[2] << "' given!" << std::endl;
-        throw std::exception();
+        KILL;
     }
     std::string name = (char *) values[1]->getLiteral()->data;
 #ifdef DEBUG
@@ -108,7 +108,7 @@ RefPtr<TTObject> BuiltinObjectSetter::invoke(RefPtr<TTObject> dest, std::vector<
     if (!object->hasField(TO_TT_STR(name.c_str())))
     {
         std::cerr << "[Builtin]: Field not found!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 #ifdef DEBUG
     std::cout << "[Builtin]: Setting field in dest = " << object << std::endl;
@@ -124,7 +124,7 @@ RefPtr<TTObject> BuiltinObjectDebugPrint::invoke(RefPtr<TTObject> dest, std::vec
     if (argNames.size() != 1 || values.size() != 1)
     {
         std::cerr << "[Builtin]: Print object accepts one argument only." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     std::cout << "DBG PRINT ***************************** BEGIN ********************************" << std::endl;
@@ -139,7 +139,7 @@ RefPtr<TTObject> BuiltinObjectDebugPrintRec::invoke(RefPtr<TTObject> dest, std::
     if (argNames.size() != 1 || values.size() != 1)
     {
         std::cerr << "[Builtin]: Print object accepts one argument only." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     std::cout << "DBG PRINT REC ***************************** BEGIN ********************************" << std::endl;
@@ -154,13 +154,13 @@ RefPtr<TTObject> BuiltinObjectDebugPrintString::invoke(RefPtr<TTObject> dest, st
     if (argNames.size() != 1 || values.size() != 1)
     {
         std::cerr << "[Builtin]: PrintString object accepts one argument only." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     if (values[0]->type != TT_LITERAL || values[0]->getLiteral()->type != LITERAL_TYPE_STRING)
     {
         std::cerr << "[Builtin]: PrintString object not string literal!" << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     std::string str = (const char *) values[0]->getLiteral()->data;
@@ -184,7 +184,7 @@ RefPtr<TTObject> BuiltinObjectClone::invoke(RefPtr<TTObject> dest, std::vector<s
     if (argNames.size() != 1 || values.size() != 1)
     {
         std::cerr << "[Builtin]: Clone builting function accepts one argument only." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> cloned = values[0];
@@ -198,7 +198,7 @@ RefPtr<TTObject> BuiltinObjectNew::invoke(RefPtr<TTObject> dest, std::vector<std
     if (argNames.size() != 1 || values.size() != 0)
     {
         std::cerr << "[Builtin]: New builtin function accepts no arguments." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     RefPtr<TTObject> res = TTObject::createObject(TT_OBJECT);
@@ -284,7 +284,7 @@ RefPtr<TTObject> BuiltinObjectToString::invoke(RefPtr<TTObject> dest, std::vecto
     if (argNames.size() != 1 || values.size() != 0)
     {
         std::cerr << "[Builtin]: ToString builtin function accepts no arguments." << std::endl;
-        throw std::exception();
+        KILL;
     }
 
     const char *resStr = "Object";

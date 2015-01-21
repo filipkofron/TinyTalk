@@ -436,7 +436,7 @@ bool TTObject::setLiteral(RefPtr<TTLiteral> lit)
     if(type != TT_LITERAL)
     {
         std::cerr << "Object is not literal: Cannot set literal value!" << std::endl;
-        throw  std::exception();
+        KILL;
     }
     RefPtr<TTObject> thiz = this;
 
