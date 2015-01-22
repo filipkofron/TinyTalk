@@ -36,7 +36,7 @@ Map = Object createWith:
 
         ns do: [ :each: |
             (each startsWith: mapPrefix)
-                ifTrue: [ eachNameDo value: each ];
+                ifTrue: [ eachNameDo value: ((each splitBy: mapPrefix) at: 0) ];
             i = i add: 1
         ]
     ],

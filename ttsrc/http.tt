@@ -7,7 +7,8 @@ HttpRequest = Object createWith:
         res = this getParent createWith:
         {
             "path", nil,
-            "host", nil
+            "host", nil,
+			"getArgs", nil
         };
         res setParent: this;
         res
@@ -35,8 +36,28 @@ HttpRequest = Object createWith:
 					Out writeLine: argsStr
 				]
 		];
+		| argsStrs args |;
+		argsStrs = argsStr splitBy: "&";
+		args = Map new;
+		argsStrs do: [ :each: |
+			| name value |;
+			each = each splitBy: "=";
+			(each size greaterThan: 1)
+				ifTrue:
+				[
+					name = each at: 0;
+					value = each at: 1
+				]
+				ifFalse:
+				[
+					name = each at: 0;
+					value = ""
+				];
+			args addKey: name value: value
+		];
 		inst = this new;
 		inst setPath: path;
+		inst setGetArgs: args;
 		inst
 
 	],
@@ -54,6 +75,13 @@ HttpRequest = Object createWith:
     ],
     "getHost", [ :getHost |
         host
+    ],
+
+	"setGetArgs:", [ :setGetArgs: |
+        getArgs = setGetArgs
+    ],
+    "getGetArgs", [ :getGetArgs |
+        getArgs
     ]
 };
 
@@ -100,10 +128,22 @@ HttpHandler = Object createWith:
     ],
 
     "createResponseForRequest:", [ :createResponseForRequest: |
-        | req resp |;
+        | req resp test |;
         req = createResponseForRequest;
         resp = HttpResponse new;
+		test = "\n<br />\nResults:<br />\n";
+		req getGetArgs eachNameDo: [ :each: |
+			each isNil not ifTrue:
+			[
+				test = test append: "name: ";
+				test = test append: each;
+				test = test append: " - value: ";
+				test = test append: ((req getGetArgs getKey: each) toString);
+				test = test append: "<br />\n"
+			]
+		];
         resp setOutput: ("404 - page '" append: (createResponseForRequest getPath append: "' not found"));
+		resp setOutput: (resp getOutput append: test);
         resp
     ],
 
