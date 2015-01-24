@@ -59,17 +59,13 @@ HttpServer = Object createWith:
                 (fullRequest length greaterThan: 32768) ifTrue: [end = True]
             ];
 
-        Out writeLine: "full request:";
-        Out writeLine: fullRequest;
+//        Out writeLine: "Got request:";
+//        Out writeLine: fullRequest;
 		httpRequest = HttpRequest fromHttpHeader: fullRequest;
 
 		| handler httpResponse |;
 		handler = handlers getKey: (httpRequest getPath);
 		handler isNil ifTrue: [ handler = handlers getKey: "404"];
-		Out writeLine: "Got handler for key:";
-		Out writeLine: (httpRequest getPath);
-		Out writeLine: "Got handler:";
-		Out writeLine: (handler toString);
 		httpResponse = handler createResponseForRequest: httpRequest;
 
         handleClient writeLine: (httpResponse getFullResponse);

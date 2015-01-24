@@ -29,11 +29,7 @@ HttpRequest = Object createWith:
 					path = parts at: 0;
 					(parts size greaterThan: 1)
 						ifTrue: [ argsStr = parts at: 1 ]
-						ifFalse: [ argsStr = "" ];
-					Out writeLine: "Got the path:";
-					Out writeLine: path;
-					Out writeLine: "Got the args:";
-					Out writeLine: argsStr
+						ifFalse: [ argsStr = "" ]
 				]
 		];
 		| argsStrs args |;
@@ -50,8 +46,17 @@ HttpRequest = Object createWith:
 				]
 				ifFalse:
 				[
-					name = each at: 0;
-					value = ""
+					(each size greaterThan: 0)
+						ifTrue:
+						[
+							name = each at: 0;
+							value = ""
+						]
+						ifFalse:
+						[
+							name = "";
+							value = ""
+						]
 				];
 			args addKey: name value: value
 		];
