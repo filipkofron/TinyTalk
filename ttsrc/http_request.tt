@@ -1,0 +1,89 @@
+| HttpRequest |;
+
+HttpRequest = Object createWith:
+{
+    "new", [ :new |
+        | res |;
+        res = this getParent createWith:
+        {
+            "path", nil,
+            "host", nil,
+			"getArgs", nil
+        };
+        res setParent: this;
+        res
+    ],
+
+	"fromHttpHeader:", [ :fromHttpHeader: |
+		| lines argsStr path inst |;
+		lines = fromHttpHeader splitBy: "\n";
+		lines do: [ :each: |
+			each = each trim toLower;
+			(each startsWith: "get")
+				ifTrue:
+				[
+					| parts |;
+					parts = each splitBy: "get";
+					parts = (parts at: 0) trim splitBy: " ";
+					parts = (parts at: 0) splitBy: "?";
+					path = parts at: 0;
+					(parts size greaterThan: 1)
+						ifTrue: [ argsStr = parts at: 1 ]
+						ifFalse: [ argsStr = "" ];
+					Out writeLine: "Got the path:";
+					Out writeLine: path;
+					Out writeLine: "Got the args:";
+					Out writeLine: argsStr
+				]
+		];
+		| argsStrs args |;
+		argsStrs = argsStr splitBy: "&";
+		args = Map new;
+		argsStrs do: [ :each: |
+			| name value |;
+			each = each splitBy: "=";
+			(each size greaterThan: 1)
+				ifTrue:
+				[
+					name = each at: 0;
+					value = each at: 1
+				]
+				ifFalse:
+				[
+					name = each at: 0;
+					value = ""
+				];
+			args addKey: name value: value
+		];
+		inst = this new;
+		inst setPath: path;
+		inst setGetArgs: args;
+		inst
+
+	],
+
+    "setPath:", [ :setPath: |
+        path = setPath
+    ],
+
+    "getPath", [ :getPath |
+        path
+    ],
+
+    "setHost:", [ :setHost: |
+        host = setHost
+    ],
+    "getHost", [ :getHost |
+        host
+    ],
+
+	"setGetArgs:", [ :setGetArgs: |
+        getArgs = setGetArgs
+    ],
+    "getGetArgs", [ :getGetArgs |
+        getArgs
+    ]
+};
+
+HttpRequest
+

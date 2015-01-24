@@ -329,7 +329,14 @@ void BytecodeInterpreter::setupStackFrame(RefPtr<TTObject> block, RefPtr<TTObjec
     stackFrame->addField(TO_TT_STR("byteCode"), byteCodeObj);
 
     RefPtr<TTObject> newEnv = TTObject::createObject(TT_ENV);
-    newEnv->addField(TO_TT_STR("parentEnv"), parentEnv);
+    if(block->hasField(TO_TT_STR("_force_global_env")))
+    {
+        newEnv = Runtime::globalEnvironment;
+    }
+    else
+    {
+        newEnv->addField(TO_TT_STR("parentEnv"), parentEnv);
+    }
 
     stackFrame->addField(TO_TT_STR("env"), newEnv);
 

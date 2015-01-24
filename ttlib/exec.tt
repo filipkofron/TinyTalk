@@ -13,10 +13,42 @@ Exec = Object createWith:
         block value
     ],
 
+    "execStringInGlobalEnv:", [ :execStringInGlobalEnv: |
+        | expr block byteCode |;
+        expr = System parse: execStringInGlobalEnv;
+        block = [ nil ];
+        byteCode = System generateBytecode: expr;
+        Object object: block set: "blockExpr" value: expr;
+        Object object: block set: "blockByteCode" value: byteCode;
+        Object inObject: block createField: "_force_global_env" withValue: nil;
+        block value
+    ],
+
+    "execFileNameInGlobalEnv:", [ :execFileNameInGlobalEnv: |
+        | contents |;
+        contents = "";
+        (File openReadOnly: execFileNameInGlobalEnv) eachLineDo: [ :each: | contents = contents append: each ];
+        this execStringInGlobalEnv: contents
+    ],
+
+    "execFileInGlobalEnv:", [ :execFileInGlobalEnv: |
+        | contents |;
+        contents = "";
+        execFileInGlobalEnv eachLineDo: [ :each: | contents = contents append: each ];
+        this execStringInGlobalEnv: contents
+    ],
+
+    "execFileName:", [ :execFileName: |
+        | contents |;
+        contents = "";
+        (File openReadOnly: execFileName) eachLineDo: [ :each: | contents = contents append: each ];
+        this execString: contents
+    ],
+
     "execFile:", [ :execFile: |
         | contents |;
         contents = "";
-        (File openReadOnly: execFile) eachLineDo: [ :each: | contents = contents append: each ];
+        execFile eachLineDo: [ :each: | contents = contents append: each ];
         this execString: contents
     ]
 }

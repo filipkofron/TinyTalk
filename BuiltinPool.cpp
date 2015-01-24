@@ -66,6 +66,7 @@ BuiltinPool::BuiltinPool()
     registerBultin("fileio_write:file:", std::shared_ptr<Builtin> (new BuiltinFileIOWriteFile));
     registerBultin("fileio_writeString:file:", std::shared_ptr<Builtin> (new BuiltinFileIOWriteStringFile));
     registerBultin("fileio_isOK:", std::shared_ptr<Builtin> (new BuiltinFileIOIsOK));
+    registerBultin("fileio_clearErr:", std::shared_ptr<Builtin> (new BuiltinFileIOClearErr));
     registerBultin("fileio_readLine:", std::shared_ptr<Builtin> (new BuiltinFileIOReadLine));
 
     registerBultin("socketio_createTCPServerSocketAddress:port:file:", std::shared_ptr<Builtin> (new BuiltinSocketCreateTCPServerSocketAddressPortFile));

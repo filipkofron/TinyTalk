@@ -624,10 +624,17 @@ RefPtr<TTObject> Parser::parseCreateVariable(const bool &parseOnlyOne, const boo
             }
             else
             {
-                std::cerr << "[Parser] Line: " << nextToken.getLine() << ": Error: Token "
-                        << nextToken.getTypeInfo() << " of value <" << nextToken.getValue()
-                        << "> after variable declaration may only be ; or ]." << std::endl;
-                return NULL;
+                if(nextToken.getType() == Token::Type::TEOF)
+                {
+                    return res;
+                }
+                else
+                {
+                    std::cerr << "[Parser] Line: " << nextToken.getLine() << ": Error: Token "
+                            << nextToken.getTypeInfo() << " of value <" << nextToken.getValue()
+                            << "> after variable declaration may only be ; or ]." << std::endl;
+                    return NULL;
+                }
             }
         }
     }

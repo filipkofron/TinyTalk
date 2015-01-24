@@ -24,6 +24,7 @@ public:
 
     void interpretFile(std::istream &is, bool silent);
     void interpretCommandLine(std::istream &is);
+    void startCmd();
 };
 
 #endif

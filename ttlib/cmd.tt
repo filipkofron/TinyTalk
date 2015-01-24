@@ -1,0 +1,33 @@
+| CommandLine quit |;
+
+CommandLine = Object createWith:
+{
+    "shouldQuit", False,
+
+    "quit", [ :quit |
+        shouldQuit = True
+    ],
+
+	"doCommand", [ :doCommand |
+	    While
+	        isTrue: [ shouldQuit not ]
+	        do: [
+                |res|;
+                Out writeString: "> ";
+                res = Exec execFileInGlobalEnv: In;
+                In clearErr;
+                Out writeLine: (res toString)
+            ]
+	]
+};
+
+quit = 
+Object createWith:
+{
+    "toString", [ :toString |
+		CommandLine quit; "quit"
+	]
+};
+
+CommandLine doCommand
+

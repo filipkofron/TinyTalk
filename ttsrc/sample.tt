@@ -1,8 +1,19 @@
-| http httpServer |;
+| HttpRequest HttpResponse HttpHandler HttpServer http |;
 
-http = System runFile: "ttsrc/http.tt";
-httpServer = http address: "0.0.0.0" port: 8080;
-System startThread: [ httpServer start ];
+HttpRequest = System runFile: "ttsrc/http_request.tt";
+HttpResponse = System runFile: "ttsrc/http_response.tt";
+HttpHandler = System runFile: "ttsrc/http_handler.tt";
+HttpServer = System runFile: "ttsrc/http.tt";
+
+Env installGlobalVarName: "HttpRequest" withValue: HttpRequest;
+Env installGlobalVarName: "HttpResponse" withValue: HttpResponse;
+Env installGlobalVarName: "HttpHandler" withValue: HttpHandler;
+Env installGlobalVarName: "HttpServer" withValue: HttpServer;
+
+
+http = HttpServer address: "0.0.0.0" port: 8080;
+System startThread: [ http start ];
+Out writeLine: "done loading http server";
 
 nil
 

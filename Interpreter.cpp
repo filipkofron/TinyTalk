@@ -140,6 +140,7 @@ void Interpreter::setupFile()
     BuiltinUtil::addMultipleMethod(file, "write:file:", {"write", "file"}, "fileio_write:file:");
     BuiltinUtil::addMultipleMethod(file, "writeString:file:", {"writeString", "file"}, "fileio_writeString:file:");
     BuiltinUtil::addMultipleMethod(file, "isOK:", {"isOK"}, "fileio_isOK:");
+    BuiltinUtil::addMultipleMethod(file, "clearErr:", {"clearErr"}, "fileio_clearErr:");
     BuiltinUtil::addMultipleMethod(file, "readLine:", {"readLine"}, "fileio_readLine:");
 
     Runtime::globalEnvironment->addField(TO_TT_STR("FileIO"), file);
@@ -339,4 +340,9 @@ void Interpreter::interpretCommandLine(std::istream &is)
         }
     }
     while (notEOF && !is.fail());
+}
+
+void Interpreter::startCmd()
+{
+    loadTTLibModule("cmd.tt");
 }

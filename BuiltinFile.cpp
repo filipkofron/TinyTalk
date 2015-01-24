@@ -167,6 +167,27 @@ RefPtr<TTObject> BuiltinFileIOIsOK::invoke(RefPtr<TTObject> dest, std::vector<st
     return Runtime::globalEnvironment->getField(TO_TT_STR("True"));
 }
 
+RefPtr<TTObject> BuiltinFileIOClearErr::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)
+{
+    BUILTIN_CHECK_ARGS_COUNT(1, 1);
+    RefPtr<TTObject> fd = values[0]->getField(TO_TT_STR("fd"));
+    if (!&fd)
+    {
+        std::cerr << "[Builtin] File: file handle missing!" << std::endl;
+        KILL;
+    }
+
+    if (fd->getLiteral()->length != sizeof(FILE *))
+    {
+        std::cerr << "[Builtin] File: Invalid size of file handle." << std::endl;
+        KILL;
+    }
+
+    rewind( *(FILE **) fd->getLiteral()->data );
+
+    return dest;
+}
+
 #define LINE_LENGTH_MAX (1024 * 1024 + 1)
 
 RefPtr<TTObject> BuiltinFileIOReadLine::invoke(RefPtr<TTObject> dest, std::vector<std::string> &argNames, std::vector<RefPtr<TTObject> > values, RefPtr<TTObject> env, RefPtr<TTObject> thiz)

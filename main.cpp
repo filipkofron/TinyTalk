@@ -23,7 +23,8 @@ int main()
 
 
     Interpreter interpreter;
-    interpreter.interpretCommandLine(std::cin);
+    interpreter.startCmd();
+    // interpreter.interpretCommandLine(std::cin);
 
     if(Runtime::interpretersAlive.size())
     {

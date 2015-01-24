@@ -149,4 +149,13 @@ Object
                         first = first not
                     ];
             object
-        ]
+        ];
+
+| Env GlobalEnv |;
+GlobalEnv = env;
+Env = Object createWith:
+{
+	"installGlobalVarName:withValue:", [ :installGlobalVarName: :withValue: |
+		Object inObject: GlobalEnv createField: installGlobalVarName withValue: withValue
+	]
+}

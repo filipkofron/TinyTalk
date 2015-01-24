@@ -88,5 +88,11 @@ File = Object createWith:
 
 	"isOK", [ :isOK |
 		FileIO isOK: this
-	]
+	],
+
+    "clearErr", [ :clearErr |
+        FileIO clearErr: this;
+        eof = False;
+        this
+    ]
 }

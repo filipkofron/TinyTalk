@@ -1,0 +1,34 @@
+| HttpResponse |;
+
+HttpResponse = Object createWith:
+{
+    "new", [ :new |
+        | res |;
+        res = this getParent createWith:
+        {
+            "output", nil
+        };
+        res setParent: this;
+        res
+    ],
+
+    "setOutput:", [ :setOutput: |
+        output = setOutput
+    ],
+    "getOutput", [ :getOutput |
+        output
+    ],
+
+	"getFullResponse", [ :getFullResponse |
+		| full |;
+		full = "HTTP/1.x 200 OK\r\n";
+		full = full append: "Connection: close\r\n";
+		full = full append: "Content-Type: text/html; charset=UTF-8\r\n";
+		full = full append: "\r\n";
+		full = full append: (this getOutput);
+		full
+	]
+};
+
+HttpResponse
+
