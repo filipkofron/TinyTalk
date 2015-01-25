@@ -1,4 +1,4 @@
-| HttpServer HttpHandler HttpRequest HttpResponse |;
+| HttpServer |;
 
 HttpServer = Object createWith:
 {
@@ -59,8 +59,6 @@ HttpServer = Object createWith:
                 (fullRequest length greaterThan: 32768) ifTrue: [end = True]
             ];
 
-//        Out writeLine: "Got request:";
-//        Out writeLine: fullRequest;
 		httpRequest = HttpRequest fromHttpHeader: fullRequest;
 
 		| handler httpResponse |;
@@ -79,6 +77,19 @@ HttpServer = Object createWith:
         handlers addKey: (registerHandler getPath) value: registerHandler
     ]
 };
+
+| HttpUtil HttpRequest HttpResponse HttpHandler |;
+
+HttpUtil = Exec execFileName: "ttsrc/http_util.tt";
+HttpRequest = Exec execFileName: "ttsrc/http_request.tt";
+HttpResponse = Exec execFileName: "ttsrc/http_response.tt";
+HttpHandler = Exec execFileName: "ttsrc/http_handler.tt";
+
+Env installGlobalVarName: "HttpUtil" withValue: HttpUtil;
+Env installGlobalVarName: "HttpRequest" withValue: HttpRequest;
+Env installGlobalVarName: "HttpResponse" withValue: HttpResponse;
+Env installGlobalVarName: "HttpHandler" withValue: HttpHandler;
+Env installGlobalVarName: "HttpServer" withValue: HttpServer;
 
 HttpServer
 

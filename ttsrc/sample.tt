@@ -1,17 +1,12 @@
-| HttpRequest HttpResponse HttpHandler HttpServer http |;
+| http HttpServer Sat |;
 
-HttpRequest = System runFile: "ttsrc/http_request.tt";
-HttpResponse = System runFile: "ttsrc/http_response.tt";
-HttpHandler = System runFile: "ttsrc/http_handler.tt";
-HttpServer = System runFile: "ttsrc/http.tt";
-
-Env installGlobalVarName: "HttpRequest" withValue: HttpRequest;
-Env installGlobalVarName: "HttpResponse" withValue: HttpResponse;
-Env installGlobalVarName: "HttpHandler" withValue: HttpHandler;
-Env installGlobalVarName: "HttpServer" withValue: HttpServer;
-
+HttpServer = Exec execFileName: "ttsrc/http.tt";
+Sat = Exec execFileName: "ttsrc/sat.tt";
 
 http = HttpServer address: "0.0.0.0" port: 8080;
+
+Sat createForServer: http;
+
 System startThread: [ http start ];
 Out writeLine: "done loading http server";
 

@@ -1,0 +1,40 @@
+| HttpUtil |;
+
+HttpUtil = Object createWith:
+{
+	"parseArgumentString:", [ :parseArgumentString: |
+		| argsStrs args |;
+		parseArgumentString isNil ifTrue: [ parseArgumentString = "" ];
+		argsStrs = parseArgumentString splitBy: "&";
+		args = Map new;
+		argsStrs do: [ :each: |
+			| name value |;
+			each = each splitBy: "=";
+			(each size greaterThan: 1)
+				ifTrue:
+				[
+					name = each at: 0;
+					value = each at: 1
+				]
+				ifFalse:
+				[
+					(each size greaterThan: 0)
+						ifTrue:
+						[
+							name = each at: 0;
+							value = ""
+						]
+						ifFalse:
+						[
+							name = "";
+							value = ""
+						]
+				];
+			args addKey: name value: value
+		];
+		args
+	]
+};
+
+HttpUtil
+

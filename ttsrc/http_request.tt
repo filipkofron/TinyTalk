@@ -16,6 +16,9 @@ HttpRequest = Object createWith:
 
 	"fromHttpHeader:", [ :fromHttpHeader: |
 		| lines argsStr path inst |;
+		fromHttpHeader isNil ifTrue: [ fromHttpHeader = "get" ];
+		path = "";
+		argsStr = "";
 		lines = fromHttpHeader splitBy: "\n";
 		lines do: [ :each: |
 			each = each trim toLower;
@@ -24,45 +27,26 @@ HttpRequest = Object createWith:
 				[
 					| parts |;
 					parts = each splitBy: "get";
-					parts = (parts at: 0) trim splitBy: " ";
-					parts = (parts at: 0) splitBy: "?";
-					path = parts at: 0;
-					(parts size greaterThan: 1)
-						ifTrue: [ argsStr = parts at: 1 ]
-						ifFalse: [ argsStr = "" ]
-				]
-		];
-		| argsStrs args |;
-		argsStrs = argsStr splitBy: "&";
-		args = Map new;
-		argsStrs do: [ :each: |
-			| name value |;
-			each = each splitBy: "=";
-			(each size greaterThan: 1)
-				ifTrue:
-				[
-					name = each at: 0;
-					value = each at: 1
-				]
-				ifFalse:
-				[
-					(each size greaterThan: 0)
+					(parts size greaterThan: 0)
 						ifTrue:
 						[
-							name = each at: 0;
-							value = ""
+							parts = (parts at: 0) trim splitBy: " ";
+							parts = (parts at: 0) splitBy: "?";
+							path = parts at: 0;
+							(parts size greaterThan: 1)
+								ifTrue: [ argsStr = parts at: 1 ]
+								ifFalse: [ argsStr = "" ]
 						]
 						ifFalse:
 						[
-							name = "";
-							value = ""
+							path = "";
+							argsStr = ""
 						]
-				];
-			args addKey: name value: value
+				]
 		];
 		inst = this new;
 		inst setPath: path;
-		inst setGetArgs: args;
+		inst setGetArgs: (HttpUtil parseArgumentString: argsStr);
 		inst
 
 	],

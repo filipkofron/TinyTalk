@@ -1,0 +1,45 @@
+ | SatFromHandler |;
+
+SatFromHandler = HttpHandler createWith:
+{
+	"header",
+"<!DOCTYPE html>
+<html>
+<head>
+<title>SAT solver in TinyTalk</title>
+</head>
+<body>
+
+	",
+
+	"footer",
+"
+</body>
+</html>
+	",
+
+	"form",
+"
+<form method=\"GET\" action=\"/sat_solve\">
+<p>
+	Enter the SAT format of the problem:
+</p>
+<p>
+	<input type=\"text\" name=\"problem\">
+	<input name=\"sender\" value=\"Solve\" type=\"submit\">
+</p>
+</form>
+",
+
+	"createResponseForRequest:", [ :createResponseForRequest: |
+		| response doc |;
+		response = HttpResponse new;
+		doc = header append: form;
+		doc = doc append: footer;
+		response setOutput: doc;
+		response
+	]
+};
+
+SatFromHandler
+

@@ -1,0 +1,12 @@
+| SatFormHandler Sat |;
+
+Sat = Object createWith:
+{
+	"createForServer:", [ :createForServer: |
+		SatFormHandler = Exec execFileName: "ttsrc/sat_form.tt";
+		createForServer registerHandler: (SatFormHandler createForPath: "/")
+	]
+};
+
+Sat
+
