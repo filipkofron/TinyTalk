@@ -1,0 +1,11 @@
+| SatSolver |;
+
+SatSolver = Object createWith:
+{
+	"solveMap:lines:vars:", [ :solveMap: :lines: :vars: |
+		"Satisfiable"
+	]
+};
+
+SatSolver
+
