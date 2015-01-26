@@ -130,7 +130,9 @@ SatFromHandler = HttpHandler createWith:
 				doc = doc append: "\"";
 				doc = doc append: (thiz valueInPrevMap: prevMap line: line var: var);
 				doc = doc append: " value=\"true\">";
-				doc = doc append: (var toString);
+				| c |; c = ("A" charAsIntAt: 0) minus: 1;
+				c = " " setChar: (((var add: c)) charValue) at: 0;
+				doc = doc append: c;
 				doc = doc append: " "
 			];
 		doc append: "<br/>\n"
@@ -226,19 +228,19 @@ SatFromHandler = HttpHandler createWith:
 				varsStr isNil ifTrue: [ varsStr = "5" ];
 				lines = Integer fromString: (linesStr trim);
 				vars = Integer fromString: (varsStr trim);
+				vars = thiz clamp: vars min: 1 max: 20;
+				lines = thiz clamp: lines min: 1 max: 20;
 				(action equals: "solve")
 					ifTrue:
 					[
 						| linesSolve varsSolve |;
-						linesSolve = thiz extractNumber: "linesSolve" fromArgs: args default: 0;
-						varsSolve = thiz extractNumber: "varsSolve" fromArgs: args default: 0;
+						linesSolve = thiz extractNumber: "linessolve" fromArgs: args default: 0;
+						varsSolve = thiz extractNumber: "varssolve" fromArgs: args default: 0;
 						linesSolve = thiz clamp: linesSolve min: 1 max: 20;
 						varsSolve = thiz clamp: varsSolve min: 1 max: 20;
 						solution = SatSolver solveMap: prev lines: linesSolve vars: varsSolve
 					]
 			];
-		vars = this clamp: vars min: 1 max: 20;
-		lines = this clamp: lines min: 1 max: 20;
 		response = HttpResponse new;
 		doc = header append: (this genSizeFormLines: lines vars: vars);
 		doc = doc append: (this genMainFormLines: lines vars: vars prevMap: prev);

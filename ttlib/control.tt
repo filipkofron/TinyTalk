@@ -22,6 +22,8 @@ True createField: "or:" withValue: [ :or: | True ];
 True createField: "and:" withValue: [ :and: | and ];
 False createField: "or:" withValue: [ :or: | or ];
 False createField: "and:" withValue: [ :and: | False ];
+True createField: "xor:" withValue: [ :xor: | xor not ];
+False createField: "xor:" withValue: [ :xor: | xor ];
 
 True createField: "toString" withValue: [ "True" ];
 False createField: "toString" withValue: [ "False" ];
@@ -155,10 +157,21 @@ Object
 For
 	createField: "from:to:do:"
 	withValue: [ :from: :to: :do: |
-		to = to add: 1;
-		While
-			isTrue: [ (from equals: to) not ]
-			do: [ do value: from; from = from add: 1 ]
+		(to greaterThan: from)
+		ifTrue:
+		[
+			to = to add: 1;
+			While
+				isTrue: [ (from equals: to) not ]
+				do: [ do value: from; from = from add: 1 ]
+		]
+		ifFalse:
+		[
+			to = to minus: 1;
+			While
+				isTrue: [ (from equals: to) not ]
+				do: [ do value: from; from = from minus: 1 ]
+		]
 	];
 
 | Env GlobalEnv |;

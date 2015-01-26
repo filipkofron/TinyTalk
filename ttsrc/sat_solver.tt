@@ -2,8 +2,101 @@
 
 SatSolver = Object createWith:
 {
+	"buildLineArrayFromMap:lines:vars:", [ :buildLineArrayFromMap: :lines: :vars: |
+		| linesArr |;
+		linesArr = Array newWithSize: lines;
+		For from: 0 to: (lines minus: 1) do:
+		[ :i: |
+			| varsArray |;
+			varsArray = (Array newWithSize: vars);
+			linesArr at: i set: varsArray;
+
+			| line |;
+			line = buildLineArrayFromMap getKey: ((i add: 1) toString);
+			line isNil ifTrue:
+			[
+				For from: 0 to: (vars minus: 1) do:
+				[ :j: |
+					varsArray at: j set: True
+				]
+			]
+			ifFalse:
+			[
+				For from: 0 to: (vars minus: 1) do:
+				[ :j: |
+					varsArray at: j set: ((line getKey: ((j add: 1) toString)) isNil)
+				]
+			]
+		];
+		linesArr
+	],
+
+	"evalVarArray:guess:", [ :evalVarArray: :guess: |
+		| res g |;
+		res = False;
+		g = 0;
+		evalVarArray do:
+		[ :each: |
+			res = res or: (each xor: (guess at: g));
+			g = g add: 1
+		];
+		res
+	],
+
+	"evalLineArray:guess:", [ :evalLineArray: :guess: |
+		| res thiz |;
+		res = True;
+		thiz = this;
+		evalLineArray do:
+		[ :each: |
+			res = res and: (thiz evalVarArray: each guess: guess)
+		];
+		res
+	],
+
+	"guessLineArray:at:until:guess:", [ :guessLineArray: :at: :until: :guess: |
+		| thiz res |;
+		thiz = this;
+		(at equals: until)
+		ifFalse:
+		[
+			guess at: at set: True;
+			res = thiz guessLineArray: guessLineArray at: (at add: 1) until: until guess: guess;
+			res
+			ifFalse:
+			[
+				guess at: at set: False;
+				thiz guessLineArray: guessLineArray at: (at add: 1) until: until guess: guess
+			]
+			ifTrue:
+			[
+				res
+			]
+		]
+		ifTrue:
+		[
+			thiz evalLineArray: guessLineArray guess: guess
+		]
+	],
+
+	"startGuessingLineArray:vars:", [ :startGuessingLineArray: :vars: |
+		| guess |;
+		guess = Array newWithSize: vars;
+		this guessLineArray: startGuessingLineArray at: 0 until: vars guess: guess
+	],
+
 	"solveMap:lines:vars:", [ :solveMap: :lines: :vars: |
-		"Satisfiable"
+		| linesArr |;
+		linesArr = this buildLineArrayFromMap: solveMap lines: lines vars: vars;
+		(this startGuessingLineArray: linesArr vars: vars)
+		ifTrue:
+		[
+			"Satisfiable"
+		]
+		ifFalse:
+		[
+			"Unsatisfiable"
+		]
 	]
 };
 
