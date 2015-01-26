@@ -7,6 +7,9 @@
     school mail: kofrofil@fit.cvut.cz
     personal mail: filip.kofron.cz@gmail.com
 
+[Current Sources]
+    https://github.com/filipkofron/tinytalk
+
 [Intro]
     This semestral work contains a simple VM capable of interpreting my
     simple language syntax called "TinyTalk". It is mainly based upon

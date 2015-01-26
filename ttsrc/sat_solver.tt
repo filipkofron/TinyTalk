@@ -92,7 +92,7 @@ SatSolver = Object createWith:
 		[
 			| res first |;
 			first = True;
-			res = "Satisfiable, to solution is [";
+			res = "Satisfiable, the solution is [";
 			guess do:
 			[ :each: |
 				first

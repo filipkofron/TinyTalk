@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(TinyTalk C CXX)
 
-list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -g -rdynamic -Wall -march=native -O0 -fbuiltin -pthread")
+list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -fno-strict-aliasing -g -rdynamic -Wall -march=native -O2 -fbuiltin -pthread")
 
 set(SOURCE_FILES    Builtin.h
                     BuiltinFile.h
