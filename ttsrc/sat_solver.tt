@@ -79,19 +79,34 @@ SatSolver = Object createWith:
 		]
 	],
 
-	"startGuessingLineArray:vars:", [ :startGuessingLineArray: :vars: |
-		| guess |;
-		guess = Array newWithSize: vars;
+	"startGuessingLineArray:vars:guess:", [ :startGuessingLineArray: :vars: :guess: |
 		this guessLineArray: startGuessingLineArray at: 0 until: vars guess: guess
 	],
 
 	"solveMap:lines:vars:", [ :solveMap: :lines: :vars: |
-		| linesArr |;
+		| linesArr guess |;
+		guess = Array newWithSize: vars;
 		linesArr = this buildLineArrayFromMap: solveMap lines: lines vars: vars;
-		(this startGuessingLineArray: linesArr vars: vars)
+		(this startGuessingLineArray: linesArr vars: vars guess: guess)
 		ifTrue:
 		[
-			"Satisfiable"
+			| res first |;
+			first = True;
+			res = "Satisfiable, to solution is [";
+			guess do:
+			[ :each: |
+				first
+					ifTrue:
+					[
+						first = False
+					]
+					ifFalse:
+					[
+						res = res append: ", "
+					];
+				res = res append: (each not toString)
+			];
+			res append: "]"
 		]
 		ifFalse:
 		[
