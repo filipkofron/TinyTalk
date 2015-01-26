@@ -1,3 +1,0 @@
-|lol|;
-lol = "test";
-Out writeLine: lol;

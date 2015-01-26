@@ -189,11 +189,7 @@ RefPtr<TTObject> BuiltinIntegerFromString::invoke(RefPtr<TTObject> dest, std::ve
     BUILTIN_CHECK_STRING(0);
 
     int32_t a = 0;
-    if(sscanf((const char *) values[0]->getLiteral()->data, "%d", &a) != 1)
-    {
-        std::cerr << "[Builtin]: FromString builtin function parse error." << std::endl;
-        KILL;
-    }
+    sscanf((const char *) values[0]->getLiteral()->data, "%d", &a);
 
     RefPtr<TTObject> res = TTLiteral::createIntegerLiteral(a);
 

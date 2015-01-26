@@ -3,12 +3,25 @@
 SatFromHandler = HttpHandler createWith:
 {
 	"header",
-"<!DOCTYPE html>
-<html>
-<head>
-<title>SAT solver in TinyTalk</title>
-</head>
-<body>
+"
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>SAT solver in TinyTalk</title>
+			<style>
+			body {
+				background-color: #0A0A0A;
+				color: #20FF00;
+				font-family: \"Monospace\";
+				font-size: 0.6875em;
+			}
+			textarea,button,input {
+				background-color: #2A2A2A;
+				color: #FFFF00;
+			}
+			</style>
+		</head>
+	<body>
 
 	",
 
@@ -18,23 +31,223 @@ SatFromHandler = HttpHandler createWith:
 </html>
 	",
 
-	"form",
-"
-<form method=\"GET\" action=\"/sat_solve\">
+	"sizeFormBegin",
+	"
+	<form method=\"GET\">
+	<p>
+	",
+
+	"sizeFormEnd",
+	"
+		<button name=\"action\" value=\"resize\" type=\"submit\">Resize</button>
+	</p>
+
+	",
+
+	"formBegin",
+	"
+<br/>
 <p>
 	Enter the SAT format of the problem:
 </p>
 <p>
-	<input type=\"text\" name=\"problem\">
-	<input name=\"sender\" value=\"Solve\" type=\"submit\">
+	",
+
+	"formEnd",
+	"
+<p>
+<button name=\"action\" value=\"solve\" type=\"submit\">Solve</button>
+</p>
 </p>
 </form>
-",
+	",
+
+	"clamp:min:max:", [ :clamp: :min: :max: |
+		(clamp lessThan: min)
+			ifTrue:
+			[
+				clamp = min;
+				clamp
+			]
+			ifFalse:
+			[
+				(clamp greaterThan: max)
+				ifTrue:
+				[
+					clamp = max;
+					clamp
+				]
+				ifFalse:
+				[
+					clamp
+				]
+			]
+	],
+
+	"genSizeFormLines:vars:", [ :genSizeFormLines: :vars: |
+		| doc |;
+		doc = sizeFormBegin;
+		doc =  doc append: "<label>Lines: <input name=\"lines\" type=\"number\" min=\"1\" max=\"20\" value=\"";
+		doc = doc append: (genSizeFormLines toString);
+		doc = doc append: "\"></label><label>Variables: <input name=\"vars\" type=\"number\" min=\"1\" max=\"20\" value=\"";
+		doc = doc append: (vars toString);
+		doc = doc append: "\"></label>";
+		doc append: sizeFormEnd
+	],
+
+	"valueInPrevMap:line:var:", [ :valueInPrevMap: :line: :var: |
+		|prev|;
+		prev = (valueInPrevMap getKey: (line toString));
+		prev isNil
+			ifTrue:
+			[
+				""
+			]
+			ifFalse:
+			[
+				(prev getKey: (var toString)) isNil
+				ifTrue:
+				[
+					""
+				]
+				ifFalse:
+				[
+					"checked"
+				]
+			]
+	],
+
+	"genMainFormVars:line:prevMap:", [ :genMainFormVars: :line: :prevMap: |
+		| doc thiz |;
+		thiz = this;
+		doc = "";
+		For from: 1 to: genMainFormVars do:
+			[ :var: |
+				doc = doc append: "<input type=\"checkbox\" name=\"";
+				doc = doc append: (line toString);
+				doc = doc append: "_";
+				doc = doc append: (var toString);
+				doc = doc append: "\"";
+				doc = doc append: (thiz valueInPrevMap: prevMap line: line var: var);
+				doc = doc append: " value=\"true\">";
+				doc = doc append: (var toString);
+				doc = doc append: " "
+			];
+		doc append: "<br/>\n"
+	],
+
+	"genHiddenLines:vars:", [ :genHiddenLines: :vars: |
+		| doc |;
+		doc = "<input type=\"hidden\" name=\"linesSolve\" value=\"";
+		doc = doc append: (genHiddenLines toString);
+		doc = doc append: "\">";
+		doc = doc append: "<input type=\"hidden\" name=\"varsSolve\" value=\"";
+		doc = doc append: (vars toString);
+		doc append: "\">"
+	],
+
+	"genMainFormLines:vars:prevMap:", [ :genMainFormLines: :vars: :prevMap: |
+		| doc thiz |;
+		thiz = this;
+		doc = formBegin append: (thiz genHiddenLines: genMainFormLines vars: vars);
+		For from: 1 to: genMainFormLines do:
+		[ :line: |
+			doc = doc append: "line ";
+			(line lessThan: 10)
+				ifTrue:
+				[
+					doc = doc append: "&nbsp;"
+				];
+			doc = doc append: (line toString);
+			doc = doc append: ": ";
+			doc = doc append: (thiz genMainFormVars: vars line: line prevMap: prevMap)
+		];
+		doc append: formEnd
+	],
+
+	"addLineMaps:name:", [ :addLineMaps: :name: |
+		| parts |;
+		parts = name splitBy: "_";
+		(parts size equals: 2)
+			ifTrue:
+			[
+				| map |;
+				map = addLineMaps getKey: (parts at: 0);
+				map isNil ifTrue:
+				[
+					map = Map new;
+					addLineMaps addKey: (parts at: 0) value: map		
+				];
+				map addKey: (parts at: 1) value: True
+			]
+	],
+
+	"loadPrevRequest:", [ :loadPrevRequest: |
+		| lineMaps thiz |;
+		thiz = this;
+		lineMaps = Map new;
+		loadPrevRequest getGetArgs eachNameDo:
+		[ :name: |
+			 thiz addLineMaps: lineMaps name: name
+		];
+		lineMaps
+	],
+
+	"extractNumber:fromArgs:default:", [ :extractNumber: :fromArgs: :default: |
+		| number |;
+		number = fromArgs getKey: extractNumber;
+		number isNil ifTrue:
+		[
+			default
+		]
+		ifFalse:
+		[
+			Integer fromString: number
+		]
+	],
 
 	"createResponseForRequest:", [ :createResponseForRequest: |
-		| response doc |;
+		| response doc args lines vars solution thiz |;
+		thiz = this;
+		lines = 3;
+		vars = 5;
+		args = createResponseForRequest getGetArgs;
+		| action |;
+		action = (args getKey: "action");
+		| prev |;
+		prev = this loadPrevRequest: createResponseForRequest;
+		action isNil not
+			ifTrue:
+			[
+				| linesStr varsStr |;
+				linesStr = (args getKey: "lines");
+				varsStr = (args getKey: "vars");
+				linesStr isNil ifTrue: [ linesStr = "3" ];
+				varsStr isNil ifTrue: [ varsStr = "5" ];
+				lines = Integer fromString: (linesStr trim);
+				vars = Integer fromString: (varsStr trim);
+				(action equals: "solve")
+					ifTrue:
+					[
+						| linesSolve varsSolve |;
+						linesSolve = thiz extractNumber: "linesSolve" fromArgs: args default: 0;
+						varsSolve = thiz extractNumber: "varsSolve" fromArgs: args default: 0;
+						linesSolve = thiz clamp: linesSolve min: 1 max: 20;
+						varsSolve = thiz clamp: varsSolve min: 1 max: 20;
+						solution = SatSolver solveMap: prev lines: linesSolve vars: varsSolve
+					]
+			];
+		vars = this clamp: vars min: 1 max: 20;
+		lines = this clamp: lines min: 1 max: 20;
 		response = HttpResponse new;
-		doc = header append: form;
+		doc = header append: (this genSizeFormLines: lines vars: vars);
+		doc = doc append: (this genMainFormLines: lines vars: vars prevMap: prev);
+		solution isNil ifFalse:
+		[
+			doc = doc append: "\n<br/>\nSolution: ";
+			doc = doc append: solution;
+			doc = doc append: "\n<br/>\n"
+		];
 		doc = doc append: footer;
 		response setOutput: doc;
 		response

@@ -28,9 +28,10 @@ False createField: "toString" withValue: [ "False" ];
 
 // While
 
-| While Loop |;
-While = (Object new);
-Loop = (Object new);
+| While Loop For |;
+While = Object new;
+Loop = Object new;
+For = Object new;
 
 While createField: "toString" withValue: ["While"];
 
@@ -150,6 +151,15 @@ Object
                     ];
             object
         ];
+
+For
+	createField: "from:to:do:"
+	withValue: [ :from: :to: :do: |
+		to = to add: 1;
+		While
+			isTrue: [ (from equals: to) not ]
+			do: [ do value: from; from = from add: 1 ]
+	];
 
 | Env GlobalEnv |;
 GlobalEnv = env;

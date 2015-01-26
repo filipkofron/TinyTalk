@@ -1,4 +1,8 @@
-| SatFormHandler Sat |;
+| SatFormHandler Sat SatSolver |;
+
+SatSolver = Exec execFileName: "ttsrc/sat_solver.tt";
+
+Env installGlobalVarName: "SatSolver" withValue: SatSolver;
 
 Sat = Object createWith:
 {
