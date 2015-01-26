@@ -1,0 +1,16 @@
+Out writeLine: "For i from 0 to 9, write i:";
+For from: 0 to: 9 do:
+[ :i: |
+    Out writeLine: ("i = " append: (i toString))
+];
+Out writeLine: "";
+
+
+Out writeLine: "Loop 3 times writing hello";
+Loop repeat:
+[
+    Out writeLine: "hello"
+]
+times: 3;
+Out writeLine: "== This is all folks! ==";
+nil
