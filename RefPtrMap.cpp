@@ -32,7 +32,7 @@ void RefPtrMap::reg_threadunsafe(RefPtrBase *refPtr)
         if(index == stop)
         {
             std::cerr << "RefPTRMAP Out of slots!" << std::endl;
-            exit(1);
+            KILL;
         }
     }
 
@@ -55,7 +55,7 @@ void RefPtrMap::reg(RefPtrBase *refPtr)
         if(index == stop)
         {
             std::cerr << "RefPTRMAP Out of slots!" << std::endl;
-            exit(1);
+            KILL;
         }
     }
 
@@ -79,7 +79,7 @@ void RefPtrMap::unreg(RefPtrBase *refPtr)
         if(index == stop)
         {
             std::cerr << "RefPTRMAP slot not found!" << std::endl;
-            exit(1);
+            KILL;
         }
     }
     vals[index] = NULL;
@@ -95,7 +95,7 @@ void RefPtrMap::unreg(RefPtrBase *refPtr)
         if(index == stop)
         {
             std::cerr << "RefPTRMAP slot is FULL!" << std::endl;
-            exit(1);
+            KILL;
         }
     }
 #else

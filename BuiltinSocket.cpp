@@ -192,5 +192,6 @@ RefPtr<TTObject> BuiltinSocketCloseTCPClientSocketFile::invoke(RefPtr<TTObject> 
     checkIfExistsAndCloseFile(values[0]);
     checkServerSocketOpened(values[0]);
     closeServerSocketIfOpened(values[0]);
+
     return dest;
 }

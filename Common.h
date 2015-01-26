@@ -51,5 +51,7 @@ int64_t currentTimeMilis();
 do { \
     std::cerr << "** THIS IS FORCED KILL **" << std::endl;\
     print_backtrace();\
+    std::cout.flush();\
+    std::cerr.flush();\
     exit(1); \
 } while(false)

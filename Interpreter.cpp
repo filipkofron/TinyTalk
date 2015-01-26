@@ -237,8 +237,6 @@ void Interpreter::interpretFile(std::istream &is, bool silent)
             std::cout << std::endl;
 #endif
 
-            std::set_terminate(std::abort);
-
             if (&expression != NULL)
             {
                 //RefPtr<TTObject> result = evaluator.evaluate(expression, Runtime::globalEnvironment);

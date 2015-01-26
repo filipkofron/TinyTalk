@@ -16,7 +16,7 @@ MemAllocator::MemAllocator(size_t poolCapacity)
     if(!pool)
     {
         std::cerr << "MemAlloc: Fatal error: Out of host memory." << std::endl;
-        exit(1);
+        KILL;
     }
     memset(pool, 0, poolCapacity);
 #ifdef DEBUG

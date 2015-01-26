@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <csignal>
 
 #include "Common.h"
 #include "Reader.h"
@@ -17,6 +18,7 @@ int main()
     std::cout << ">> Written by Filip Kofron" << std::endl;
     MemAllocator::initializeDefaultAllocator(Runtime::allocSize);
 
+    signal(SIGPIPE, SIG_IGN);
 
     std::cout << std::endl;
     std::cout << std::endl;
