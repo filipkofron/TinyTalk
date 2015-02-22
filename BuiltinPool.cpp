@@ -35,7 +35,7 @@ BuiltinPool::BuiltinPool()
     registerBultin("integer_greaterThan:", std::shared_ptr<Builtin> (new BuiltinIntegerGreaterThan));
     registerBultin("integer_equals:", std::shared_ptr<Builtin> (new BuiltinIntegerEquals));
     registerBultin("integer_lessThanOrEqual:", std::shared_ptr<Builtin> (new BuiltinIntegerLessThanOrEqual));
-    registerBultin("integer_greaterThanOrEqual", std::shared_ptr<Builtin> (new BuiltinIntegerGreaterThanOrEqual));
+    registerBultin("integer_greaterThanOrEqual:", std::shared_ptr<Builtin> (new BuiltinIntegerGreaterThanOrEqual));
     registerBultin("integer_fromString:", std::shared_ptr<Builtin> (new BuiltinIntegerFromString));
     registerBultin("integer_charValue", std::shared_ptr<Builtin> (new BuiltinIntegerCharValue));
 
