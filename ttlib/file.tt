@@ -65,6 +65,24 @@ File = Object createWith:
 		fileThiz
 	],
 
+	"eachLineDo:untilLine:", [ :eachLineDo: :untilLine: |
+		| fileThiz prevLineWas |;
+		fileThiz = this;
+		prevLineWas = False;
+		While
+			isTrue: [(fileThiz isEOF not) and: (prevLineWas not)]
+			do: [
+				| read |; read = fileThiz readLine;
+				prevLineWas = (read trim) equals: untilLine;
+				prevLineWas
+					ifFalse:
+					[
+						eachLineDo value: read
+					]
+			];
+		fileThiz
+	],
+
 	"write:", [ :write: |
 		FileIO write: write file: this
 	],

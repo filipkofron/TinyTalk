@@ -14,7 +14,7 @@ CommandLine = Object createWith:
 	        do: [
                 |res|;
                 Out writeString: "> ";
-                res = Exec execFileInGlobalEnv: In;
+                res = Exec execFileInGlobalEnvInteractive: In;
                 In clearErr;
                 Out writeLine: (res toString)
             ]

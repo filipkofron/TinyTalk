@@ -58,6 +58,11 @@ Map = Object createWith:
         this
     ],
 
+	"setKey:value:", [ :addKey: :value: |
+        Object inObject: values setField: (mapPrefix append: (setKey toString)) withValue: value;
+        this
+    ],
+
     "getKey:", [ :getKey: |
         Object object: values get: (mapPrefix append: (getKey toString))
     ]

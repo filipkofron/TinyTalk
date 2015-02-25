@@ -35,6 +35,15 @@ Exec = Object createWith:
         | contents |;
         contents = "";
         execFileInGlobalEnv eachLineDo: [ :each: | contents = contents append: each ];
+        execFileInGlobalEnv clearErr;
+        this execStringInGlobalEnv: contents
+    ],
+
+    "execFileInGlobalEnvInteractive:", [ :execFileInGlobalEnvInteractive: |
+        | contents |;
+        contents = "";
+        execFileInGlobalEnvInteractive eachLineDo: [ :each: | contents = contents append: each ] untilLine: ";;";
+        execFileInGlobalEnvInteractive clearErr;
         this execStringInGlobalEnv: contents
     ],
 
